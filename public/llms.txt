@@ -1,0 +1,19 @@
+# Integrated Technics
+
+> Enterprise security, ICT, AV and data center integration delivered end-to-end by certified engineers across the region.
+
+## Pages
+
+- [Home](/): Overview of Integrated Technics services and capabilities.
+- [Services](/services): Security, ICT, AV and data center service offerings.
+- [Industries](/industries): Sectors we serve.
+- [Projects](/projects): Case studies and delivered projects.
+- [Partners](/partners): Authorized technology partners and ecosystem.
+- [About](/about): Company background and team.
+- [Careers](/careers): Open roles and how to apply.
+- [News](/news): Company news and updates.
+- [Contact](/contact): Contact information and request a proposal.
+
+## Optional
+
+- [Sign in](/signin): Customer and admin sign-in.

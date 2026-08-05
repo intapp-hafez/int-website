@@ -1,0 +1,16 @@
+{
+  "createdAt": "2026-06-20T08:42:58.008Z",
+  "source": "plans",
+  "files": [
+    {
+      "path": "plan.md",
+      "size": 2927,
+      "sha256": "c31e06a4671a38753c8a9ad8653f677de35a50ef88ed23db981c48f57eec6c68"
+    },
+    {
+      "path": "project.json",
+      "size": 71,
+      "sha256": "8a6a35b06e9854fc9cf139c9ff046d29f4905a8bcef0bd4ed359a5ef276f87dd"
+    }
+  ]
+}
