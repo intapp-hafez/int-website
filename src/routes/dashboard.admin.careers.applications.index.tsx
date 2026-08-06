@@ -12,6 +12,8 @@ import * as XLSX from "xlsx";
 import { STATUS_LABEL, STATUS_COLOR, STATUS_ALL, STATUS_PIPELINE, type CareerStatus } from "@/lib/career-workflow";
 import { useAdminT } from "@/lib/admin-i18n";
 import { Label } from "@/components/ui/label";
+import { useCanAccess } from "@/lib/permissions-store";
+import { AccessDenied } from "@/routes/dashboard.admin.careers";
 
 export const Route = createFileRoute("/dashboard/admin/careers/applications/")({
   validateSearch: (search: Record<string, unknown>): { job?: string } => ({
@@ -32,6 +34,7 @@ type App = {
 
 function ApplicationsList() {
   const { t, lang } = useAdminT();
+  const can = useCanAccess("careers_applications");
   const search = useSearch({ from: "/dashboard/admin/careers/applications/" }) as any;
   const [apps, setApps] = useState<App[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,13 +48,14 @@ function ApplicationsList() {
 
   useEffect(() => {
     (async () => {
+      if (!can.view) { setLoading(false); return; }
       try {
         const data = await listApplications();
         setApps((data as any) ?? []);
       } catch { setApps([]); }
       finally { setLoading(false); }
     })();
-  }, []);
+  }, [can.view]);
 
   const jobs = useMemo(() => {
     const map = new Map<string, string>();
@@ -139,6 +143,8 @@ function ApplicationsList() {
     return c;
   }, [apps]);
 
+  if (!can.view) return <AccessDenied what={lang === "ar" ? "طلبات التوظيف" : "career applicants"} />;
+
   if (loading) return <div className="text-center py-12 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div>;
 
   const statusLabel = (s: CareerStatus) => lang === "ar" ? STATUS_LABEL[s].ar : STATUS_LABEL[s].en;
@@ -206,6 +212,7 @@ function ApplicationsList() {
               key={a.id}
               a={a}
               lang={lang}
+              canEdit={can.edit}
               onShortlist={async () => {
                 try {
                   await updateApplicationStatus({ data: { id: a.id, from: a.status, to: "shortlisted" } });
@@ -255,7 +262,7 @@ function AppCard({ a }: { a: App }) {
   );
 }
 
-function AppRow({ a, lang, onShortlist }: { a: App; lang: string; onShortlist: () => void }) {
+function AppRow({ a, lang, canEdit, onShortlist }: { a: App; lang: string; canEdit: boolean; onShortlist: () => void }) {
   const loc = [a.city, a.country].filter(Boolean).join(", ");
   return (
     <Link to="/dashboard/admin/careers/applications/$id" params={{ id: a.id }} className="flex flex-wrap items-center gap-3 rounded-md border bg-card p-3 hover:border-accent transition-colors">
@@ -270,7 +277,7 @@ function AppRow({ a, lang, onShortlist }: { a: App; lang: string; onShortlist: (
       </div>
       <div className="text-xs text-muted-foreground">{a.career_jobs?.title_en || "—"}</div>
       <span className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_COLOR[a.status]}`}>{lang === "ar" ? STATUS_LABEL[a.status].ar : STATUS_LABEL[a.status].en}</span>
-      {a.status !== "shortlisted" && !["accepted", "rejected", "withdrawn"].includes(a.status) && (
+      {canEdit && a.status !== "shortlisted" && !["accepted", "rejected", "withdrawn"].includes(a.status) && (
         <Button
           variant="outline"
           size="sm"
