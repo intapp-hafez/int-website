@@ -352,7 +352,11 @@ function AppDetail() {
           <Card>
             <CardContent className="p-4 space-y-3 sticky top-28">
               <h3 className="font-semibold text-sm">{t("moveToStage")}</h3>
-              {allowed.length === 0 ? (
+              {!can.edit ? (
+                <p className="text-xs text-muted-foreground">
+                  {isAr ? "ليست لديك صلاحية تغيير الحالة." : "You don't have permission to change statuses."}
+                </p>
+              ) : allowed.length === 0 ? (
                 <p className="text-xs text-muted-foreground">{t("finalState")}</p>
               ) : (
                 <>
