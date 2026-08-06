@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { STATUS_LABEL, STATUS_COLOR, STATUS_PIPELINE, nextStatuses, type CareerStatus } from "@/lib/career-workflow";
 import { useAdminT } from "@/lib/admin-i18n";
+import { useCanAccess } from "@/lib/permissions-store";
+import { AccessDenied } from "@/routes/dashboard.admin.careers";
 import {
   getApplication,
   updateApplicationStatus,
@@ -52,6 +54,7 @@ type Event = { id: string; from_status: CareerStatus | null; to_status: CareerSt
 
 function AppDetail() {
   const { t, lang } = useAdminT();
+  const can = useCanAccess("careers_applications");
   const isAr = lang === "ar";
   const sLabel = (s: CareerStatus) => isAr ? STATUS_LABEL[s].ar : STATUS_LABEL[s].en;
   const { id } = Route.useParams();
@@ -103,15 +106,17 @@ function AppDetail() {
   };
 
   if (loading) return <div className="text-center py-12 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div>;
+  if (!can.view) return <AccessDenied what={isAr ? "طلبات التوظيف" : "career applicants"} />;
   if (!app) return <div className="text-center py-12 text-muted-foreground">Application not found.</div>;
 
-  const allowed = nextStatuses(app.status);
+  const allowed = can.edit ? nextStatuses(app.status) : [];
   const stepIdx = STATUS_PIPELINE.indexOf(app.status);
 
   const eventForStage = (s: CareerStatus): Event | undefined =>
     [...events].reverse().find(ev => ev.to_status === s);
 
   const openEditFor = (s: CareerStatus) => {
+    if (!can.edit) return;
     const ev = eventForStage(s);
     if (!ev) return;
     setEditEvent(ev);
@@ -178,7 +183,7 @@ function AppDetail() {
                   <div className="min-w-0">
                     <div className="text-[10px] sm:text-xs truncate inline-flex items-center gap-1">
                       {sLabel(s)}
-                      {ev && (
+                      {ev && can.edit && (
                         <button onClick={() => openEditFor(s)} title="Edit stage note & date" className="text-muted-foreground hover:text-accent">
                           <Pencil className="h-3 w-3" />
                         </button>
@@ -316,8 +321,8 @@ function AppDetail() {
           <Card>
             <CardContent className="p-4 space-y-3">
               <h3 className="font-semibold text-sm">{t("internalNotes")}</h3>
-              <Textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} placeholder={t("internalNotes")} />
-              <div className="flex justify-end"><Button size="sm" onClick={saveNotes}>{t("save")}</Button></div>
+              <Textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} placeholder={t("internalNotes")} disabled={!can.edit} />
+              {can.edit && <div className="flex justify-end"><Button size="sm" onClick={saveNotes}>{t("save")}</Button></div>}
             </CardContent>
           </Card>
 
@@ -347,7 +352,11 @@ function AppDetail() {
           <Card>
             <CardContent className="p-4 space-y-3 sticky top-28">
               <h3 className="font-semibold text-sm">{t("moveToStage")}</h3>
-              {allowed.length === 0 ? (
+              {!can.edit ? (
+                <p className="text-xs text-muted-foreground">
+                  {isAr ? "ليست لديك صلاحية تغيير الحالة." : "You don't have permission to change statuses."}
+                </p>
+              ) : allowed.length === 0 ? (
                 <p className="text-xs text-muted-foreground">{t("finalState")}</p>
               ) : (
                 <>

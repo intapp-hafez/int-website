@@ -14,7 +14,7 @@ import { useI18n } from "@/lib/i18n";
 import { mockJobs } from "@/data/careers-mock";
 import { toast } from "sonner";
 import { z } from "zod";
-import { sendApplicationConfirmation } from "@/lib/career-track.functions";
+import { sendApplicationConfirmation, sendApplicationSms } from "@/lib/career-track.functions";
 
 export const Route = createFileRoute("/careers")({
   head: () => ({ meta: [
@@ -279,6 +279,9 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
       try {
         await sendApplicationConfirmation({ data: { ref: data.ref, origin: window.location.origin } });
       } catch { /* confirmation email is best-effort */ }
+      try {
+        await sendApplicationSms({ data: { ref: data.ref, origin: window.location.origin } });
+      } catch { /* SMS / WhatsApp receipt is best-effort */ }
     }
   };
 
@@ -293,7 +296,7 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
             <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto" />
             <p className="text-sm">{ar ? "شكراً لك. سيقوم فريقنا بمراجعة طلبك والتواصل معك قريباً." : "Thanks. Our team will review your application and reach out shortly."}</p>
             <p className="text-xs text-muted-foreground">{ar ? "رقم المرجع:" : "Reference:"} <span className="font-mono">{done}</span></p>
-            <p className="text-xs text-muted-foreground">{ar ? "أرسلنا تأكيداً بالبريد الإلكتروني يحتوي على رقم المرجع." : "We emailed you a confirmation with this reference number."}</p>
+            <p className="text-xs text-muted-foreground">{ar ? "أرسلنا تأكيداً بالبريد الإلكتروني ورسالة نصية / واتساب تحتوي على رقم المرجع ورابط التتبع." : "We sent a confirmation by email and an SMS / WhatsApp message with this reference number and tracking link."}</p>
             {!done.startsWith("DEMO-") && (
               <Button asChild variant="outline" className="w-full">
                 <Link to="/track-application" search={{ ref: done, email: form.email }}>

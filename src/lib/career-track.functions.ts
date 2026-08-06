@@ -91,3 +91,35 @@ export const sendApplicationConfirmation = createServerFn({ method: "POST" })
     });
     return deliverEmail((app as any).email, mail.subject, mail.html, mail.text);
   });
+
+/** Sends the SMS / WhatsApp receipt (reference number + tracking link). */
+export const sendApplicationSms = createServerFn({ method: "POST" })
+  .inputValidator((input: { ref: string; origin: string }) => {
+    const ref = String(input?.ref ?? "").trim().toUpperCase();
+    if (!REF_RE.test(ref)) throw new Error("Invalid reference number");
+    return { ref, origin: String(input?.origin ?? "").slice(0, 200) };
+  })
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { renderApplicationSms, deliverSms } = await import("@/lib/career-sms.server");
+    const { data: app } = await supabaseAdmin
+      .from("career_applications")
+      .select("ref,status,full_name,phone,career_jobs(title_en,title_ar)")
+      .ilike("ref", data.ref)
+      .maybeSingle();
+    if (!app) return { sent: false, channel: null, reason: "not_found" as const };
+    const phone = (app as any).phone as string;
+    if (!phone) return { sent: false, channel: null, reason: "no_phone" as const };
+    const job = (app as any).career_jobs ?? {};
+    const trackUrl = `${data.origin.replace(/\/$/, "")}/track-application?ref=${encodeURIComponent((app as any).ref)}`;
+    const body = renderApplicationSms({
+      ref: (app as any).ref,
+      fullName: (app as any).full_name,
+      phone,
+      jobTitleEn: job.title_en ?? "",
+      jobTitleAr: job.title_ar ?? "",
+      status: (app as any).status,
+      trackUrl,
+    });
+    return deliverSms(phone, body);
+  });
