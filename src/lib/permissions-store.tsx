@@ -31,6 +31,8 @@ export const ADMIN_PAGES: AdminPage[] = [
   { key: "seo", en: "SEO", ar: "تحسين محركات البحث" },
   { key: "smtp", en: "SMTP", ar: "إعدادات البريد" },
   { key: "careers", en: "Careers", ar: "الوظائف" },
+  { key: "careers_applications", en: "Career Applicants", ar: "طلبات التوظيف" },
+  { key: "careers_analytics", en: "Careers Analytics", ar: "تحليلات التوظيف" },
   { key: "products", en: "Products", ar: "المنتجات" },
   { key: "news", en: "News", ar: "الأخبار" },
   { key: "security", en: "Security Center", ar: "مركز الأمان" },
