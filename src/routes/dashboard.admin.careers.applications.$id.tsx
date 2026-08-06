@@ -321,8 +321,8 @@ function AppDetail() {
           <Card>
             <CardContent className="p-4 space-y-3">
               <h3 className="font-semibold text-sm">{t("internalNotes")}</h3>
-              <Textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} placeholder={t("internalNotes")} />
-              <div className="flex justify-end"><Button size="sm" onClick={saveNotes}>{t("save")}</Button></div>
+              <Textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} placeholder={t("internalNotes")} disabled={!can.edit} />
+              {can.edit && <div className="flex justify-end"><Button size="sm" onClick={saveNotes}>{t("save")}</Button></div>}
             </CardContent>
           </Card>
 
