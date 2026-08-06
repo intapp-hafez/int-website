@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Briefcase, Layers, Phone, Info } from "lucide-react";
+import { Home, Briefcase, Newspaper, Phone, Info } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useSettings } from "@/lib/settings-store";
 
@@ -13,7 +13,7 @@ export function MobileBottomNav() {
   const tabs = [
     { to: "/", label: t("nav.home"), icon: Home, exact: true },
     { to: "/services", label: t("nav.services"), icon: Briefcase, page: "services" as const },
-    { to: "/industries", label: t("nav.industries"), icon: Layers, page: "industries" as const },
+    { to: "/news", label: t("nav.news"), icon: Newspaper, page: "news" as const },
     { to: "/about", label: t("nav.about"), icon: Info, page: "about" as const },
     { to: "/contact", label: t("nav.contact"), icon: Phone, page: "contact" as const },
   ].filter((tab: any) => !tab.page || vis[tab.page as keyof typeof vis] !== false);

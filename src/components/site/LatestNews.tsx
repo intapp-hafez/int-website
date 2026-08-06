@@ -9,6 +9,7 @@ export function LatestNews() {
   const { posts } = useNews();
   const active = posts.filter((p) => p.active);
   if (active.length === 0) return null;
+
   const featured = active.find((p) => p.featured) ?? active[0];
   const rest = active.filter((p) => p.id !== featured.id).slice(0, 3);
   const locale = lang === "ar" ? "ar" : "en-US";
@@ -22,9 +23,9 @@ export function LatestNews() {
         <Link
           to="/news/$slug"
           params={{ slug: featured.slug }}
-          className={`group relative overflow-hidden rounded-3xl border bg-card glow-on-hover ${isRtl ? "lg:order-2" : "lg:order-1"}`}
+          className={`group relative overflow-hidden rounded-3xl border bg-card glow-on-hover h-full flex flex-col ${isRtl ? "lg:order-2" : "lg:order-1"}`}
         >
-          <div className="aspect-[4/3] lg:aspect-[5/6] overflow-hidden bg-muted">
+          <div className="relative aspect-[4/3] lg:absolute lg:inset-0 lg:aspect-auto overflow-hidden bg-muted">
             {featured.image_url ? (
               <img
                 src={featured.image_url}

@@ -225,7 +225,7 @@ function AboutAdminPage() {
           <ShieldAlert className="h-5 w-5 text-destructive mt-0.5 shrink-0" />
           <div>
             <p className="font-medium text-destructive">Admin role required</p>
-            <p className="text-muted-foreground text-xs mt-1">You can browse the editor, but saving and uploading are disabled. Sign in with an admin account that has the admin role assigned in Lovable Cloud.</p>
+            <p className="text-muted-foreground text-xs mt-1">You can browse the editor, but saving and uploading are disabled. Sign in with an admin account that has the admin role assigned in your database.</p>
           </div>
         </div>
       )}

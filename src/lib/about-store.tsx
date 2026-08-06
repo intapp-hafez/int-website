@@ -94,7 +94,7 @@ export const defaultAboutContent: AboutContent = {
   certifications: ["ISO 9001", "ISO 27001", "ISO 14001", "OHSAS 45001", "Cisco Gold", "Fortinet Expert", "Dell Titanium", "PMP-led"],
   ownerEyebrow: { en: "Leadership", ar: "القيادة" },
   ownerTitle: { en: "Message from Our Founder", ar: "رسالة من مؤسسنا" },
-  ownerName: { en: "Karim El-Hassan", ar: "كريم الحسن" },
+  ownerName: { en: "Eng: Waleed Al Agamy", ar: "م. وليد العجمي" },
   ownerRole: { en: "Founder & CEO", ar: "المؤسس والرئيس التنفيذي" },
   ownerBio: {
     en: "For over two decades, I have believed that technology should serve people, not the other way around. Integrated Technics was built to bring world-class engineering, uncompromising ethics, and a client-first mindset to every project we touch.",
@@ -103,7 +103,7 @@ export const defaultAboutContent: AboutContent = {
   teamTitle: { en: "Meet the Team", ar: "تعرف على الفريق" },
   teamSub: { en: "Certified engineers, project leaders and advisors who turn complexity into reliable outcomes.", ar: "مهندسون معتمدون وقادة مشاريع ومستشارون يحولون التعقيد إلى نتائج موثوقة." },
   team: [
-    { key: "ceo", name: { en: "Karim El-Hassan", ar: "كريم الحسن" }, role: { en: "Founder & CEO", ar: "المؤسس والرئيس التنفيذي" } },
+    { key: "ceo", name: { en: "Eng: Waleed Al Agamy", ar: "م. وليد العجمي" }, role: { en: "Founder & CEO", ar: "المؤسس والرئيس التنفيذي" } },
     { key: "cto", name: { en: "Layla Mahmoud", ar: "ليلى محمود" }, role: { en: "Chief Technology Officer", ar: "مديرة التقنية" } },
     { key: "operations", name: { en: "Omar Farouk", ar: "عمر فاروق" }, role: { en: "Operations Director", ar: "مدير العمليات" } },
     { key: "projects", name: { en: "Nadia Shami", ar: "نادية شامي" }, role: { en: "Projects Director", ar: "مديرة المشاريع" } },

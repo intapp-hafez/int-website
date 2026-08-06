@@ -38,7 +38,7 @@ export function TopHeader() {
           </a>
           <a href={telHref} className="inline-flex items-center gap-1.5 hover:text-accent transition-colors min-h-[32px]">
             <Phone className="h-3.5 w-3.5 shrink-0" />
-            <span dir="ltr" className="hidden xs:inline">{settings.phone}</span>
+            <span dir="ltr">{settings.phone}</span>
           </a>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-3 ms-auto shrink-0">

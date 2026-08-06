@@ -53,7 +53,20 @@ export function NewsProvider({ children }: { children: ReactNode }) {
       .order("sort_order", { ascending: true })
       .order("published_at", { ascending: false });
     if (error) console.error("[news] load failed", error);
-    else setPosts((data ?? []) as NewsPost[]);
+    
+    let fetched = (data ?? []) as NewsPost[];
+    
+    // Global Mock Data if database is empty
+    if (fetched.length === 0) {
+      fetched = [
+        { id: "1", slug: "mock-1", title_en: "Annual Tech Conference 2026", title_ar: "المؤتمر التقني السنوي 2026", excerpt_en: "Join us for the biggest tech conference in the region.", excerpt_ar: "انضم إلينا في أكبر مؤتمر تقني في المنطقة.", body_en: "<p>Full details about the upcoming conference.</p>", body_ar: "<p>تفاصيل كاملة حول المؤتمر القادم.</p>", category_en: "Events", category_ar: "فعاليات", published_at: new Date().toISOString(), image_url: "https://images.unsplash.com/photo-1540575467063-118a5b11644d?w=800&q=80", featured: true, active: true } as any,
+        { id: "2", slug: "mock-2", title_en: "New AI Security System Launch", title_ar: "إطلاق نظام أمني جديد مدعوم بالذكاء الاصطناعي", excerpt_en: "We are proud to announce our latest AI-powered physical security system.", excerpt_ar: "نفتخر بالإعلان عن أحدث أنظمتنا الأمنية.", body_en: "<p>Discover the power of AI in physical security.</p>", body_ar: "<p>اكتشف قوة الذكاء الاصطناعي في الأمن المادي.</p>", category_en: "News", category_ar: "أخبار", published_at: new Date(Date.now() - 86400000).toISOString(), image_url: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&q=80", featured: false, active: true } as any,
+        { id: "3", slug: "mock-3", title_en: "Partnership with Tech Giants", title_ar: "شراكة استراتيجية مع عمالقة التقنية", excerpt_en: "Integrated Technics has achieved Gold Partner status.", excerpt_ar: "حققت انتجريتد تكنيكس تصنيف الشريك الذهبي.", body_en: "<p>We are now gold partners.</p>", body_ar: "<p>نحن الآن شركاء ذهبيون.</p>", category_en: "Announcements", category_ar: "إعلانات", published_at: new Date(Date.now() - 86400000 * 2).toISOString(), image_url: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80", featured: false, active: true } as any,
+        { id: "4", slug: "mock-4", title_en: "Data Center Expansion", title_ar: "توسعة مركز البيانات", excerpt_en: "Our tier 3 data center has been expanded significantly.", excerpt_ar: "تمت توسعة مركز البيانات الخاص بنا بشكل كبير.", body_en: "<p>Expansion details...</p>", body_ar: "<p>تفاصيل التوسعة...</p>", category_en: "News", category_ar: "أخبار", published_at: new Date(Date.now() - 86400000 * 3).toISOString(), image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&q=80", featured: false, active: true } as any
+      ];
+    }
+    
+    setPosts(fetched);
     setLoading(false);
   };
 

@@ -54,7 +54,7 @@ export function Navbar() {
       <div className="container mx-auto px-3 sm:px-4 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-2">
         <Link to="/" className="flex items-center gap-2 font-display font-bold min-w-0">
           <img src={logo} alt="Integrated Technics" className="h-8 md:h-9 w-auto shrink-0" />
-          <span className="hidden sm:inline text-sm md:text-base truncate">Integrated<span className="text-accent">Technics</span></span>
+          <span className="text-sm md:text-base truncate">Integrated<span className="text-accent">Technics</span></span>
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">

@@ -69,7 +69,7 @@ select cron.schedule(
   '0 3 * * *',
   $cron$
   select net.http_post(
-    url := 'https://project--fd28236a-0353-48b0-a792-27aff7a2361c-dev.lovable.app/api/public/hooks/seo-bot-daily',
+    url := 'https://your-domain.com/api/webhooks/seo-bot-daily',
     headers := '{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impwb25mYmt5cXFhZ214YXhmbWRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzNDY3NDMsImV4cCI6MjA5MzkyMjc0M30.SUnn8fzK_RIOWQ3VVsJG80bG3nv-vpiBmgUL1AOCXzg"}'::jsonb,
     body := '{"trigger":"cron"}'::jsonb
   );

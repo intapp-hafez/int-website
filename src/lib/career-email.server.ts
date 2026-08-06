@@ -44,15 +44,13 @@ function esc(s: string) {
 /** Sends through Resend when configured; otherwise reports why it was skipped. */
 export async function deliverEmail(to: string, subject: string, html: string, text: string) {
   const key = process.env["RESEND_API_KEY"];
-  const lovableKey = process.env["LOVABLE_API_KEY"];
   const from = process.env["CAREERS_FROM_EMAIL"] ?? "Careers <onboarding@resend.dev>";
-  if (!key || !lovableKey) return { sent: false, reason: "email_not_configured" as const };
-  const res = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
+  if (!key) return { sent: false, reason: "email_not_configured" as const };
+  const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": key,
+      Authorization: `Bearer ${key}`,
     },
     body: JSON.stringify({ from, to: [to], subject, html, text }),
   });

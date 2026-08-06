@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+
 import { useEffect } from "react";
 import { Calendar, ArrowLeft } from "lucide-react";
 import { Section } from "@/components/site/Section";
@@ -58,42 +59,50 @@ function NewsDetailsPage() {
   const isHtml = /<[a-z][\s\S]*>/i.test(body || "");
 
   return (
-    <div>
-      <section className="gradient-surface relative">
-        <div className="absolute inset-0 grid-bg opacity-50" />
-        <div className="container mx-auto px-4 lg:px-8 py-16 md:py-20 relative max-w-4xl">
-          <Link to="/news" className="text-sm text-accent inline-flex items-center gap-1.5 mb-6">
-            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />{lang === "ar" ? "كل الأخبار" : "All news"}
-          </Link>
-          {category && (
-            <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{category}</div>
-          )}
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">{title}</h1>
-          <div className="text-sm text-muted-foreground inline-flex items-center gap-1.5">
-            <Calendar className="h-4 w-4" />{new Date(post.published_at).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}
-          </div>
-        </div>
-      </section>
-      {post.image_url && (
-        <div className="container mx-auto px-4 lg:px-8 max-w-5xl -mt-8">
-          <img src={post.image_url} alt={title} className="w-full aspect-[16/9] object-cover rounded-2xl border" />
-        </div>
-      )}
-      <Section>
-        <article className="max-w-3xl mx-auto">
-          {excerpt && <p className="text-lg text-muted-foreground mb-6 leading-relaxed">{excerpt}</p>}
-          {isHtml ? (
-            <div
-              className="prose prose-neutral dark:prose-invert max-w-none text-[16px] leading-[1.9] [&_p]:mb-4 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-3 [&_ul]:list-disc [&_ul]:ps-6 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:ps-6 [&_ol]:mb-4 [&_blockquote]:border-s-4 [&_blockquote]:border-accent [&_blockquote]:ps-4 [&_blockquote]:italic [&_blockquote]:my-6 [&_a]:text-accent [&_a]:underline hover:[&_a]:text-accent/80 [&_hr]:my-8"
-              dangerouslySetInnerHTML={{ __html: body }}
-            />
-          ) : (
-            <div className="prose prose-neutral dark:prose-invert max-w-none whitespace-pre-wrap text-[15px] leading-[1.9]">
-              {body}
+    <div className="container mx-auto px-4 lg:px-8 py-12 md:py-20 max-w-7xl">
+      <Link to="/news" className="text-sm text-accent inline-flex items-center gap-1.5 mb-8 hover:underline">
+        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />{lang === "ar" ? "كل الأخبار" : "All news"}
+      </Link>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+        {/* Left Side: Image */}
+        {post.image_url && (
+          <div className="lg:col-span-5 lg:sticky lg:top-24">
+            <div className="rounded-3xl overflow-hidden border bg-muted/20">
+              <img src={post.image_url} alt={title} className="w-full h-auto aspect-[4/3] object-cover" />
             </div>
+          </div>
+        )}
+
+        {/* Right Side: Contents */}
+        <div className={post.image_url ? "lg:col-span-7" : "lg:col-span-12"}>
+          {category && (
+            <div className="text-sm font-semibold uppercase tracking-widest text-accent mb-4">{category}</div>
           )}
-        </article>
-      </Section>
+          
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">{title}</h1>
+          
+          <div className="text-sm text-muted-foreground inline-flex items-center gap-1.5 mb-10 pb-8 border-b w-full">
+            <Calendar className="h-4 w-4" />
+            {new Date(post.published_at).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}
+          </div>
+
+          <article>
+            {excerpt && <p className="text-xl text-muted-foreground mb-8 leading-relaxed font-medium">{excerpt}</p>}
+            
+            {isHtml ? (
+              <div
+                className="prose prose-neutral dark:prose-invert max-w-none text-[17px] leading-[1.9] [&_p]:mb-6 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-6 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:mt-8 [&_h3]:mb-4 [&_ul]:list-disc [&_ul]:ps-6 [&_ul]:mb-6 [&_ol]:list-decimal [&_ol]:ps-6 [&_ol]:mb-6 [&_blockquote]:border-s-4 [&_blockquote]:border-accent [&_blockquote]:ps-6 [&_blockquote]:italic [&_blockquote]:my-8 [&_blockquote]:text-xl [&_blockquote]:text-muted-foreground [&_a]:text-accent [&_a]:underline hover:[&_a]:text-accent/80 [&_hr]:my-10"
+                dangerouslySetInnerHTML={{ __html: body }}
+              />
+            ) : (
+              <div className="prose prose-neutral dark:prose-invert max-w-none whitespace-pre-wrap text-[17px] leading-[1.9]">
+                {body}
+              </div>
+            )}
+          </article>
+        </div>
+      </div>
     </div>
   );
 }

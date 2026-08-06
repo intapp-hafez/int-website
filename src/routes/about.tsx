@@ -6,13 +6,14 @@ import { useI18n } from "@/lib/i18n";
 import { useAboutContent, withCacheBust, pickBi } from "@/lib/about-store";
 import { useSettings } from "@/lib/settings-store";
 import { trackCta } from "@/lib/cta-tracking";
-import ownerImg from "@/assets/owner.jpg";
+
 import teamKarim from "@/assets/team-karim.jpg";
 import teamLayla from "@/assets/team-layla.jpg";
 import teamOmar from "@/assets/team-omar.jpg";
 import teamNadia from "@/assets/team-nadia.jpg";
 import teamSamir from "@/assets/team-samir.jpg";
 import teamDina from "@/assets/team-dina.jpg";
+import logoImg from "@/assets/logo.png";
 
 
 export const Route = createFileRoute("/about")({
@@ -45,7 +46,7 @@ function AboutPage() {
   ];
 
   const teamImageByKey: Record<string, string> = {
-    ceo: teamKarim, cto: teamLayla, operations: teamOmar,
+    ceo: "https://integratedtechnics.com/wp-content/uploads/2026/05/fghjkm.webp", cto: teamLayla, operations: teamOmar,
     projects: teamNadia, security: teamSamir, ict: teamDina,
   };
 
@@ -108,7 +109,7 @@ function AboutPage() {
           <div className="relative mx-auto w-full max-w-sm lg:max-w-md">
             <div className="absolute inset-6 gradient-hero rounded-full blur-3xl opacity-25" />
             <img
-              src={ownerImg}
+              src="https://integratedtechnics.com/wp-content/uploads/2026/05/fghjkm.webp"
               alt={t("about.ownerName")}
               loading="lazy"
               width={1024}
@@ -166,9 +167,18 @@ function AboutPage() {
       </section>
 
       <Section id="overview" className="scroll-mt-32">
-        <div className="max-w-3xl">
-          <h2 className="text-3xl font-bold mb-4">{L(content.overviewT)}</h2>
-          <p className="text-muted-foreground leading-relaxed">{L(content.overviewD)}</p>
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-3">{lang === "ar" ? "من نحن" : "Who We Are"}</div>
+            <h2 className="text-3xl font-bold mb-4">{L(content.overviewT)}</h2>
+            <p className="text-muted-foreground leading-relaxed text-lg">{L(content.overviewD)}</p>
+          </div>
+          <div className="flex items-center justify-center lg:justify-end">
+            <div className="relative w-64 h-64 md:w-80 md:h-80 bg-white dark:bg-card rounded-3xl border shadow-2xl p-8 flex items-center justify-center">
+              <div className="absolute inset-0 bg-accent/5 rounded-3xl" />
+              <img src={logoImg} alt="Logo" className="w-full h-auto max-h-full object-contain relative z-10" />
+            </div>
+          </div>
         </div>
       </Section>
 
@@ -179,9 +189,13 @@ function AboutPage() {
             <h2 className="text-3xl md:text-4xl font-bold mb-4">{L(content.visionT)}</h2>
             <p className="text-muted-foreground leading-relaxed text-lg">{L(content.visionD)}</p>
           </div>
-          <div className="order-1 lg:order-2 flex items-center justify-center">
-            <div className="h-32 w-32 rounded-3xl gradient-hero text-primary-foreground flex items-center justify-center shadow-glow">
-              <Eye className="h-14 w-14" />
+          <div className="order-1 lg:order-2">
+            <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
+              <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80" alt="Vision" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-6 start-6 h-14 w-14 rounded-2xl bg-accent text-primary-foreground flex items-center justify-center shadow-lg">
+                <Eye className="h-6 w-6" />
+              </div>
             </div>
           </div>
         </div>
@@ -189,12 +203,16 @@ function AboutPage() {
 
       <Section>
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          <div className="flex items-center justify-center">
-            <div className="h-32 w-32 rounded-3xl gradient-hero text-primary-foreground flex items-center justify-center shadow-glow">
-              <Target className="h-14 w-14" />
+          <div className="order-2 lg:order-1">
+            <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
+              <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="Mission" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-6 start-6 h-14 w-14 rounded-2xl bg-accent text-primary-foreground flex items-center justify-center shadow-lg">
+                <Target className="h-6 w-6" />
+              </div>
             </div>
           </div>
-          <div>
+          <div className="order-1 lg:order-2">
             <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-3">{lang === "ar" ? "مهمتنا" : "Our Mission"}</div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">{L(content.missionT)}</h2>
             <p className="text-muted-foreground leading-relaxed text-lg">{L(content.missionD)}</p>
@@ -239,8 +257,15 @@ function AboutPage() {
             </p>
           </div>
           {settings.mapUrl && (
-            <div className="rounded-2xl overflow-hidden border aspect-video">
+            <div className="relative rounded-2xl overflow-hidden border aspect-video group">
               <iframe src={settings.mapUrl} title="Map" className="w-full h-full" loading="lazy" />
+              <div className="absolute bottom-4 right-4 rtl:right-auto rtl:left-4 z-10">
+                <Button asChild size="sm" variant="secondary" className="shadow-lg hover:shadow-xl transition-all">
+                  <a href="https://www.google.com/maps?cid=15241427059088096626" target="_blank" rel="noopener noreferrer">
+                    {lang === "ar" ? "فتح في خرائط جوجل" : "Open in Google Maps"}
+                  </a>
+                </Button>
+              </div>
             </div>
           )}
         </div>

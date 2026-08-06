@@ -1,7 +1,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { generateText, Output } from "ai";
 import { z } from "zod";
-import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { createAiProvider } from "./ai-gateway.server";
 
 type Severity = "info" | "warn" | "fail";
 type Finding = {
@@ -283,12 +283,12 @@ export async function runSeoBot(
 
     // ----- AI keyword & meta suggestions (bilingual) -----
     let suggestionsCount = 0;
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY;
     const aiModel = "google/gemini-3-flash-preview";
 
     if (apiKey && pageList.length) {
       try {
-        const gateway = createLovableAiGatewayProvider(apiKey);
+        const gateway = createAiProvider(apiKey);
         const compactPages = pageList.slice(0, full ? 40 : 20).map((p) => ({
           id: p.id,
           path: p.path,

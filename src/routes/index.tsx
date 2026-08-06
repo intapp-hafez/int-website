@@ -81,11 +81,11 @@ function ServicesCarouselSection() {
           })}
         </CarouselContent>
         <CarouselPrevious
-          className="hidden lg:flex -left-4 xl:-left-12"
+          className="hidden lg:flex left-0 xl:-left-4"
           aria-label={lang === "ar" ? "الخدمة السابقة" : "Previous service"}
         />
         <CarouselNext
-          className="hidden lg:flex -right-4 xl:-right-12"
+          className="hidden lg:flex right-0 xl:-right-4"
           aria-label={lang === "ar" ? "الخدمة التالية" : "Next service"}
         />
       </Carousel>
@@ -95,10 +95,7 @@ function ServicesCarouselSection() {
 }
 
 function PartnersSlider() {
-  const { lang, dir } = useI18n();
-  const isRtl = dir === "rtl";
-  const { autoplayRef, containerRef } = useCarouselAutoplay(2500);
-  const [api, setApi] = useState<CarouselApi>();
+  const { lang } = useI18n();
   const { partners: allPartners, loading } = usePartners();
   const partners = allPartners.filter((p) => p.active);
   if (loading) {
@@ -110,50 +107,93 @@ function PartnersSlider() {
       </div>
     );
   }
+
+  const partnerBgs = [
+    "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
+    "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80",
+    "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80",
+    "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
+    "https://images.unsplash.com/photo-1531297172864-459c7bac36ea?w=800&q=80",
+  ];
+
+  const firstRow = partners.slice(0, Math.ceil(partners.length / 2));
+  const secondRow = partners.slice(Math.ceil(partners.length / 2));
+
+  // Repeat 4 times to ensure it covers wide screens
+  const firstRowRepeated = [...firstRow, ...firstRow, ...firstRow, ...firstRow];
+  const secondRowRepeated = [...secondRow, ...secondRow, ...secondRow, ...secondRow];
+
   return (
-    <>
-    <Carousel
-      ref={containerRef}
-      opts={{ align: "start", loop: true, direction: isRtl ? "rtl" : "ltr" }}
-      plugins={[autoplayRef.current]}
-      setApi={setApi}
-      className="w-full"
-      aria-label={lang === "ar" ? "الشركاء" : "Partners carousel"}
-    >
-      <CarouselContent className="-ml-3">
-        {partners.map((p) => {
-          const displayName = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en || p.name_ar;
-          const inner = (
-            <div className="relative aspect-[3/2] rounded-lg border bg-card flex flex-col items-center justify-center gap-2 p-4 hover:border-accent transition-colors group">
-              <SmartLogo src={p.logo} alt={displayName} name={displayName} />
-              <div className="text-[11px] font-medium text-muted-foreground group-hover:text-accent">{displayName}</div>
-            </div>
-          );
-          return (
-            <CarouselItem key={p.id} className="pl-3 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6">
-              {p.href ? (
-                <a href={p.href} target="_blank" rel="noreferrer">{inner}</a>
-              ) : inner}
-            </CarouselItem>
-          );
-        })}
-      </CarouselContent>
-      <CarouselPrevious className="hidden lg:flex -left-4 xl:-left-12" aria-label={lang === "ar" ? "السابق" : "Previous"} />
-      <CarouselNext className="hidden lg:flex -right-4 xl:-right-12" aria-label={lang === "ar" ? "التالي" : "Next"} />
-    </Carousel>
-    <CarouselDots api={api} label={lang === "ar" ? "التنقل بين الشركاء" : "Partners slide navigation"} />
-    </>
+    <div className="flex flex-col gap-6 relative py-4">
+      <div className="flex w-full overflow-hidden group">
+        <div className="flex w-max min-w-full animate-marquee group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3">
+          {firstRowRepeated.map((p, idx) => {
+            const displayName = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en || p.name_ar;
+            const bgImage = partnerBgs[idx % partnerBgs.length];
+            const inner = (
+              <div className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex flex-col items-center justify-center p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
+                <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110 opacity-75" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
+                
+                <div className="relative z-10 flex flex-row items-center justify-start mt-auto w-full gap-3 pb-2 transition-transform duration-500 group-hover/item:-translate-y-1">
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 bg-white rounded-xl border-2 border-white flex items-center justify-center p-1.5 shadow-md">
+                    <SmartLogo src={p.logo} alt={displayName} name={displayName} />
+                  </div>
+                  <div className="text-sm font-display font-bold text-white drop-shadow-md text-start line-clamp-2">
+                    {displayName}
+                  </div>
+                </div>
+              </div>
+            );
+            return (
+              <div key={`${p.id}-${idx}`}>
+                {p.href ? <a href={p.href} target="_blank" rel="noreferrer">{inner}</a> : inner}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="flex w-full overflow-hidden group">
+        <div className="flex w-max min-w-full animate-marquee-reverse group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3">
+          {secondRowRepeated.map((p, idx) => {
+            const displayName = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en || p.name_ar;
+            const bgImage = partnerBgs[(idx + 3) % partnerBgs.length]; // Offset so rows look slightly different
+            const inner = (
+              <div className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex flex-col items-center justify-center p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
+                <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110 opacity-75" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
+                
+                <div className="relative z-10 flex flex-row items-center justify-start mt-auto w-full gap-3 pb-2 transition-transform duration-500 group-hover/item:-translate-y-1">
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 bg-white rounded-xl border-2 border-white flex items-center justify-center p-1.5 shadow-md">
+                    <SmartLogo src={p.logo} alt={displayName} name={displayName} />
+                  </div>
+                  <div className="text-sm font-display font-bold text-white drop-shadow-md text-start line-clamp-2">
+                    {displayName}
+                  </div>
+                </div>
+              </div>
+            );
+            return (
+              <div key={`${p.id}-${idx}`}>
+                {p.href ? <a href={p.href} target="_blank" rel="noreferrer">{inner}</a> : inner}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
 
-function SmartLogo({ src, alt, name }: { src: string; alt: string; name: string }) {
+function SmartLogo({ src, alt, name, align = "center" }: { src: string; alt: string; name: string; align?: "center" | "start" }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   return (
-    <div className="relative flex items-center justify-center h-10 w-full">
+    <div className={`relative flex items-center h-10 w-full ${align === "start" ? "justify-start" : "justify-center"}`}>
       {!loaded && !failed && <Skeleton className="absolute inset-0 h-full w-full" />}
       {failed ? (
-        <div className="h-10 w-10 rounded-md bg-accent/10 text-accent font-bold grid place-items-center text-sm">
+        <div className={`h-10 w-10 rounded-md bg-accent/10 text-accent font-bold grid place-items-center text-sm ${align === "start" ? "mr-auto rtl:ml-auto rtl:mr-0" : ""}`}>
           {name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
         </div>
       ) : (
@@ -170,7 +210,7 @@ function SmartLogo({ src, alt, name }: { src: string; alt: string; name: string 
             if (fallback && img.src !== fallback) { img.src = fallback; return; }
             setFailed(true);
           }}
-          className={`max-h-10 max-w-[80%] object-contain grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition ${loaded ? "opacity-70" : "opacity-0"}`}
+          className={`max-h-10 max-w-[80%] object-contain transition-opacity duration-300 drop-shadow-sm ${loaded ? "opacity-100" : "opacity-0"} ${align === "start" ? "mr-auto rtl:ml-auto rtl:mr-0" : ""}`}
         />
       )}
     </div>
@@ -230,11 +270,11 @@ function ProjectsCarouselSection() {
           ))}
         </CarouselContent>
         <CarouselPrevious
-          className="hidden lg:flex -left-4 xl:-left-12"
+          className="hidden lg:flex left-0 xl:-left-4"
           aria-label={lang === "ar" ? "المشروع السابق" : "Previous project"}
         />
         <CarouselNext
-          className="hidden lg:flex -right-4 xl:-right-12"
+          className="hidden lg:flex right-0 xl:-right-4"
           aria-label={lang === "ar" ? "المشروع التالي" : "Next project"}
         />
       </Carousel>
@@ -253,7 +293,6 @@ function Home() {
   const activeSlides = slides.filter(s => s.active);
   const autoplay = useRef(Autoplay({ delay: 5500, stopOnInteraction: false, stopOnMouseEnter: true }));
   const [heroApi, setHeroApi] = useState<CarouselApi>();
-  const [industriesApi, setIndustriesApi] = useState<CarouselApi>();
   return (
     <div>
       {/* Hero — slider when admin slides exist, else default */}
@@ -378,35 +417,51 @@ function Home() {
       {/* Industries */}
 
       {/* Industries */}
-      <Section className="bg-muted/30" eyebrow="Industries" title={t("industries.title")} sub={t("industries.sub")}>
-        <Carousel
-          opts={{ align: "start", direction: isRtl ? "rtl" : "ltr" }}
-          setApi={setIndustriesApi}
-          className="w-full"
-        >
-          <CarouselContent className="-ml-3 sm:-ml-5">
-            {industries.map(i => (
-              <CarouselItem key={i.slug} className="pl-3 sm:pl-5 basis-1/2 lg:basis-1/5">
-                <div className="aspect-square rounded-xl border bg-card flex items-center justify-center text-center p-4 hover:border-accent hover:shadow-card transition-all cursor-default">
-                  <span className="font-display font-semibold">{i.title[lang]}</span>
+      <Section className="bg-muted/30 overflow-hidden" eyebrow="Industries" title={t("industries.title")} sub={t("industries.sub")}>
+        <div className="flex flex-col gap-6 relative py-4">
+          <style>{`
+            @keyframes marquee {
+              0% { transform: translateX(0%); }
+              100% { transform: translateX(-50%); }
+            }
+            .animate-marquee { animation: marquee 40s linear infinite; }
+            .animate-marquee-reverse { animation: marquee 40s linear infinite reverse; }
+          `}</style>
+          
+          <div className="flex w-full overflow-hidden group">
+            <div className={`flex w-max min-w-full ${isRtl ? 'animate-marquee-reverse' : 'animate-marquee'} group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3`}>
+              {[...industries.slice(0, Math.ceil(industries.length / 2)), ...industries.slice(0, Math.ceil(industries.length / 2)), ...industries.slice(0, Math.ceil(industries.length / 2)), ...industries.slice(0, Math.ceil(industries.length / 2))].map((i, idx) => (
+                <div key={`${i.slug}-${idx}`} className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex items-end text-start p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
+                  <img src={(i as any).image} alt={i.title[lang]} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
+                  <span className="relative font-display font-bold text-white drop-shadow-lg z-10 text-sm sm:text-lg">{i.title[lang]}</span>
                 </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="hidden lg:flex -left-4 xl:-left-12" />
-          <CarouselNext className="hidden lg:flex -right-4 xl:-right-12" />
-        </Carousel>
-        <CarouselDots api={industriesApi} label={lang === "ar" ? "التنقل بين القطاعات" : "Industries slide navigation"} />
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex w-full overflow-hidden group">
+            <div className={`flex w-max min-w-full ${isRtl ? 'animate-marquee' : 'animate-marquee-reverse'} group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3`}>
+              {[...industries.slice(Math.ceil(industries.length / 2)), ...industries.slice(Math.ceil(industries.length / 2)), ...industries.slice(Math.ceil(industries.length / 2)), ...industries.slice(Math.ceil(industries.length / 2))].map((i, idx) => (
+                <div key={`${i.slug}-${idx}`} className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex items-end text-start p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
+                  <img src={(i as any).image} alt={i.title[lang]} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
+                  <span className="relative font-display font-bold text-white drop-shadow-lg z-10 text-sm sm:text-lg">{i.title[lang]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </Section>
 
       {/* Featured projects */}
       <ProjectsCarouselSection />
 
-      {/* Featured products */}
-      <FeaturedProducts />
-
       {/* Latest News */}
       <LatestNews />
+
+      {/* Featured products */}
+      <FeaturedProducts />
 
       {/* Why Choose Us */}
       <Section className="bg-primary text-primary-foreground" eyebrow="Why Us" title={t("why.title")}>

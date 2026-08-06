@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export const Route = createFileRoute("/news")({
+export const Route = createFileRoute("/news/")({
   head: () => ({ meta: [{ title: "News — Integrated Technics" }, { name: "description", content: "Updates from our projects, alliances and recognitions." }] }),
   component: NewsPage,
 });

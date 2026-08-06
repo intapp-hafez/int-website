@@ -228,7 +228,7 @@ export function SeoBotPanel() {
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  Scans keywords, meta tags, hreflang, OG images & indexing daily — powered by Lovable AI.
+                  Scans keywords, meta tags, hreflang, OG images & indexing daily — powered by AI.
                 </p>
               </div>
             </div>

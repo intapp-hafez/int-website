@@ -65,7 +65,7 @@ export const defaultSettings: SiteSettings = {
     en: env.VITE_SITE_BIO_EN || "Integrated Technics delivers reliable IT, networking and smart solutions across Egypt.",
     ar: env.VITE_SITE_BIO_AR || "إنتجريتد تكنيكس تقدم حلول تقنية المعلومات والشبكات والحلول الذكية في جميع أنحاء مصر.",
   },
-  mapUrl: env.VITE_CONTACT_MAP_URL || "https://www.google.com/maps?q=Cairo,Egypt&output=embed",
+  mapUrl: env.VITE_CONTACT_MAP_URL || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.645091723737!2d31.32836267555355!3d30.046995681881665!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14583e606a282f1b%3A0xd389476b3f71c432!2sIntegrated%20Technics!5e0!3m2!1sen!2seg!4v1699999999999!5m2!1sen!2seg",
   social: {
     linkedin: env.VITE_SOCIAL_LINKEDIN || "https://www.linkedin.com/",
     twitter: env.VITE_SOCIAL_TWITTER || "https://twitter.com/",
@@ -111,7 +111,7 @@ export const defaultSettings: SiteSettings = {
   },
 };
 
-const KEY = "it_site_settings_v2";
+const KEY = "it_site_settings_v5";
 
 type Ctx = {
   settings: SiteSettings;

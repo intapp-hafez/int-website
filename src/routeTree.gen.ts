@@ -17,7 +17,6 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as IndustriesRouteImport } from './routes/industries'
-import { Route as NewsRouteImport } from './routes/news'
 import { Route as PartnersRouteImport } from './routes/partners'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -30,6 +29,7 @@ import { Route as TrackQuoteRouteImport } from './routes/track-quote'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardAdminRouteImport } from './routes/dashboard.admin'
 import { Route as DashboardWorkspaceRouteImport } from './routes/dashboard.workspace'
+import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
@@ -149,11 +149,6 @@ const IndustriesRoute = IndustriesRouteImport.update({
   path: '/industries',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NewsRoute = NewsRouteImport.update({
-  id: '/news',
-  path: '/news',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PartnersRoute = PartnersRouteImport.update({
   id: '/partners',
   path: '/partners',
@@ -214,10 +209,15 @@ const DashboardWorkspaceRoute = DashboardWorkspaceRouteImport.update({
   path: '/workspace',
   getParentRoute: () => DashboardRoute,
 } as any)
+const NewsIndexRoute = NewsIndexRouteImport.update({
+  id: '/news/',
+  path: '/news/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewsSlugRoute = NewsSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => NewsRoute,
+  id: '/news/$slug',
+  path: '/news/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesSlugRoute = ServicesSlugRouteImport.update({
   id: '/$slug',
@@ -655,7 +655,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
-  '/news': typeof NewsRouteWithChildren
   '/partners': typeof PartnersRoute
   '/projects': typeof ProjectsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -671,6 +670,7 @@ export interface FileRoutesByFullPath {
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/news/': typeof NewsIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/dashboard/admin/about': typeof DashboardAdminAboutRoute
   '/dashboard/admin/careers': typeof DashboardAdminCareersRouteWithChildren
@@ -755,7 +755,6 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
-  '/news': typeof NewsRouteWithChildren
   '/partners': typeof PartnersRoute
   '/projects': typeof ProjectsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -769,6 +768,7 @@ export interface FileRoutesByTo {
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/news': typeof NewsIndexRoute
   '/shop': typeof ShopIndexRoute
   '/dashboard/admin/about': typeof DashboardAdminAboutRoute
   '/dashboard/admin/chatbot': typeof DashboardAdminChatbotRoute
@@ -843,7 +843,6 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
-  '/news': typeof NewsRouteWithChildren
   '/partners': typeof PartnersRoute
   '/projects': typeof ProjectsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -859,6 +858,7 @@ export interface FileRoutesById {
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/news/': typeof NewsIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/dashboard/admin/about': typeof DashboardAdminAboutRoute
   '/dashboard/admin/careers': typeof DashboardAdminCareersRouteWithChildren
@@ -946,7 +946,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/forgot-password'
     | '/industries'
-    | '/news'
     | '/partners'
     | '/projects'
     | '/reset-password'
@@ -962,6 +961,7 @@ export interface FileRouteTypes {
     | '/services/$slug'
     | '/shop/$slug'
     | '/dashboard/'
+    | '/news/'
     | '/shop/'
     | '/dashboard/admin/about'
     | '/dashboard/admin/careers'
@@ -1046,7 +1046,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/forgot-password'
     | '/industries'
-    | '/news'
     | '/partners'
     | '/projects'
     | '/reset-password'
@@ -1060,6 +1059,7 @@ export interface FileRouteTypes {
     | '/services/$slug'
     | '/shop/$slug'
     | '/dashboard'
+    | '/news'
     | '/shop'
     | '/dashboard/admin/about'
     | '/dashboard/admin/chatbot'
@@ -1133,7 +1133,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/forgot-password'
     | '/industries'
-    | '/news'
     | '/partners'
     | '/projects'
     | '/reset-password'
@@ -1149,6 +1148,7 @@ export interface FileRouteTypes {
     | '/services/$slug'
     | '/shop/$slug'
     | '/dashboard/'
+    | '/news/'
     | '/shop/'
     | '/dashboard/admin/about'
     | '/dashboard/admin/careers'
@@ -1235,7 +1235,6 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   IndustriesRoute: typeof IndustriesRoute
-  NewsRoute: typeof NewsRouteWithChildren
   PartnersRoute: typeof PartnersRoute
   ProjectsRoute: typeof ProjectsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1245,7 +1244,9 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrackApplicationRoute: typeof TrackApplicationRoute
   TrackQuoteRoute: typeof TrackQuoteRoute
+  NewsSlugRoute: typeof NewsSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
+  NewsIndexRoute: typeof NewsIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
   ApiPublicHooksSeoBotDailyRoute: typeof ApiPublicHooksSeoBotDailyRoute
 }
@@ -1306,13 +1307,6 @@ declare module '@tanstack/react-router' {
       path: '/industries'
       fullPath: '/industries'
       preLoaderRoute: typeof IndustriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/news': {
-      id: '/news'
-      path: '/news'
-      fullPath: '/news'
-      preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partners': {
@@ -1399,12 +1393,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardWorkspaceRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/news/': {
+      id: '/news/'
+      path: '/news'
+      fullPath: '/news/'
+      preLoaderRoute: typeof NewsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/news/$slug': {
       id: '/news/$slug'
-      path: '/$slug'
+      path: '/news/$slug'
       fullPath: '/news/$slug'
       preLoaderRoute: typeof NewsSlugRouteImport
-      parentRoute: typeof NewsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/services/$slug': {
       id: '/services/$slug'
@@ -2306,16 +2307,6 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
-interface NewsRouteChildren {
-  NewsSlugRoute: typeof NewsSlugRoute
-}
-
-const NewsRouteChildren: NewsRouteChildren = {
-  NewsSlugRoute: NewsSlugRoute,
-}
-
-const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
-
 interface ServicesRouteChildren {
   ServicesSlugRoute: typeof ServicesSlugRoute
 }
@@ -2337,7 +2328,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   IndustriesRoute: IndustriesRoute,
-  NewsRoute: NewsRouteWithChildren,
   PartnersRoute: PartnersRoute,
   ProjectsRoute: ProjectsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
@@ -2347,20 +2337,12 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrackApplicationRoute: TrackApplicationRoute,
   TrackQuoteRoute: TrackQuoteRoute,
+  NewsSlugRoute: NewsSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
+  NewsIndexRoute: NewsIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
   ApiPublicHooksSeoBotDailyRoute: ApiPublicHooksSeoBotDailyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
