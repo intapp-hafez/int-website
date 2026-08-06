@@ -99,6 +99,7 @@ import { Route as DashboardAdminHelpdeskDevicesRouteImport } from './routes/dash
 import { Route as DashboardAdminHelpdeskCategoriesRouteImport } from './routes/dashboard.admin.helpdesk.categories'
 import { Route as DashboardAdminHelpdeskBranchesRouteImport } from './routes/dashboard.admin.helpdesk.branches'
 import { Route as DashboardAdminClientsIdRouteImport } from './routes/dashboard.admin.clients.$id'
+import { Route as DashboardAdminCareersAnalyticsRouteImport } from './routes/dashboard.admin.careers.analytics'
 import { Route as ApiPublicHooksSeoBotDailyRouteImport } from './routes/api/public/hooks/seo-bot-daily'
 import { Route as DashboardAdminHelpdeskTicketsIndexRouteImport } from './routes/dashboard.admin.helpdesk.tickets.index'
 import { Route as DashboardAdminCareersApplicationsIndexRouteImport } from './routes/dashboard.admin.careers.applications.index'
@@ -591,6 +592,12 @@ const DashboardAdminClientsIdRoute = DashboardAdminClientsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DashboardAdminClientsRoute,
 } as any)
+const DashboardAdminCareersAnalyticsRoute =
+  DashboardAdminCareersAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => DashboardAdminCareersRoute,
+  } as any)
 const ApiPublicHooksSeoBotDailyRoute =
   ApiPublicHooksSeoBotDailyRouteImport.update({
     id: '/api/public/hooks/seo-bot-daily',
@@ -709,6 +716,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/workspace/': typeof DashboardWorkspaceIndexRoute
   '/api/public/hooks/seo-bot-daily': typeof ApiPublicHooksSeoBotDailyRoute
+  '/dashboard/admin/careers/analytics': typeof DashboardAdminCareersAnalyticsRoute
   '/dashboard/admin/clients/$id': typeof DashboardAdminClientsIdRoute
   '/dashboard/admin/helpdesk/branches': typeof DashboardAdminHelpdeskBranchesRoute
   '/dashboard/admin/helpdesk/categories': typeof DashboardAdminHelpdeskCategoriesRoute
@@ -796,6 +804,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin': typeof DashboardAdminIndexRoute
   '/dashboard/workspace': typeof DashboardWorkspaceIndexRoute
   '/api/public/hooks/seo-bot-daily': typeof ApiPublicHooksSeoBotDailyRoute
+  '/dashboard/admin/careers/analytics': typeof DashboardAdminCareersAnalyticsRoute
   '/dashboard/admin/clients/$id': typeof DashboardAdminClientsIdRoute
   '/dashboard/admin/helpdesk/branches': typeof DashboardAdminHelpdeskBranchesRoute
   '/dashboard/admin/helpdesk/categories': typeof DashboardAdminHelpdeskCategoriesRoute
@@ -897,6 +906,7 @@ export interface FileRoutesById {
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/workspace/': typeof DashboardWorkspaceIndexRoute
   '/api/public/hooks/seo-bot-daily': typeof ApiPublicHooksSeoBotDailyRoute
+  '/dashboard/admin/careers/analytics': typeof DashboardAdminCareersAnalyticsRoute
   '/dashboard/admin/clients/$id': typeof DashboardAdminClientsIdRoute
   '/dashboard/admin/helpdesk/branches': typeof DashboardAdminHelpdeskBranchesRoute
   '/dashboard/admin/helpdesk/categories': typeof DashboardAdminHelpdeskCategoriesRoute
@@ -1000,6 +1010,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/'
     | '/dashboard/workspace/'
     | '/api/public/hooks/seo-bot-daily'
+    | '/dashboard/admin/careers/analytics'
     | '/dashboard/admin/clients/$id'
     | '/dashboard/admin/helpdesk/branches'
     | '/dashboard/admin/helpdesk/categories'
@@ -1087,6 +1098,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/workspace'
     | '/api/public/hooks/seo-bot-daily'
+    | '/dashboard/admin/careers/analytics'
     | '/dashboard/admin/clients/$id'
     | '/dashboard/admin/helpdesk/branches'
     | '/dashboard/admin/helpdesk/categories'
@@ -1187,6 +1199,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/'
     | '/dashboard/workspace/'
     | '/api/public/hooks/seo-bot-daily'
+    | '/dashboard/admin/careers/analytics'
     | '/dashboard/admin/clients/$id'
     | '/dashboard/admin/helpdesk/branches'
     | '/dashboard/admin/helpdesk/categories'
@@ -1883,6 +1896,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminClientsIdRouteImport
       parentRoute: typeof DashboardAdminClientsRoute
     }
+    '/dashboard/admin/careers/analytics': {
+      id: '/dashboard/admin/careers/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/admin/careers/analytics'
+      preLoaderRoute: typeof DashboardAdminCareersAnalyticsRouteImport
+      parentRoute: typeof DashboardAdminCareersRoute
+    }
     '/api/public/hooks/seo-bot-daily': {
       id: '/api/public/hooks/seo-bot-daily'
       path: '/api/public/hooks/seo-bot-daily'
@@ -1950,12 +1970,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardAdminCareersRouteChildren {
+  DashboardAdminCareersAnalyticsRoute: typeof DashboardAdminCareersAnalyticsRoute
   DashboardAdminCareersIndexRoute: typeof DashboardAdminCareersIndexRoute
   DashboardAdminCareersApplicationsIdRoute: typeof DashboardAdminCareersApplicationsIdRoute
   DashboardAdminCareersApplicationsIndexRoute: typeof DashboardAdminCareersApplicationsIndexRoute
 }
 
 const DashboardAdminCareersRouteChildren: DashboardAdminCareersRouteChildren = {
+  DashboardAdminCareersAnalyticsRoute: DashboardAdminCareersAnalyticsRoute,
   DashboardAdminCareersIndexRoute: DashboardAdminCareersIndexRoute,
   DashboardAdminCareersApplicationsIdRoute:
     DashboardAdminCareersApplicationsIdRoute,
