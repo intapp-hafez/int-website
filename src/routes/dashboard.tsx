@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth, type Role } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, Star, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, Star, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin } from "lucide-react";
 import { useCanAccess, usePermissions, ADMIN_PAGES } from "@/lib/permissions-store";
 import { demoUsers } from "@/data/demo";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -86,6 +86,13 @@ const adminGroups: NavGroup[] = [
     items: [
       { to: "/dashboard/admin/users", en: "Users", ar: "المستخدمون", icon: Users, role: "admin", pageKey: "users" },
       { to: "/dashboard/admin/permissions", en: "Permissions", ar: "الصلاحيات", icon: ShieldCheck, role: "admin", pageKey: "permissions" },
+    ],
+  },
+  {
+    en: "Lookups", ar: "القوائم", icon: Globe,
+    items: [
+      { to: "/dashboard/admin/locations", en: "Locations", ar: "المواقع", icon: MapPin, role: "admin", pageKey: "locations" },
+      { to: "/dashboard/admin/nationalities", en: "Nationalities", ar: "الجنسيات", icon: Globe, role: "admin", pageKey: "nationalities" },
     ],
   },
   {

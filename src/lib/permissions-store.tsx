@@ -36,6 +36,8 @@ export const ADMIN_PAGES: AdminPage[] = [
   { key: "products", en: "Products", ar: "المنتجات" },
   { key: "news", en: "News", ar: "الأخبار" },
   { key: "security", en: "Security Center", ar: "مركز الأمان" },
+  { key: "locations", en: "Locations", ar: "المواقع" },
+  { key: "nationalities", en: "Nationalities", ar: "الجنسيات" },
 ];
 
 export const PERM_ACTIONS: PermAction[] = ["view", "add", "edit", "delete"];

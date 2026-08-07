@@ -1,10 +1,12 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 
-import { useEffect } from "react";
-import { Calendar, ArrowLeft } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { Calendar, ArrowLeft, ArrowRight } from "lucide-react";
 import { Section } from "@/components/site/Section";
 import { useI18n } from "@/lib/i18n";
 import { useNews } from "@/lib/news-store";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+import { Countdown } from "@/components/ui/countdown";
 
 export const Route = createFileRoute("/news/$slug")({
   head: () => ({ meta: [{ title: "News — Integrated Technics" }] }),
@@ -17,6 +19,18 @@ function NewsDetailsPage() {
   const { posts, loading } = useNews();
   const post = posts.find((p) => p.slug === slug);
   const locale = lang === "ar" ? "ar" : "en-US";
+  const isRtl = lang === "ar";
+
+  const related = useMemo(() => {
+    if (!post) return [];
+    const allActive = posts.filter((p) => p.active && p.slug !== slug);
+    let r = allActive.filter((p) => p.category_en === post.category_en || p.category_ar === post.category_ar);
+    if (r.length < 3) {
+      const others = allActive.filter((p) => !r.includes(p));
+      r = [...r, ...others];
+    }
+    return r.slice(0, 6);
+  }, [posts, post, slug]);
 
   // Per-post SEO overrides (title + description + canonical og:image)
   useEffect(() => {
@@ -103,6 +117,53 @@ function NewsDetailsPage() {
           </article>
         </div>
       </div>
+
+      {related.length > 0 && (
+        <div className="mt-20 pt-16 border-t">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold">{lang === "ar" ? "أخبار ذات صلة" : "Related News"}</h2>
+            <Link to="/news" className="text-accent text-sm font-medium hover:underline inline-flex items-center gap-1">
+              {lang === "ar" ? "عرض الكل" : "View all"} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+            </Link>
+          </div>
+          <Carousel opts={{ align: "start", direction: isRtl ? "rtl" : "ltr" }} className="w-full">
+            <CarouselContent className="-ml-4">
+              {related.map((n) => (
+                <CarouselItem key={n.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                  <Link to="/news/$slug" params={{ slug: n.slug }} className="group p-0 rounded-2xl border bg-card overflow-hidden glow-on-hover flex flex-col h-full">
+                    {n.image_url && (
+                      <div className="aspect-[16/10] overflow-hidden bg-muted relative">
+                        <img src={n.image_url} alt={lang === "ar" ? n.title_ar : n.title_en} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        {(n.category_en || "").toLowerCase() === "events" && new Date(n.published_at).getTime() > Date.now() && (
+                          <Countdown date={n.published_at} />
+                        )}
+                      </div>
+                    )}
+                    <div className={`p-6 flex flex-col flex-1 ${isRtl ? "text-right" : "text-left"}`}>
+                      {(lang === "ar" ? n.category_ar : n.category_en) && (
+                        <div className="text-[10px] font-semibold uppercase tracking-wider text-accent mb-2">{lang === "ar" ? n.category_ar : n.category_en}</div>
+                      )}
+                      <div className="text-xs text-muted-foreground inline-flex items-center gap-1.5 mb-2">
+                        <Calendar className="h-3.5 w-3.5" />
+                        {new Date(n.published_at).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2 line-clamp-2 group-hover:text-accent transition-colors">{lang === "ar" ? n.title_ar : n.title_en}</h3>
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{lang === "ar" ? n.excerpt_ar : n.excerpt_en}</p>
+                      <span className="mt-auto text-sm font-medium text-accent inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                        {lang === "ar" ? "اقرأ المزيد" : "Read more"} <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
+                      </span>
+                    </div>
+                  </Link>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-end gap-2 mt-6">
+              <CarouselPrevious className="static translate-y-0 h-10 w-10" />
+              <CarouselNext className="static translate-y-0 h-10 w-10" />
+            </div>
+          </Carousel>
+        </div>
+      )}
     </div>
   );
 }

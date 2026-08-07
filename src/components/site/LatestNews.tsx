@@ -3,6 +3,7 @@ import { Calendar, ArrowRight } from "lucide-react";
 import { Section } from "@/components/site/Section";
 import { useI18n } from "@/lib/i18n";
 import { useNews } from "@/lib/news-store";
+import { Countdown } from "@/components/ui/countdown";
 
 export function LatestNews() {
   const { t, lang, dir } = useI18n();
@@ -34,6 +35,9 @@ export function LatestNews() {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
             ) : null}
+            {(featured.category_en || "").toLowerCase() === "events" && new Date(featured.published_at).getTime() > Date.now() && (
+              <Countdown date={featured.published_at} className="top-6 bottom-auto lg:top-8" />
+            )}
           </div>
           <div className={`absolute inset-x-0 bottom-0 p-5 sm:p-7 bg-gradient-to-t from-black/85 via-black/45 to-transparent text-white ${isRtl ? "text-right" : "text-left"}`}>
             {(lang === "ar" ? featured.category_ar : featured.category_en) && (
@@ -65,10 +69,13 @@ export function LatestNews() {
               params={{ slug: p.slug }}
               className="group flex gap-4 p-3 sm:p-4 rounded-2xl border bg-card glow-on-hover"
             >
-              <div className="shrink-0 w-28 sm:w-36 aspect-[4/3] rounded-xl overflow-hidden bg-muted">
+              <div className="shrink-0 w-28 sm:w-36 aspect-[4/3] rounded-xl overflow-hidden bg-muted relative">
                 {p.image_url ? (
                   <img src={p.image_url} alt={lang === "ar" ? p.title_ar : p.title_en} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : null}
+                {(p.category_en || "").toLowerCase() === "events" && new Date(p.published_at).getTime() > Date.now() && (
+                  <Countdown date={p.published_at} className="scale-50 origin-bottom sm:scale-[0.6] sm:-bottom-2" />
+                )}
               </div>
               <div className={`min-w-0 flex-1 ${isRtl ? "text-right" : "text-left"}`}>
                 {(lang === "ar" ? p.category_ar : p.category_en) && (

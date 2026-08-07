@@ -1,4 +1,4 @@
-import { Mail, Phone, Globe, LogIn, Search, FileText, CalendarClock, LayoutDashboard, LogOut, User } from "lucide-react";
+import { Mail, Phone, Globe, LogIn, Search, LogOut, User, LayoutDashboard } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
@@ -42,25 +42,7 @@ export function TopHeader() {
           </a>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-3 ms-auto shrink-0">
-          <div className="hidden sm:flex items-center gap-1.5">
-            <button
-              type="button"
-              data-testid="header-request-proposal"
-              aria-label={lang === "ar" ? "طلب عرض" : "Request Proposal"}
-              onClick={() => {
-                trackCta("request_proposal");
-                setProposalOpen(true);
-              }}
-              className="inline-flex items-center gap-1 rounded-md bg-accent text-accent-foreground px-2 py-1 font-semibold hover:brightness-110 transition min-h-[28px]"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              <span>{lang === "ar" ? "طلب عرض" : "Request Proposal"}</span>
-            </button>
-            <Link to="/contact" onClick={() => trackCta("book_consultation")} className="inline-flex items-center gap-1 rounded-md border border-primary-foreground/30 px-2 py-1 font-semibold hover:bg-primary-foreground/10 transition min-h-[28px]">
-              <CalendarClock className="h-3.5 w-3.5" />
-              <span>{lang === "ar" ? "حجز استشارة" : "Book Consultation"}</span>
-            </Link>
-          </div>
+
           <Link to="/track-quote" className="inline-flex items-center gap-1 hover:text-accent transition-colors min-h-[32px] px-1">
             <Search className="h-3.5 w-3.5" />
             <span className="hidden md:inline">{lang === "ar" ? "تتبع العرض" : "Track Quote"}</span>
@@ -120,7 +102,7 @@ export function TopHeader() {
                       {lang === "ar" ? "لوحة التحكم" : "Dashboard"}
                     </Link>
                     <Link
-                      to={user.role === "admin" ? "/dashboard/admin/settings" : "/dashboard/workspace"}
+                      to={user.role === "admin" ? "/dashboard/admin/settings" : "/dashboard/workspace/profile"}
                       onClick={() => setAvatarOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted transition-colors"
                     >

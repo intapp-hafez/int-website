@@ -158,7 +158,7 @@ export function Navbar() {
                   <Link to={user.role === "client" ? "/dashboard/workspace" : "/dashboard/admin"} onClick={() => setOpen(false)} className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2">
                     <LayoutDashboard className="h-4 w-4" /> {lang === "ar" ? "لوحة التحكم" : "Dashboard"}
                   </Link>
-                  <Link to={user.role === "admin" ? "/dashboard/admin/settings" : "/dashboard/workspace"} onClick={() => setOpen(false)} className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2">
+                  <Link to={user.role === "admin" ? "/dashboard/admin/settings" : "/dashboard/workspace/profile"} onClick={() => setOpen(false)} className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2">
                     <User className="h-4 w-4" /> {user.role === "admin" ? (lang === "ar" ? "إعدادات الموقع" : "Site Settings") : (lang === "ar" ? "الملف الشخصي" : "My Profile")}
                   </Link>
                   <button onClick={handleSignOut} className="w-full text-start px-3 py-3 rounded-md hover:bg-destructive/10 text-destructive text-sm font-medium min-h-[48px] flex items-center gap-2">

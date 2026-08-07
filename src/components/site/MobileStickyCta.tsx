@@ -1,79 +1,75 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { FileText, CalendarClock } from "lucide-react";
+import { FileText, CalendarClock, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { trackCta } from "@/lib/cta-tracking";
+import { useSettings } from "@/lib/settings-store";
 import { RequestProposalDialog } from "./RequestProposalDialog";
 
 /**
- * Mobile-only sticky CTA bar with Request Proposal + Book Consultation.
- * Appears after the user scrolls past ~40% of the viewport, hides near the
- * bottom of the page so it never covers the footer, and stays clear of the
- * bottom nav via safe-area + 4rem offset.
+ * Desktop-only sticky CTA bar with Request Proposal + Book Consultation.
+ * Positioned next to the WhatsApp/sticky icons.
  */
 export function MobileStickyCta() {
   const { lang, dir } = useI18n();
+  const { settings } = useSettings();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const onScroll = () => {
-      const y = window.scrollY;
-      const vh = window.innerHeight;
-      const docH = document.documentElement.scrollHeight;
-      const pastTrigger = y > vh * 0.4;
-      const nearBottom = y + vh >= docH - 120; // leave room for footer/bottom nav
-      setVisible(pastTrigger && !nearBottom);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [pathname]);
+    if (dismissed) {
+      const timer = setTimeout(() => {
+        setDismissed(false);
+      }, 120000); // 2 minutes
+      return () => clearTimeout(timer);
+    }
+  }, [dismissed]);
 
   if (pathname.startsWith("/dashboard")) return null;
   if (pathname === "/contact" || pathname.startsWith("/contact/")) return null;
 
+  const side = settings.sticky.side === "start" ? "start-4 lg:start-6" : "end-4 lg:end-6";
+  const align = settings.sticky.side === "start" ? "items-start" : "items-end";
+
   return (
     <>
-    <div
-      aria-hidden={!visible}
-      style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 4rem)" }}
-      className={`lg:hidden fixed inset-x-0 z-30 px-3 transition-all duration-300 ${
-        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
-      }`}
-    >
-      <div
-        role="region"
-        aria-label={lang === "ar" ? "إجراءات سريعة" : "Quick actions"}
-        className="mx-auto max-w-md rounded-2xl border bg-card/95 backdrop-blur shadow-elegant p-2 grid grid-cols-2 gap-2"
-      >
+    {!dismissed && (
+      <div className={`hidden lg:flex flex-col gap-3 ${align} fixed ${side} bottom-40 lg:bottom-[168px] z-30 transition-all duration-300`}>
         <button
-          type="button"
-          onClick={() => {
-            trackCta("request_proposal");
-            setOpen(true);
-          }}
-          className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent text-accent-foreground px-3 h-11 text-sm font-semibold hover:brightness-110 transition"
+          onClick={() => setDismissed(true)}
+          aria-label={lang === "ar" ? "إخفاء" : "Dismiss"}
+          className="h-6 w-6 rounded-full bg-card shadow-elegant border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          <FileText className="h-4 w-4" aria-hidden="true" />
-          <span>{lang === "ar" ? "طلب عرض" : "Request Proposal"}</span>
+          <X className="h-3.5 w-3.5" />
         </button>
-        <Link
-          to="/contact"
-          onClick={() => trackCta("book_consultation")}
-          className="inline-flex items-center justify-center gap-1.5 rounded-xl border bg-background px-3 h-11 text-sm font-semibold hover:bg-accent hover:text-accent-foreground transition-colors"
+        <div
+          role="region"
+          aria-label={lang === "ar" ? "إجراءات سريعة" : "Quick actions"}
+          className="flex flex-col gap-3"
         >
-          <CalendarClock className="h-4 w-4" aria-hidden="true" />
-          <span>{lang === "ar" ? "حجز استشارة" : "Book Consultation"}</span>
-        </Link>
+          <button
+            type="button"
+            onClick={() => {
+              trackCta("request_proposal");
+              setOpen(true);
+            }}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent text-accent-foreground px-5 h-12 text-sm font-semibold shadow-elegant hover:brightness-110 transition"
+          >
+            <FileText className="h-4 w-4" aria-hidden="true" />
+            <span>{lang === "ar" ? "طلب عرض" : "Request Proposal"}</span>
+          </button>
+          <Link
+            to="/contact"
+            onClick={() => trackCta("book_consultation")}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-card/95 backdrop-blur px-5 h-12 text-sm font-semibold shadow-elegant hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <CalendarClock className="h-4 w-4" aria-hidden="true" />
+            <span>{lang === "ar" ? "حجز استشارة" : "Book Consultation"}</span>
+          </Link>
+        </div>
       </div>
-    </div>
+    )}
     <RequestProposalDialog open={open} onOpenChange={setOpen} lang={lang} dir={dir} />
     </>
   );

@@ -7,6 +7,7 @@ import { Calendar, ArrowRight, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Countdown } from "@/components/ui/countdown";
 
 export const Route = createFileRoute("/news/")({
   head: () => ({ meta: [{ title: "News — Integrated Technics" }, { name: "description", content: "Updates from our projects, alliances and recognitions." }] }),
@@ -64,13 +65,13 @@ function NewsPage() {
     <div>
       <section className="gradient-surface relative">
         <div className="absolute inset-0 grid-bg opacity-50" />
-        <div className="container mx-auto px-4 lg:px-8 py-24 relative">
+        <div className="container mx-auto px-4 lg:px-8 pt-16 md:pt-24 pb-8 relative">
           <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">Newsroom</div>
           <h1 className="text-4xl md:text-6xl font-bold mb-4">{t("news.title")}</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">{t("news.sub")}</p>
         </div>
       </section>
-      <Section>
+      <Section className="!pt-8 !md:pt-12">
         {active.length === 0 ? (
           <p className="text-center text-muted-foreground">{lang === "ar" ? "لا توجد أخبار بعد." : "No news yet."}</p>
         ) : (
@@ -122,8 +123,11 @@ function NewsPage() {
                   {shown.map((n) => (
                     <Link to="/news/$slug" params={{ slug: n.slug }} key={n.id} className="group p-0 rounded-2xl border bg-card overflow-hidden glow-on-hover flex flex-col">
                       {n.image_url && (
-                        <div className="aspect-[16/10] overflow-hidden bg-muted">
+                        <div className="aspect-[16/10] overflow-hidden bg-muted relative">
                           <img src={n.image_url} alt={lang === "ar" ? n.title_ar : n.title_en} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          {(n.category_en || "").toLowerCase() === "events" && new Date(n.published_at).getTime() > Date.now() && (
+                            <Countdown date={n.published_at} />
+                          )}
                         </div>
                       )}
                       <div className={`p-6 flex flex-col flex-1 ${isRtl ? "text-right" : "text-left"}`}>

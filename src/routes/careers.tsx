@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Section } from "@/components/site/Section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -88,14 +88,25 @@ function CareersPage() {
 
   return (
     <div>
-      <section className="gradient-surface relative">
+      <section className="gradient-surface relative overflow-hidden">
         <div className="absolute inset-0 grid-bg opacity-50" />
-        <div className="container mx-auto px-4 lg:px-8 py-24 relative">
-          <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{ar ? "الوظائف" : "Careers"}</div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">{ar ? "ابنِ ما له معنى." : "Build what matters."}</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">
-            {ar ? "انضم إلى فريق من المهندسين المعتمدين الذين يقدمون أنظمة معقدة لأكثر مؤسسات المنطقة تطلباً." : "Join a team of certified engineers delivering complex systems for the region's most demanding enterprises."}
-          </p>
+        <div className="container mx-auto px-4 lg:px-8 py-24 relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{ar ? "الوظائف" : "Careers"}</div>
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">{ar ? "ابنِ ما له معنى." : "Build what matters."}</h1>
+              <p className="text-lg text-muted-foreground max-w-xl">
+                {ar ? "انضم إلى فريق من المهندسين المعتمدين الذين يقدمون أنظمة معقدة لأكثر مؤسسات المنطقة تطلباً." : "Join a team of certified engineers delivering complex systems for the region's most demanding enterprises."}
+              </p>
+            </div>
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 aspect-video md:aspect-auto md:h-full min-h-[300px]">
+              <img 
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" 
+                alt={ar ? "فريق العمل" : "Our team"} 
+                className="absolute inset-0 w-full h-full object-cover" 
+              />
+            </div>
+          </div>
         </div>
       </section>
       <Section>
@@ -190,6 +201,7 @@ const applySchema = z.object({
   nationality: z.string().trim().min(2).max(80),
   country: z.string().trim().min(2).max(80),
   city: z.string().trim().min(2).max(80),
+  gender: z.string().trim().min(2).max(20),
   current_title: z.string().trim().max(120).optional().default(""),
   current_company: z.string().trim().max(120).optional().default(""),
   years_experience: z.number().int().min(0).max(60),
@@ -200,7 +212,7 @@ const applySchema = z.object({
   notice_period_days: z.number().int().min(0).max(365).optional().nullable(),
   earliest_start_date: z.string().optional().default(""),
   source: z.string().trim().max(80).optional().default(""),
-  resume_url: z.string().trim().url().max(500),
+  resume_url: z.string().trim().max(500).optional().default(""),
   linkedin_url: z.string().trim().url().max(500).optional().or(z.literal("")),
   portfolio_url: z.string().trim().url().max(500).optional().or(z.literal("")),
   skills: z.string().trim().max(500).optional().default(""),
@@ -218,10 +230,56 @@ const EDU_OPTIONS = [
 ];
 const SOURCE_OPTIONS = ["LinkedIn", "Company website", "Referral", "Job board", "Social media", "Other"];
 
+// We're keeping COUNTRIES_OPTIONS as fallback or removing? Let's just remove it if unused, but it's okay to keep if needed elsewhere.
+const COUNTRIES_OPTIONS = [
+  { v: "Saudi Arabia", ar: "السعودية" },
+  { v: "United Arab Emirates", ar: "الإمارات العربية المتحدة" },
+  { v: "Kuwait", ar: "الكويت" },
+  { v: "Qatar", ar: "قطر" },
+  { v: "Bahrain", ar: "البحرين" },
+  { v: "Oman", ar: "عمان" },
+  { v: "Egypt", ar: "مصر" },
+  { v: "Jordan", ar: "الأردن" },
+  { v: "Lebanon", ar: "لبنان" },
+  { v: "Syria", ar: "سوريا" },
+  { v: "Iraq", ar: "العراق" },
+  { v: "United States", ar: "الولايات المتحدة" },
+  { v: "United Kingdom", ar: "المملكة المتحدة" },
+  { v: "India", ar: "الهند" },
+  { v: "Pakistan", ar: "باكستان" },
+  { v: "Philippines", ar: "الفلبين" },
+  { v: "Other", ar: "أخرى" },
+];
+
+const GENDER_OPTIONS = [
+  { v: "male", en: "Male", ar: "ذكر" },
+  { v: "female", en: "Female", ar: "أنثى" },
+];
+
 function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => void; ar: boolean }) {
+  const [locations, setLocations] = useState<any[]>([]);
+  const [nationalities, setNationalities] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (job) {
+      (supabase as any).from("sys_locations").select("*").eq("is_active", true).order("country_en").then((res: any) => setLocations(res.data || []));
+      (supabase as any).from("sys_nationalities").select("*").eq("is_active", true).order("name_en").then((res: any) => setNationalities(res.data || []));
+    }
+  }, [job]);
+
+  const countries = useMemo(() => {
+    const map = new Map<string, any>();
+    locations.forEach(l => {
+      if (!map.has(l.country_en)) {
+        map.set(l.country_en, { en: l.country_en, ar: l.country_ar });
+      }
+    });
+    return Array.from(map.values());
+  }, [locations]);
+
   const initial = {
     full_name: "", email: "", phone: "",
-    nationality: "", country: "", city: "",
+    nationality: "", country: "", city: "", gender: "",
     current_title: "", current_company: "",
     years_experience: 0, highest_education: "bachelor", university: "",
     expected_salary: null as number | null, salary_currency: "USD",
@@ -232,10 +290,43 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
   const [form, setForm] = useState(initial);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<string | null>(null);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
 
-  useEffect(() => { if (job) { setForm(initial); setDone(null); } /* eslint-disable-next-line */ }, [job]);
+  const currentCities = useMemo(() => {
+    return locations.filter(l => l.country_en === form.country || l.country_ar === form.country);
+  }, [locations, form.country]);
+
+  useEffect(() => { if (job) { setForm(initial); setDone(null); setResumeFile(null); } /* eslint-disable-next-line */ }, [job]);
 
   const update = <K extends keyof typeof form>(k: K, v: typeof form[K]) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setResumeFile(null);
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error(ar ? "يجب أن يكون حجم الملف أقل من 2 ميغابايت" : "File size must be less than 2MB");
+      e.target.value = "";
+      return;
+    }
+    const allowed = [
+      "application/pdf", 
+      "application/msword", 
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
+      "image/png", 
+      "image/jpeg", 
+      "image/jpg"
+    ];
+    if (!allowed.includes(file.type)) {
+      toast.error(ar ? "صيغة الملف غير مدعومة" : "Unsupported file format");
+      e.target.value = "";
+      return;
+    }
+    setResumeFile(file);
+    update("resume_url", ""); 
+  };
 
   const submit = async () => {
     const parsed = applySchema.safeParse(form);
@@ -244,7 +335,26 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
       toast.error(`${first.path.join(".")}: ${first.message}`);
       return;
     }
+    if (!form.resume_url && !resumeFile) {
+      toast.error(ar ? "يرجى تقديم السيرة الذاتية (رابط أو ملف)" : "Please provide a resume URL or upload a file");
+      return;
+    }
     setSubmitting(true);
+    
+    let uploadedUrl = form.resume_url;
+    if (resumeFile) {
+      const ext = resumeFile.name.split('.').pop();
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: upError } = await supabase.storage.from("career-resumes").upload(filename, resumeFile);
+      if (upError) {
+        toast.error(ar ? "تعذر رفع الملف" : "Could not upload file");
+        setSubmitting(false);
+        return;
+      }
+      const { data: pubData } = supabase.storage.from("career-resumes").getPublicUrl(filename);
+      uploadedUrl = pubData.publicUrl;
+    }
+
     const d = parsed.data;
     const isDemo = !!job?.id?.startsWith("mock-");
     if (isDemo) {
@@ -257,7 +367,7 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
     const payload = {
       job_id: job?.id,
       full_name: d.full_name, email: d.email, phone: d.phone,
-      nationality: d.nationality, country: d.country, city: d.city,
+      nationality: d.nationality, country: d.country, city: d.city, gender: d.gender,
       current_title: d.current_title, current_company: d.current_company,
       years_experience: d.years_experience,
       highest_education: d.highest_education, university: d.university,
@@ -265,7 +375,7 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
       notice_period_days: d.notice_period_days,
       earliest_start_date: d.earliest_start_date || null,
       source: d.source,
-      resume_url: d.resume_url, linkedin_url: d.linkedin_url || "", portfolio_url: d.portfolio_url || "",
+      resume_url: uploadedUrl, linkedin_url: d.linkedin_url || "", portfolio_url: d.portfolio_url || "",
       skills: d.skills ? d.skills.split(",").map(s => s.trim()).filter(Boolean) : [],
       languages: d.languages ? d.languages.split(",").map(s => s.trim()).filter(Boolean) : [],
       cover_letter: d.cover_letter,
@@ -287,7 +397,7 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
 
   return (
     <Dialog open={!!job} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{done ? (ar ? "تم استلام طلبك" : "Application received") : (ar ? `التقديم على: ${job ? (job.title_ar || job.title_en) : ""}` : `Apply: ${job?.title_en ?? ""}`)}</DialogTitle>
         </DialogHeader>
@@ -309,20 +419,53 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
         ) : (
           <div className="space-y-5">
             <Fieldset title={ar ? "المعلومات الشخصية" : "Personal information"}>
-              <Field label={ar ? "الاسم الكامل *" : "Full name *"}><Input value={form.full_name} onChange={e => update("full_name", e.target.value)} /></Field>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="grid sm:grid-cols-3 gap-3">
+                <Field label={ar ? "الاسم الكامل *" : "Full name *"}><Input value={form.full_name} onChange={e => update("full_name", e.target.value)} /></Field>
                 <Field label={ar ? "البريد الإلكتروني *" : "Email *"}><Input dir="ltr" type="email" value={form.email} onChange={e => update("email", e.target.value)} /></Field>
                 <Field label={ar ? "الهاتف *" : "Phone *"}><Input dir="ltr" value={form.phone} onChange={e => update("phone", e.target.value)} /></Field>
               </div>
-              <div className="grid sm:grid-cols-3 gap-3">
-                <Field label={ar ? "الجنسية *" : "Nationality *"}><Input value={form.nationality} onChange={e => update("nationality", e.target.value)} /></Field>
-                <Field label={ar ? "الدولة *" : "Country *"}><Input value={form.country} onChange={e => update("country", e.target.value)} /></Field>
-                <Field label={ar ? "المدينة *" : "City *"}><Input value={form.city} onChange={e => update("city", e.target.value)} /></Field>
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <Field label={ar ? "الجنسية *" : "Nationality *"}>
+                  <Select value={form.nationality} onValueChange={v => update("nationality", v)}>
+                    <SelectTrigger><SelectValue placeholder={ar ? "اختر..." : "Select..."} /></SelectTrigger>
+                    <SelectContent>
+                      {nationalities.length > 0 ? nationalities.map(o => <SelectItem key={o.id} value={o.name_en}>{ar ? o.name_ar : o.name_en}</SelectItem>) : COUNTRIES_OPTIONS.map(o => <SelectItem key={o.v} value={o.v}>{ar ? o.ar : o.v}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label={ar ? "الدولة *" : "Country *"}>
+                  <Select value={form.country} onValueChange={v => { update("country", v); update("city", ""); }}>
+                    <SelectTrigger><SelectValue placeholder={ar ? "اختر..." : "Select..."} /></SelectTrigger>
+                    <SelectContent>
+                      {countries.length > 0 ? countries.map(o => <SelectItem key={o.en} value={o.en}>{ar ? o.ar : o.en}</SelectItem>) : COUNTRIES_OPTIONS.map(o => <SelectItem key={o.v} value={o.v}>{ar ? o.ar : o.v}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label={ar ? "المدينة *" : "City *"}>
+                  {countries.length > 0 ? (
+                    <Select value={form.city} onValueChange={v => update("city", v)}>
+                      <SelectTrigger><SelectValue placeholder={ar ? "اختر..." : "Select..."} /></SelectTrigger>
+                      <SelectContent>
+                        {currentCities.map(o => <SelectItem key={o.id} value={o.city_en}>{ar ? o.city_ar : o.city_en}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input value={form.city} onChange={e => update("city", e.target.value)} />
+                  )}
+                </Field>
+                <Field label={ar ? "الجنس *" : "Gender *"}>
+                  <Select value={form.gender} onValueChange={v => update("gender", v)}>
+                    <SelectTrigger><SelectValue placeholder={ar ? "اختر..." : "Select..."} /></SelectTrigger>
+                    <SelectContent>
+                      {GENDER_OPTIONS.map(o => <SelectItem key={o.v} value={o.v}>{ar ? o.ar : o.en}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
               </div>
             </Fieldset>
 
             <Fieldset title={ar ? "الخبرة المهنية" : "Professional experience"}>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
                 <Field label={ar ? "المسمى الوظيفي الحالي" : "Current job title"}><Input value={form.current_title} onChange={e => update("current_title", e.target.value)} /></Field>
                 <Field label={ar ? "الشركة الحالية" : "Current company"}><Input value={form.current_company} onChange={e => update("current_company", e.target.value)} /></Field>
                 <Field label={ar ? "سنوات الخبرة *" : "Years of experience *"}><Input type="number" min={0} max={60} value={form.years_experience} onChange={e => update("years_experience", Number(e.target.value)||0)} /></Field>
@@ -353,13 +496,20 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
             </Fieldset>
 
             <Fieldset title={ar ? "الروابط والمهارات" : "Links & skills"}>
-              <Field label={ar ? "رابط السيرة الذاتية *" : "Resume URL *"}><Input dir="ltr" placeholder="https://" value={form.resume_url} onChange={e => update("resume_url", e.target.value)} /></Field>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <Field label={ar ? "السيرة الذاتية (رابط أو ملف) *" : "Resume (URL or File) *"}>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                  <Input dir="ltr" placeholder="https://" value={form.resume_url} onChange={e => { update("resume_url", e.target.value); setResumeFile(null); }} disabled={!!resumeFile} className="flex-1" />
+                  <span className="text-muted-foreground text-sm shrink-0">{ar ? "أو رفع ملف:" : "or upload:"}</span>
+                  <Input type="file" className="flex-1" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onChange={handleFileChange} />
+                </div>
+                {resumeFile && <p className="text-xs text-green-600 mt-1.5 font-medium">{resumeFile.name} ({Math.round(resumeFile.size / 1024)} KB)</p>}
+              </Field>
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
                 <Field label={ar ? "لينكدإن" : "LinkedIn"}><Input dir="ltr" placeholder="https://linkedin.com/in/..." value={form.linkedin_url} onChange={e => update("linkedin_url", e.target.value)} /></Field>
                 <Field label={ar ? "معرض الأعمال" : "Portfolio"}><Input dir="ltr" placeholder="https://" value={form.portfolio_url} onChange={e => update("portfolio_url", e.target.value)} /></Field>
+                <Field label={ar ? "المهارات (مفصولة بفواصل)" : "Skills (comma-separated)"}><Input placeholder="React, Node.js, SQL" value={form.skills} onChange={e => update("skills", e.target.value)} /></Field>
+                <Field label={ar ? "اللغات" : "Languages"}><Input placeholder={ar ? "العربية, الإنجليزية" : "English, Arabic"} value={form.languages} onChange={e => update("languages", e.target.value)} /></Field>
               </div>
-              <Field label={ar ? "المهارات (مفصولة بفواصل)" : "Skills (comma-separated)"}><Input placeholder="React, Node.js, SQL" value={form.skills} onChange={e => update("skills", e.target.value)} /></Field>
-              <Field label={ar ? "اللغات" : "Languages"}><Input placeholder={ar ? "العربية, الإنجليزية" : "English, Arabic"} value={form.languages} onChange={e => update("languages", e.target.value)} /></Field>
             </Fieldset>
 
             <Fieldset title={ar ? "معلومات إضافية" : "Additional info"}>

@@ -42,7 +42,6 @@ function AboutPage() {
     { href: "#leadership", label: isRtl ? "القيادة" : "Leadership" },
     { href: "#values", label: isRtl ? "قيمنا" : "Values" },
     { href: "#certifications", label: isRtl ? "الشهادات" : "Certifications" },
-    { href: "#location", label: isRtl ? "الموقع" : "Location" },
   ];
 
   const teamImageByKey: Record<string, string> = {
@@ -80,7 +79,7 @@ function AboutPage() {
         ) : (
           <div className="absolute inset-0 grid-bg opacity-50" />
         )}
-        <div className="container mx-auto px-4 lg:px-8 py-24 md:py-32 relative">
+        <div className="container mx-auto px-4 lg:px-8 py-16 md:py-24 relative">
           <div className="max-w-3xl animate-fade-in-up">
             <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{L(content.eyebrow)}</div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">{L(content.title)}</h1>
@@ -89,7 +88,7 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* Anchor navigation */}
+      {/* Anchor navigation hidden by request
       <nav aria-label={isRtl ? "أقسام الصفحة" : "Page sections"} className="sticky top-16 z-20 border-b bg-background/85 backdrop-blur">
         <div className="container mx-auto px-4 lg:px-8">
           <ul className="flex flex-wrap gap-1 py-2 text-sm">
@@ -103,6 +102,7 @@ function AboutPage() {
           </ul>
         </div>
       </nav>
+      */}
 
       <Section id="leadership" className="bg-muted/30 scroll-mt-32">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
@@ -245,6 +245,7 @@ function AboutPage() {
         </div>
       </Section>
 
+      {/* Our Location Section Hidden By Request
       <Section id="location" className="bg-muted/30 scroll-mt-32" title={isRtl ? "موقعنا" : "Our Location"}>
         <div className="grid lg:grid-cols-2 gap-8 items-start">
           <div className="space-y-3">
@@ -270,6 +271,7 @@ function AboutPage() {
           )}
         </div>
       </Section>
+      */}
 
       <Section title={L(content.teamTitle)} sub={L(content.teamSub)} center>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">

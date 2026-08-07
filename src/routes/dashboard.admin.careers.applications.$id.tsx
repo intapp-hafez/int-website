@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Loader2, ArrowLeft, Mail, Phone, ExternalLink, Linkedin, FileText, Clock, Pencil,
-  Briefcase, MapPin, GraduationCap, Building, Globe, DollarSign, Calendar, Star, Languages, ShieldCheck, Award
+  Briefcase, MapPin, GraduationCap, Building, Globe, DollarSign, Calendar, Star, Languages, ShieldCheck, Award, User
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -40,6 +40,7 @@ type AppFull = {
   nationality: string | null;
   country: string | null;
   city: string | null;
+  gender: string | null;
   expected_salary: number | null;
   salary_currency: string | null;
   earliest_start_date: string | null;
@@ -241,6 +242,9 @@ function AppDetail() {
                 )}
                 {app.nationality && (
                   <div className="flex items-center gap-2"><Globe className="h-4 w-4 text-muted-foreground shrink-0" /> <span className="text-muted-foreground">{isAr ? "الجنسية" : "Nationality"}:</span> {app.nationality}</div>
+                )}
+                {app.gender && (
+                  <div className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground shrink-0" /> <span className="text-muted-foreground">{isAr ? "الجنس" : "Gender"}:</span> {app.gender === 'male' ? (isAr ? 'ذكر' : 'Male') : app.gender === 'female' ? (isAr ? 'أنثى' : 'Female') : app.gender}</div>
                 )}
                 {salary && (
                   <div className="flex items-center gap-2"><DollarSign className="h-4 w-4 text-muted-foreground shrink-0" /> <span className="text-muted-foreground">{isAr ? "الراتب المتوقع" : "Expected Salary"}:</span> {salary}</div>
