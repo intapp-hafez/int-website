@@ -4,8 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, Mail, Phone, X, Briefcase, MapPin, FileSpreadsheet } from "lucide-react";
-import { listApplications, listApplicationsFull, updateApplicationStatus } from "@/lib/admin-data.functions";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2, Search, Mail, Phone, X, Briefcase, MapPin, FileSpreadsheet, FileText, FileDown } from "lucide-react";
+import {
+  listApplications,
+  listApplicationsFull,
+  listApplicationsReport,
+  updateApplicationStatus,
+  bulkUpdateApplicationStatus,
+} from "@/lib/admin-data.functions";
+import { BulkActionBar } from "@/components/admin/BulkActionBar";
+import { buildApplicantCsv, openApplicantReportPdf } from "@/lib/applicant-report";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
@@ -45,6 +54,8 @@ function ApplicationsList() {
   const [dateTo, setDateTo] = useState<string>("");
   const [view, setView] = useState<"board" | "list">("board");
   const [exporting, setExporting] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [reporting, setReporting] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -84,6 +95,47 @@ function ApplicationsList() {
 
   const hasFilters = statusFilter !== "all" || jobFilter !== "all" || !!dateFrom || !!dateTo || !!q.trim();
   const clearAll = () => { setStatusFilter("all"); setJobFilter("all"); setDateFrom(""); setDateTo(""); setQ(""); };
+
+  const toggleOne = (id: string) =>
+    setSelected(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
+  const allFilteredSelected = filtered.length > 0 && filtered.every(a => selected.includes(a.id));
+  const toggleAllFiltered = () =>
+    setSelected(allFilteredSelected ? [] : filtered.map(a => a.id));
+
+  const bulkStatus = async (to: string) => {
+    const ids = [...selected];
+    try {
+      await bulkUpdateApplicationStatus({ data: { ids, to } });
+      setApps(prev => prev.map(x => (ids.includes(x.id) ? { ...x, status: to as CareerStatus } : x)));
+      setSelected([]);
+      toast.success(lang === "ar" ? `تم تحديث ${ids.length} طلب` : `${ids.length} application(s) updated`);
+    } catch {
+      toast.error(lang === "ar" ? "تعذر التحديث" : "Could not update");
+    }
+  };
+
+  const downloadReport = async (kind: "csv" | "pdf") => {
+    setReporting(true);
+    try {
+      const ids = selected.length ? selected : filtered.map(a => a.id);
+      const { apps: rows, events } = await listApplicationsReport({ data: { ids } }) as any;
+      if (kind === "csv") {
+        const csv = buildApplicantCsv(rows, events);
+        const url = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `applicants-report-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        openApplicantReportPdf(rows, events);
+      }
+    } catch {
+      toast.error(lang === "ar" ? "تعذر إنشاء التقرير" : "Could not build the report");
+    } finally {
+      setReporting(false);
+    }
+  };
 
   const exportExcel = async () => {
     setExporting(true);
@@ -194,12 +246,35 @@ function ApplicationsList() {
           {exporting ? <Loader2 className="h-3 w-3 me-1 animate-spin" /> : <FileSpreadsheet className="h-3 w-3 me-1" />}
           {lang === "ar" ? "تصدير إلى Excel" : "Export to Excel"}
         </Button>
+        <Button variant="outline" size="sm" onClick={() => downloadReport("csv")} disabled={reporting || filtered.length === 0}>
+          {reporting ? <Loader2 className="h-3 w-3 me-1 animate-spin" /> : <FileDown className="h-3 w-3 me-1" />}
+          {lang === "ar" ? "تقرير CSV" : "Report CSV"}
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => downloadReport("pdf")} disabled={reporting || filtered.length === 0}>
+          {reporting ? <Loader2 className="h-3 w-3 me-1 animate-spin" /> : <FileText className="h-3 w-3 me-1" />}
+          {lang === "ar" ? "تقرير PDF" : "Report PDF"}
+        </Button>
         <div className="inline-flex rounded-md border bg-card p-0.5 ms-auto text-sm">
           <button onClick={() => setView("board")} className={`px-3 py-1 rounded ${view === "board" ? "bg-accent/10 text-accent" : "text-muted-foreground"}`}>{t("board")}</button>
           <button onClick={() => setView("list")} className={`px-3 py-1 rounded ${view === "list" ? "bg-accent/10 text-accent" : "text-muted-foreground"}`}>{t("list")}</button>
         </div>
       </div>
       <div className="text-xs text-muted-foreground">{t("showing")} {filtered.length} {t("of")} {apps.length}</div>
+
+      {can.edit && view === "list" && filtered.length > 0 && (
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Checkbox checked={allFilteredSelected} onCheckedChange={() => toggleAllFiltered()} />
+          {lang === "ar" ? "تحديد كل النتائج" : "Select all results"}
+        </label>
+      )}
+      {can.edit && (
+        <BulkActionBar
+          count={selected.length}
+          onClear={() => setSelected([])}
+          statusOptions={STATUS_ALL.map(s => ({ value: s, label: lang === "ar" ? STATUS_LABEL[s].ar : STATUS_LABEL[s].en }))}
+          onStatusChange={bulkStatus}
+        />
+      )}
 
       {apps.length === 0 ? (
         <Card><CardContent className="py-12 text-center text-sm text-muted-foreground">{t("noApplications")}</CardContent></Card>
@@ -213,6 +288,8 @@ function ApplicationsList() {
               a={a}
               lang={lang}
               canEdit={can.edit}
+              selected={selected.includes(a.id)}
+              onToggle={() => toggleOne(a.id)}
               onShortlist={async () => {
                 try {
                   await updateApplicationStatus({ data: { id: a.id, from: a.status, to: "shortlisted" } });
@@ -262,10 +339,18 @@ function AppCard({ a }: { a: App }) {
   );
 }
 
-function AppRow({ a, lang, canEdit, onShortlist }: { a: App; lang: string; canEdit: boolean; onShortlist: () => void }) {
+function AppRow({ a, lang, canEdit, selected, onToggle, onShortlist }: { a: App; lang: string; canEdit: boolean; selected: boolean; onToggle: () => void; onShortlist: () => void }) {
   const loc = [a.city, a.country].filter(Boolean).join(", ");
   return (
-    <Link to="/dashboard/admin/careers/applications/$id" params={{ id: a.id }} className="flex flex-wrap items-center gap-3 rounded-md border bg-card p-3 hover:border-accent transition-colors">
+    <div className="flex flex-wrap items-center gap-3 rounded-md border bg-card p-3 hover:border-accent transition-colors">
+      {canEdit && (
+        <Checkbox
+          checked={selected}
+          onCheckedChange={() => onToggle()}
+          aria-label={lang === "ar" ? "تحديد الطلب" : "Select application"}
+        />
+      )}
+      <Link to="/dashboard/admin/careers/applications/$id" params={{ id: a.id }} className="flex flex-1 flex-wrap items-center gap-3 min-w-0">
       <div className="flex-1 min-w-[200px]">
         <div className="text-sm font-medium">{a.full_name}</div>
         <div className="text-xs text-muted-foreground flex flex-wrap gap-3 mt-0.5">
@@ -277,6 +362,8 @@ function AppRow({ a, lang, canEdit, onShortlist }: { a: App; lang: string; canEd
       </div>
       <div className="text-xs text-muted-foreground">{a.career_jobs?.title_en || "—"}</div>
       <span className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_COLOR[a.status]}`}>{lang === "ar" ? STATUS_LABEL[a.status].ar : STATUS_LABEL[a.status].en}</span>
+      <span className="text-[10px] font-mono text-muted-foreground">{a.ref}</span>
+      </Link>
       {canEdit && a.status !== "shortlisted" && !["accepted", "rejected", "withdrawn"].includes(a.status) && (
         <Button
           variant="outline"
@@ -286,7 +373,6 @@ function AppRow({ a, lang, canEdit, onShortlist }: { a: App; lang: string; canEd
           <Star className="h-3 w-3 me-1" />{lang === "ar" ? "قائمة قصيرة" : "Shortlist"}
         </Button>
       )}
-      <span className="text-[10px] font-mono text-muted-foreground">{a.ref}</span>
-    </Link>
+    </div>
   );
 }
