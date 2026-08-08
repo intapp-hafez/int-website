@@ -5,13 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, Search, Mail, Phone, X, Briefcase, MapPin, FileSpreadsheet, FileText, FileDown } from "lucide-react";
+import { Loader2, Search, Mail, Phone, X, Briefcase, MapPin, FileSpreadsheet, FileText, FileDown, Upload } from "lucide-react";
 import {
   listApplications,
   listApplicationsFull,
   listApplicationsReport,
   updateApplicationStatus,
   bulkUpdateApplicationStatus,
+  bulkUpdateApplicationsByRef,
 } from "@/lib/admin-data.functions";
 import { BulkActionBar } from "@/components/admin/BulkActionBar";
 import { buildApplicantCsv, openApplicantReportPdf } from "@/lib/applicant-report";
@@ -56,6 +57,9 @@ function ApplicationsList() {
   const [exporting, setExporting] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [reporting, setReporting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState<{ updated: any[]; skipped: any[] } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     (async () => {
@@ -115,6 +119,48 @@ function ApplicationsList() {
   };
 
   const downloadReport = async (kind: "csv" | "pdf") => {
+
+  const downloadTemplate = () => {
+    const sample = filtered.slice(0, 5).map(a => `${a.ref},shortlisted,`).join("\n");
+    const csv = `ref,status,note\n${sample || "REF-123456,shortlisted,Moved from CSV"}\n`;
+    const url = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bulk-status-template.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const onUploadCsv = async (file: File) => {
+    setUploading(true);
+    setUploadResult(null);
+    try {
+      const rows = parseStatusCsv(await file.text());
+      if (!rows.length) {
+        toast.error(lang === "ar" ? "لم يتم العثور على صفوف صالحة" : "No valid rows found");
+        return;
+      }
+      const res = await bulkUpdateApplicationsByRef({ data: { rows } }) as any;
+      setUploadResult(res);
+      const map = new Map<string, string>(res.updated.map((u: any) => [String(u.ref).toUpperCase(), u.to]));
+      setApps(prev => prev.map(a => {
+        const to = map.get(String(a.ref).toUpperCase());
+        return to ? { ...a, status: to as CareerStatus } : a;
+      }));
+      toast.success(
+        lang === "ar"
+          ? `تم تحديث ${res.updated.length} — تم تخطي ${res.skipped.length}`
+          : `${res.updated.length} updated — ${res.skipped.length} skipped`
+      );
+    } catch (e: any) {
+      toast.error(e?.message || (lang === "ar" ? "تعذر معالجة الملف" : "Could not process the file"));
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const runDownloadReport = async (kind: "csv" | "pdf") => {
     setReporting(true);
     try {
       const ids = selected.length ? selected : filtered.map(a => a.id);
@@ -136,6 +182,7 @@ function ApplicationsList() {
       setReporting(false);
     }
   };
+  const downloadReport = runDownloadReport;
 
   const exportExcel = async () => {
     setExporting(true);
@@ -254,12 +301,55 @@ function ApplicationsList() {
           {reporting ? <Loader2 className="h-3 w-3 me-1 animate-spin" /> : <FileText className="h-3 w-3 me-1" />}
           {lang === "ar" ? "تقرير PDF" : "Report PDF"}
         </Button>
+        {can.edit && (
+          <>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".csv,text/csv"
+              className="hidden"
+              onChange={e => { const f = e.target.files?.[0]; if (f) onUploadCsv(f); }}
+            />
+            <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
+              {uploading ? <Loader2 className="h-3 w-3 me-1 animate-spin" /> : <Upload className="h-3 w-3 me-1" />}
+              {lang === "ar" ? "رفع CSV للتحديث الجماعي" : "Bulk update via CSV"}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={downloadTemplate}>
+              {lang === "ar" ? "نموذج CSV" : "CSV template"}
+            </Button>
+          </>
+        )}
         <div className="inline-flex rounded-md border bg-card p-0.5 ms-auto text-sm">
           <button onClick={() => setView("board")} className={`px-3 py-1 rounded ${view === "board" ? "bg-accent/10 text-accent" : "text-muted-foreground"}`}>{t("board")}</button>
           <button onClick={() => setView("list")} className={`px-3 py-1 rounded ${view === "list" ? "bg-accent/10 text-accent" : "text-muted-foreground"}`}>{t("list")}</button>
         </div>
       </div>
       <div className="text-xs text-muted-foreground">{t("showing")} {filtered.length} {t("of")} {apps.length}</div>
+
+      {uploadResult && (
+        <Card>
+          <CardContent className="py-3 text-xs space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="font-medium text-sm">
+                {lang === "ar" ? "نتيجة التحديث الجماعي" : "Bulk update result"}
+              </span>
+              <Button variant="ghost" size="sm" onClick={() => setUploadResult(null)}><X className="h-3 w-3" /></Button>
+            </div>
+            <div className="text-emerald-600">
+              {lang === "ar" ? "تم التحديث" : "Updated"}: {uploadResult.updated.length}
+              {uploadResult.updated.length > 0 && (
+                <span className="text-muted-foreground"> — {uploadResult.updated.map((u: any) => `${u.ref} → ${u.to}`).join(", ")}</span>
+              )}
+            </div>
+            {uploadResult.skipped.length > 0 && (
+              <div className="text-amber-600">
+                {lang === "ar" ? "تم التخطي" : "Skipped"}: {uploadResult.skipped.length}
+                <span className="text-muted-foreground"> — {uploadResult.skipped.map((s: any) => `${s.ref} (${s.reason})`).join(", ")}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {can.edit && view === "list" && filtered.length > 0 && (
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
