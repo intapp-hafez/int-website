@@ -25,6 +25,50 @@ function csvCell(v: any) {
   return `"${s.replace(/"/g, '""')}"`;
 }
 
+/** Parses an uploaded CSV of `ref,status,note` rows (header optional, quotes supported). */
+export function parseStatusCsv(text: string) {
+  const clean = text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n").trim();
+  if (!clean) return [];
+  const split = (line: string) => {
+    const out: string[] = [];
+    let cur = "";
+    let quoted = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (quoted) {
+        if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+        else if (c === '"') quoted = false;
+        else cur += c;
+      } else if (c === '"') quoted = true;
+      else if (c === "," || c === ";") { out.push(cur); cur = ""; }
+      else cur += c;
+    }
+    out.push(cur);
+    return out.map(s => s.trim());
+  };
+  const lines = clean.split("\n").filter(l => l.trim());
+  let header: string[] | null = null;
+  const first = split(lines[0]!).map(h => h.toLowerCase());
+  if (first.some(h => ["ref", "reference", "المرجع"].includes(h))) header = first;
+  const idx = (names: string[], fallback: number) => {
+    if (!header) return fallback;
+    const i = header.findIndex(h => names.includes(h));
+    return i >= 0 ? i : fallback;
+  };
+  const iRef = idx(["ref", "reference", "المرجع"], 0);
+  const iStatus = idx(["status", "stage", "الحالة"], 1);
+  const iNote = idx(["note", "notes", "ملاحظة"], 2);
+  return lines
+    .slice(header ? 1 : 0)
+    .map(split)
+    .map(c => ({
+      ref: (c[iRef] ?? "").trim(),
+      status: (c[iStatus] ?? "").trim().toLowerCase().replace(/\s+/g, "_"),
+      note: (c[iNote] ?? "").trim(),
+    }))
+    .filter(r => r.ref && r.status);
+}
+
 export function buildApplicantCsv(apps: Row[], events: Ev[]) {
   const byApp = groupEvents(events);
   const headers = [
