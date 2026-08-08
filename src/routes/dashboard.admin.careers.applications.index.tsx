@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,6 +33,7 @@ export const Route = createFileRoute("/dashboard/admin/careers/applications/")({
 });
 
 type App = {
+
   id: string; ref: string; full_name: string; email: string; phone: string;
   status: CareerStatus; created_at: string;
   job_id: string | null;
