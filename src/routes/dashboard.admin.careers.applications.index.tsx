@@ -15,7 +15,7 @@ import {
   bulkUpdateApplicationsByRef,
 } from "@/lib/admin-data.functions";
 import { BulkActionBar } from "@/components/admin/BulkActionBar";
-import { buildApplicantCsv, openApplicantReportPdf } from "@/lib/applicant-report";
+import { buildApplicantCsv, openApplicantReportPdf, parseStatusCsv } from "@/lib/applicant-report";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
