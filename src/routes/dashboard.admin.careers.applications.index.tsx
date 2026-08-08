@@ -118,8 +118,6 @@ function ApplicationsList() {
     }
   };
 
-  const downloadReport = async (kind: "csv" | "pdf") => {
-
   const downloadTemplate = () => {
     const sample = filtered.slice(0, 5).map(a => `${a.ref},shortlisted,`).join("\n");
     const csv = `ref,status,note\n${sample || "REF-123456,shortlisted,Moved from CSV"}\n`;
@@ -160,7 +158,7 @@ function ApplicationsList() {
     }
   };
 
-  const runDownloadReport = async (kind: "csv" | "pdf") => {
+  const downloadReport = async (kind: "csv" | "pdf") => {
     setReporting(true);
     try {
       const ids = selected.length ? selected : filtered.map(a => a.id);
@@ -182,7 +180,6 @@ function ApplicationsList() {
       setReporting(false);
     }
   };
-  const downloadReport = runDownloadReport;
 
   const exportExcel = async () => {
     setExporting(true);
