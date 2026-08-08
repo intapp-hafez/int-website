@@ -122,3 +122,58 @@ export const updateApplicationEvent = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Full applicant rows + stage history for the bilingual report. */
+export const listApplicationsReport = createServerFn({ method: "POST" })
+  .inputValidator((d: { ids?: string[] }) => ({
+    ids: Array.isArray(d?.ids) ? d.ids.filter((x) => typeof x === "string").slice(0, 500) : [],
+  }))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let q = supabaseAdmin
+      .from("career_applications")
+      .select("*, career_jobs(title_en,title_ar,location_en)")
+      .order("created_at", { ascending: false });
+    if (data.ids.length) q = q.in("id", data.ids);
+    const { data: apps, error } = await q;
+    if (error) throw new Error(error.message);
+    const ids = (apps ?? []).map((a: any) => a.id);
+    let events: any[] = [];
+    if (ids.length) {
+      const { data: ev, error: e2 } = await supabaseAdmin
+        .from("career_application_events")
+        .select("*")
+        .in("application_id", ids)
+        .order("created_at", { ascending: true });
+      if (e2) throw new Error(e2.message);
+      events = ev ?? [];
+    }
+    return { apps: (apps ?? []) as any[], events };
+  });
+
+/** Bulk stage change for many applications at once. */
+export const bulkUpdateApplicationStatus = createServerFn({ method: "POST" })
+  .inputValidator((d: { ids: string[]; to: string; note?: string }) => {
+    const ids = Array.isArray(d?.ids) ? d.ids.filter((x) => typeof x === "string").slice(0, 500) : [];
+    const to = String(d?.to ?? "");
+    if (!ids.length) throw new Error("No applications selected");
+    if (!to) throw new Error("Missing target status");
+    return { ids, to, note: String(d?.note ?? "") };
+  })
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: current, error: e0 } = await supabaseAdmin
+      .from("career_applications").select("id,status").in("id", data.ids);
+    if (e0) throw new Error(e0.message);
+    const { error } = await supabaseAdmin
+      .from("career_applications").update({ status: data.to as any }).in("id", data.ids);
+    if (error) throw new Error(error.message);
+    const rows = (current ?? []).filter((r: any) => r.status !== data.to).map((r: any) => ({
+      application_id: r.id,
+      from_status: r.status as any,
+      to_status: data.to as any,
+      note: data.note,
+    }));
+    if (rows.length) await supabaseAdmin.from("career_application_events").insert(rows);
+    return { ok: true, updated: rows.length };
+  });
