@@ -177,3 +177,54 @@ export const bulkUpdateApplicationStatus = createServerFn({ method: "POST" })
     if (rows.length) await supabaseAdmin.from("career_application_events").insert(rows);
     return { ok: true, updated: rows.length };
   });
+
+const VALID_STATUS = [
+  "new", "reviewed", "shortlisted", "interviewed", "offered", "accepted", "rejected", "withdrawn",
+];
+
+/** Bulk stage change by reference number (CSV upload). */
+export const bulkUpdateApplicationsByRef = createServerFn({ method: "POST" })
+  .inputValidator((d: { rows: { ref: string; status: string; note?: string }[] }) => {
+    const rows = (Array.isArray(d?.rows) ? d.rows : [])
+      .map((r) => ({
+        ref: String(r?.ref ?? "").trim().toUpperCase(),
+        status: String(r?.status ?? "").trim().toLowerCase(),
+        note: String(r?.note ?? "").slice(0, 500),
+      }))
+      .filter((r) => r.ref)
+      .slice(0, 1000);
+    if (!rows.length) throw new Error("No rows found in the file");
+    return { rows };
+  })
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const refs = Array.from(new Set(data.rows.map((r) => r.ref)));
+    const { data: existing, error } = await supabaseAdmin
+      .from("career_applications").select("id,ref,status").in("ref", refs);
+    if (error) throw new Error(error.message);
+    const byRef = new Map((existing ?? []).map((r: any) => [String(r.ref).toUpperCase(), r]));
+
+    const updated: { ref: string; from: string; to: string }[] = [];
+    const skipped: { ref: string; reason: string }[] = [];
+    const events: any[] = [];
+
+    for (const row of data.rows) {
+      const app = byRef.get(row.ref) as any;
+      if (!app) { skipped.push({ ref: row.ref, reason: "not_found" }); continue; }
+      if (!VALID_STATUS.includes(row.status)) { skipped.push({ ref: row.ref, reason: "invalid_status" }); continue; }
+      if (app.status === row.status) { skipped.push({ ref: row.ref, reason: "unchanged" }); continue; }
+      const { error: e1 } = await supabaseAdmin
+        .from("career_applications").update({ status: row.status as any }).eq("id", app.id);
+      if (e1) { skipped.push({ ref: row.ref, reason: "update_failed" }); continue; }
+      events.push({
+        application_id: app.id,
+        from_status: app.status as any,
+        to_status: row.status as any,
+        note: row.note || "Bulk CSV update",
+      });
+      updated.push({ ref: row.ref, from: app.status, to: row.status });
+      app.status = row.status;
+    }
+    if (events.length) await supabaseAdmin.from("career_application_events").insert(events);
+    return { updated, skipped };
+  });
