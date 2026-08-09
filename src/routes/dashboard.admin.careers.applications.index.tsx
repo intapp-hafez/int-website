@@ -60,6 +60,8 @@ function ApplicationsList() {
   const [reporting, setReporting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<{ updated: any[]; skipped: any[] } | null>(null);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const cancelRef = useRef(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -121,7 +123,7 @@ function ApplicationsList() {
 
   const downloadTemplate = () => {
     const sample = filtered.slice(0, 5).map(a => `${a.ref},shortlisted,`).join("\n");
-    const csv = `ref,status,note\n${sample || "REF-123456,shortlisted,Moved from CSV"}\n`;
+    const csv = `ref,status,note\n${sample || "REF-123456,Short list,Moved from CSV"}\n`;
     const url = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
     const a = document.createElement("a");
     a.href = url;
@@ -133,19 +135,40 @@ function ApplicationsList() {
   const onUploadCsv = async (file: File) => {
     setUploading(true);
     setUploadResult(null);
+    setProgress(null);
+    cancelRef.current = false;
     try {
       const rows = parseStatusCsv(await file.text());
       if (!rows.length) {
         toast.error(lang === "ar" ? "لم يتم العثور على صفوف صالحة" : "No valid rows found");
         return;
       }
-      const res = await bulkUpdateApplicationsByRef({ data: { rows } }) as any;
-      setUploadResult(res);
-      const map = new Map<string, string>(res.updated.map((u: any) => [String(u.ref).toUpperCase(), u.to]));
-      setApps(prev => prev.map(a => {
-        const to = map.get(String(a.ref).toUpperCase());
-        return to ? { ...a, status: to as CareerStatus } : a;
-      }));
+      // Queued background processing: send the file in small chunks so large
+      // imports never hit a request timeout, and progress stays visible.
+      const CHUNK = 50;
+      const chunks: typeof rows[] = [];
+      for (let i = 0; i < rows.length; i += CHUNK) chunks.push(rows.slice(i, i + CHUNK));
+      const agg: { updated: any[]; skipped: any[] } = { updated: [], skipped: [] };
+      setProgress({ done: 0, total: rows.length });
+      for (const chunk of chunks) {
+        if (cancelRef.current) break;
+        try {
+          const res = await bulkUpdateApplicationsByRef({ data: { rows: chunk } }) as any;
+          agg.updated.push(...(res.updated ?? []));
+          agg.skipped.push(...(res.skipped ?? []));
+          const map = new Map<string, string>((res.updated ?? []).map((u: any) => [String(u.ref).toUpperCase(), u.to]));
+          setApps(prev => prev.map(a => {
+            const to = map.get(String(a.ref).toUpperCase());
+            return to ? { ...a, status: to as CareerStatus } : a;
+          }));
+        } catch {
+          agg.skipped.push(...chunk.map(r => ({ ref: r.ref, reason: "chunk_failed" })));
+        }
+        setProgress(p => ({ done: Math.min((p?.done ?? 0) + chunk.length, rows.length), total: rows.length }));
+        setUploadResult({ updated: [...agg.updated], skipped: [...agg.skipped] });
+        await new Promise(r => setTimeout(r, 0)); // yield so the UI can repaint
+      }
+      const res = agg;
       toast.success(
         lang === "ar"
           ? `تم تحديث ${res.updated.length} — تم تخطي ${res.skipped.length}`
@@ -155,6 +178,7 @@ function ApplicationsList() {
       toast.error(e?.message || (lang === "ar" ? "تعذر معالجة الملف" : "Could not process the file"));
     } finally {
       setUploading(false);
+      setProgress(null);
       if (fileRef.current) fileRef.current.value = "";
     }
   };
