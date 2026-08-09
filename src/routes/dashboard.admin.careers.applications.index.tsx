@@ -370,6 +370,14 @@ function ApplicationsList() {
             <Button variant="ghost" size="sm" onClick={downloadTemplate}>
               {lang === "ar" ? "نموذج CSV" : "CSV template"}
             </Button>
+            <Input
+              type="email"
+              value={notifyEmail}
+              onChange={e => setNotifyEmail(e.target.value)}
+              placeholder={lang === "ar" ? "بريد لإشعار انتهاء الاستيراد (اختياري)" : "Email me the import summary (optional)"}
+              aria-label={lang === "ar" ? "بريد إشعار الاستيراد" : "Import summary email"}
+              className="w-[260px]"
+            />
             {uploading && progress && (
               <Button variant="ghost" size="sm" onClick={() => { cancelRef.current = true; }}>
                 {lang === "ar" ? "إيقاف" : "Stop"}
