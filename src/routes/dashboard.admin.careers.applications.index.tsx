@@ -24,6 +24,8 @@ import { useAdminT } from "@/lib/admin-i18n";
 import { Label } from "@/components/ui/label";
 import { useCanAccess } from "@/lib/permissions-store";
 import { AccessDenied } from "@/routes/dashboard.admin.careers";
+import { useNotifications } from "@/lib/notifications-store";
+import { sendImportSummaryEmail } from "@/lib/import-notify.functions";
 
 export const Route = createFileRoute("/dashboard/admin/careers/applications/")({
   validateSearch: (search: Record<string, unknown>): { job?: string } => ({
@@ -61,6 +63,8 @@ function ApplicationsList() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<{ updated: any[]; skipped: any[] } | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const { add: addNotification } = useNotifications();
   const cancelRef = useRef(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
