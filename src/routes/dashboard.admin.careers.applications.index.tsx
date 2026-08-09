@@ -173,11 +173,38 @@ function ApplicationsList() {
         await new Promise(r => setTimeout(r, 0)); // yield so the UI can repaint
       }
       const res = agg;
+      const total = rows.length;
+      const summaryEn = `${res.updated.length} succeeded, ${res.skipped.length} failed out of ${total} rows`;
+      const summaryAr = `${res.updated.length} ناجح، ${res.skipped.length} فاشل من أصل ${total} صف`;
       toast.success(
         lang === "ar"
           ? `تم تحديث ${res.updated.length} — تم تخطي ${res.skipped.length}`
           : `${res.updated.length} updated — ${res.skipped.length} skipped`
       );
+      try {
+        await addNotification({
+          type: "system",
+          title: lang === "ar" ? "اكتمل استيراد CSV" : "Bulk CSV import finished",
+          message: lang === "ar" ? summaryAr : summaryEn,
+          href: "/dashboard/admin/careers/applications",
+        });
+      } catch { /* notification is best-effort */ }
+      if (notifyEmail.trim()) {
+        try {
+          await sendImportSummaryEmail({
+            data: {
+              to: notifyEmail.trim(),
+              updated: res.updated.length,
+              skipped: res.skipped.length,
+              total,
+              reasons: res.skipped.slice(0, 20).map((s: any) => `${s.ref} (${s.reason})`),
+            },
+          });
+          toast.success(lang === "ar" ? "تم إرسال ملخص الاستيراد بالبريد" : "Import summary emailed");
+        } catch {
+          toast.error(lang === "ar" ? "تعذر إرسال البريد" : "Could not send the summary email");
+        }
+      }
     } catch (e: any) {
       toast.error(e?.message || (lang === "ar" ? "تعذر معالجة الملف" : "Could not process the file"));
     } finally {
