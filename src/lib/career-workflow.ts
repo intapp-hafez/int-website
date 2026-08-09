@@ -32,3 +32,58 @@ export function nextStatuses(current: CareerStatus): CareerStatus[] {
   const forward = idx >= 0 ? STATUS_PIPELINE.slice(idx + 1) : [];
   return [...forward, "rejected", "withdrawn"];
 }
+
+/** Human-friendly stage names (EN/AR + common variants) mapped to internal stage IDs. */
+export const STATUS_ALIASES: Record<string, CareerStatus> = {
+  // new
+  new: "new", "new applicant": "new", applied: "new", application: "new", pending: "new", received: "new",
+  "جديد": "new", "جديدة": "new", "تم الاستلام": "new", "قيد الانتظار": "new",
+  // reviewed
+  reviewed: "reviewed", review: "reviewed", "in review": "reviewed", "under review": "reviewed", screened: "reviewed", screening: "reviewed",
+  "تمت المراجعة": "reviewed", "مراجعة": "reviewed", "قيد المراجعة": "reviewed",
+  // shortlisted
+  shortlisted: "shortlisted", shortlist: "shortlisted", "short list": "shortlisted", "short listed": "shortlisted", "short-list": "shortlisted", "short-listed": "shortlisted",
+  "قائمة قصيرة": "shortlisted", "القائمة القصيرة": "shortlisted", "مرشح": "shortlisted",
+  // interviewed
+  interviewed: "interviewed", interview: "interviewed", "interview done": "interviewed", "interview completed": "interviewed",
+  "تمت المقابلة": "interviewed", "مقابلة": "interviewed",
+  // offered
+  offered: "offered", offer: "offered", "offer sent": "offered", "offer extended": "offered",
+  "تم تقديم عرض": "offered", "عرض": "offered", "تم إرسال العرض": "offered",
+  // accepted
+  accepted: "accepted", accept: "accepted", hired: "accepted", "offer accepted": "accepted", onboarded: "accepted",
+  "مقبول": "accepted", "تم القبول": "accepted", "تم التوظيف": "accepted",
+  // rejected
+  rejected: "rejected", reject: "rejected", declined: "rejected", "not selected": "rejected", "not a fit": "rejected", disqualified: "rejected",
+  "مرفوض": "rejected", "تم الرفض": "rejected", "غير مناسب": "rejected",
+  // withdrawn
+  withdrawn: "withdrawn", withdraw: "withdrawn", "withdrew": "withdrawn", cancelled: "withdrawn", canceled: "withdrawn",
+  "منسحب": "withdrawn", "انسحب": "withdrawn", "ملغي": "withdrawn",
+};
+
+/** Normalizes a human-typed stage name (EN/AR) to an internal stage ID, or null. */
+export function resolveStatus(input: string): CareerStatus | null {
+  const raw = String(input ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[_\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/[.,;:!]+$/g, "")
+    .replace(/[\u064B-\u0652\u0640]/g, "") // Arabic diacritics/tatweel
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ة/g, "ه")
+    .replace(/ى/g, "ي");
+  if (!raw) return null;
+  if (STATUS_ALL.includes(raw as CareerStatus)) return raw as CareerStatus;
+  for (const [key, value] of Object.entries(STATUS_ALIASES)) {
+    const k = key
+      .toLowerCase()
+      .replace(/[_\-]+/g, " ")
+      .replace(/[\u064B-\u0652\u0640]/g, "")
+      .replace(/[أإآ]/g, "ا")
+      .replace(/ة/g, "ه")
+      .replace(/ى/g, "ي");
+    if (k === raw) return value;
+  }
+  return null;
+}
