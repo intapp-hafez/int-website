@@ -24,6 +24,8 @@ import { useAdminT } from "@/lib/admin-i18n";
 import { Label } from "@/components/ui/label";
 import { useCanAccess } from "@/lib/permissions-store";
 import { AccessDenied } from "@/routes/dashboard.admin.careers";
+import { useNotifications } from "@/lib/notifications-store";
+import { sendImportSummaryEmail } from "@/lib/import-notify.functions";
 
 export const Route = createFileRoute("/dashboard/admin/careers/applications/")({
   validateSearch: (search: Record<string, unknown>): { job?: string } => ({
@@ -61,6 +63,8 @@ function ApplicationsList() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<{ updated: any[]; skipped: any[] } | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const { add: addNotification } = useNotifications();
   const cancelRef = useRef(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -169,11 +173,38 @@ function ApplicationsList() {
         await new Promise(r => setTimeout(r, 0)); // yield so the UI can repaint
       }
       const res = agg;
+      const total = rows.length;
+      const summaryEn = `${res.updated.length} succeeded, ${res.skipped.length} failed out of ${total} rows`;
+      const summaryAr = `${res.updated.length} ناجح، ${res.skipped.length} فاشل من أصل ${total} صف`;
       toast.success(
         lang === "ar"
           ? `تم تحديث ${res.updated.length} — تم تخطي ${res.skipped.length}`
           : `${res.updated.length} updated — ${res.skipped.length} skipped`
       );
+      try {
+        await addNotification({
+          type: "system",
+          title: lang === "ar" ? "اكتمل استيراد CSV" : "Bulk CSV import finished",
+          message: lang === "ar" ? summaryAr : summaryEn,
+          href: "/dashboard/admin/careers/applications",
+        });
+      } catch { /* notification is best-effort */ }
+      if (notifyEmail.trim()) {
+        try {
+          await sendImportSummaryEmail({
+            data: {
+              to: notifyEmail.trim(),
+              updated: res.updated.length,
+              skipped: res.skipped.length,
+              total,
+              reasons: res.skipped.slice(0, 20).map((s: any) => `${s.ref} (${s.reason})`),
+            },
+          });
+          toast.success(lang === "ar" ? "تم إرسال ملخص الاستيراد بالبريد" : "Import summary emailed");
+        } catch {
+          toast.error(lang === "ar" ? "تعذر إرسال البريد" : "Could not send the summary email");
+        }
+      }
     } catch (e: any) {
       toast.error(e?.message || (lang === "ar" ? "تعذر معالجة الملف" : "Could not process the file"));
     } finally {
@@ -339,6 +370,14 @@ function ApplicationsList() {
             <Button variant="ghost" size="sm" onClick={downloadTemplate}>
               {lang === "ar" ? "نموذج CSV" : "CSV template"}
             </Button>
+            <Input
+              type="email"
+              value={notifyEmail}
+              onChange={e => setNotifyEmail(e.target.value)}
+              placeholder={lang === "ar" ? "بريد لإشعار انتهاء الاستيراد (اختياري)" : "Email me the import summary (optional)"}
+              aria-label={lang === "ar" ? "بريد إشعار الاستيراد" : "Import summary email"}
+              className="w-[260px]"
+            />
             {uploading && progress && (
               <Button variant="ghost" size="sm" onClick={() => { cancelRef.current = true; }}>
                 {lang === "ar" ? "إيقاف" : "Stop"}
