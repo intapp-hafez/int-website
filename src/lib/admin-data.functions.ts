@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { resolveStatus } from "@/lib/career-workflow";
 
 // NOTE: Demo admin panel — these server functions intentionally bypass RLS
 // using the service-role client so the seeded data is visible without
@@ -178,21 +179,17 @@ export const bulkUpdateApplicationStatus = createServerFn({ method: "POST" })
     return { ok: true, updated: rows.length };
   });
 
-const VALID_STATUS = [
-  "new", "reviewed", "shortlisted", "interviewed", "offered", "accepted", "rejected", "withdrawn",
-];
-
-/** Bulk stage change by reference number (CSV upload). */
+/** Bulk stage change by reference number (CSV upload, one queued chunk per call). */
 export const bulkUpdateApplicationsByRef = createServerFn({ method: "POST" })
   .inputValidator((d: { rows: { ref: string; status: string; note?: string }[] }) => {
     const rows = (Array.isArray(d?.rows) ? d.rows : [])
       .map((r) => ({
         ref: String(r?.ref ?? "").trim().toUpperCase(),
-        status: String(r?.status ?? "").trim().toLowerCase(),
+        status: String(r?.status ?? "").trim(),
         note: String(r?.note ?? "").slice(0, 500),
       }))
       .filter((r) => r.ref)
-      .slice(0, 1000);
+      .slice(0, 200);
     if (!rows.length) throw new Error("No rows found in the file");
     return { rows };
   })
@@ -211,19 +208,20 @@ export const bulkUpdateApplicationsByRef = createServerFn({ method: "POST" })
     for (const row of data.rows) {
       const app = byRef.get(row.ref) as any;
       if (!app) { skipped.push({ ref: row.ref, reason: "not_found" }); continue; }
-      if (!VALID_STATUS.includes(row.status)) { skipped.push({ ref: row.ref, reason: "invalid_status" }); continue; }
-      if (app.status === row.status) { skipped.push({ ref: row.ref, reason: "unchanged" }); continue; }
+      const status = resolveStatus(row.status);
+      if (!status) { skipped.push({ ref: row.ref, reason: "invalid_status" }); continue; }
+      if (app.status === status) { skipped.push({ ref: row.ref, reason: "unchanged" }); continue; }
       const { error: e1 } = await supabaseAdmin
-        .from("career_applications").update({ status: row.status as any }).eq("id", app.id);
+        .from("career_applications").update({ status: status as any }).eq("id", app.id);
       if (e1) { skipped.push({ ref: row.ref, reason: "update_failed" }); continue; }
       events.push({
         application_id: app.id,
         from_status: app.status as any,
-        to_status: row.status as any,
+        to_status: status as any,
         note: row.note || "Bulk CSV update",
       });
-      updated.push({ ref: row.ref, from: app.status, to: row.status });
-      app.status = row.status;
+      updated.push({ ref: row.ref, from: app.status, to: status });
+      app.status = status;
     }
     if (events.length) await supabaseAdmin.from("career_application_events").insert(events);
     return { updated, skipped };
