@@ -339,6 +339,11 @@ function ApplicationsList() {
             <Button variant="ghost" size="sm" onClick={downloadTemplate}>
               {lang === "ar" ? "نموذج CSV" : "CSV template"}
             </Button>
+            {uploading && progress && (
+              <Button variant="ghost" size="sm" onClick={() => { cancelRef.current = true; }}>
+                {lang === "ar" ? "إيقاف" : "Stop"}
+              </Button>
+            )}
           </>
         )}
         <div className="inline-flex rounded-md border bg-card p-0.5 ms-auto text-sm">
@@ -347,6 +352,33 @@ function ApplicationsList() {
         </div>
       </div>
       <div className="text-xs text-muted-foreground">{t("showing")} {filtered.length} {t("of")} {apps.length}</div>
+
+      {progress && (
+        <Card>
+          <CardContent className="py-3 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium">
+                {lang === "ar" ? "جارٍ معالجة الاستيراد في الخلفية" : "Import running in the background"}
+              </span>
+              <span className="text-muted-foreground" dir="ltr">
+                {progress.done} / {progress.total}
+              </span>
+            </div>
+            <div
+              className="h-2 w-full overflow-hidden rounded-full bg-muted"
+              role="progressbar"
+              aria-valuenow={progress.done}
+              aria-valuemin={0}
+              aria-valuemax={progress.total}
+            >
+              <div
+                className="h-full bg-accent transition-all"
+                style={{ width: `${progress.total ? Math.round((progress.done / progress.total) * 100) : 0}%` }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {uploadResult && (
         <Card>
