@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, Shield, Users, Award, Clock } from "lucide-react";
+import { ArrowRight, CheckCircle2, Shield, Users, Award, Clock, Star, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/site/Section";
 import { StatCounter } from "@/components/site/Stat";
@@ -41,6 +41,37 @@ export const Route = createFileRoute("/")({
 });
 
 const whyIcons = [Shield, Award, Clock, Users];
+
+function TestimonialsSection() {
+  const { lang } = useI18n();
+  const { settings } = useSettings();
+  
+  if (!settings.testimonials || settings.testimonials.length === 0) return null;
+
+  return (
+    <Section eyebrow="Testimonials" title={lang === "ar" ? "ماذا يقول عملاؤنا" : "What Our Clients Say"} center className="bg-muted/30">
+      <div className="grid md:grid-cols-3 gap-6">
+        {settings.testimonials.map((t, i) => (
+          <div key={i} className="bg-card border rounded-2xl p-6 md:p-8 flex flex-col relative glow-on-hover">
+            <Quote className="absolute top-6 right-6 h-8 w-8 text-accent/20" />
+            <div className="flex gap-1 mb-4">
+              {[...Array(t.rating)].map((_, j) => (
+                <Star key={j} className="h-4 w-4 fill-amber-400 text-amber-400" />
+              ))}
+            </div>
+            <p className="text-sm md:text-base text-muted-foreground italic mb-6 flex-1 leading-relaxed">
+              "{t.quote[lang]}"
+            </p>
+            <div>
+              <div className="font-semibold text-foreground">{t.author[lang]}</div>
+              <div className="text-xs text-muted-foreground">{t.role[lang]}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
 
 function ServicesCarouselSection() {
   const { t, lang, dir } = useI18n();
@@ -504,6 +535,9 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials */}
+      <TestimonialsSection />
     </div>
   );
 }

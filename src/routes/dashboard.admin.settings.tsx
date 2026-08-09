@@ -398,6 +398,133 @@ function SettingsPage() {
 
         <Card>
           <CardHeader>
+            <CardTitle className="font-display text-lg">Homepage Testimonials</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Manage the client testimonials shown at the bottom of the homepage.
+            </p>
+            {form.testimonials?.map((t, i) => (
+              <div key={i} className="rounded-md border p-4 space-y-4 relative">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold text-muted-foreground">Testimonial {i + 1}</div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setForm({ ...form, testimonials: form.testimonials.filter((_, j) => j !== i) })}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+                
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label>Quote (English)</Label>
+                    <textarea
+                      value={t.quote.en}
+                      onChange={(e) => {
+                        const updated = form.testimonials.map((s, j) => j === i ? { ...s, quote: { ...s.quote, en: e.target.value } } : s);
+                        setForm({ ...form, testimonials: updated });
+                      }}
+                      className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>الاقتباس (عربي)</Label>
+                    <textarea
+                      dir="rtl"
+                      value={t.quote.ar}
+                      onChange={(e) => {
+                        const updated = form.testimonials.map((s, j) => j === i ? { ...s, quote: { ...s.quote, ar: e.target.value } } : s);
+                        setForm({ ...form, testimonials: updated });
+                      }}
+                      className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm"
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label>Author (English)</Label>
+                    <Input
+                      value={t.author.en}
+                      onChange={(e) => {
+                        const updated = form.testimonials.map((s, j) => j === i ? { ...s, author: { ...s.author, en: e.target.value } } : s);
+                        setForm({ ...form, testimonials: updated });
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>المؤلف (عربي)</Label>
+                    <Input
+                      dir="rtl"
+                      value={t.author.ar}
+                      onChange={(e) => {
+                        const updated = form.testimonials.map((s, j) => j === i ? { ...s, author: { ...s.author, ar: e.target.value } } : s);
+                        setForm({ ...form, testimonials: updated });
+                      }}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label>Role (English)</Label>
+                    <Input
+                      value={t.role.en}
+                      onChange={(e) => {
+                        const updated = form.testimonials.map((s, j) => j === i ? { ...s, role: { ...s.role, en: e.target.value } } : s);
+                        setForm({ ...form, testimonials: updated });
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>المنصب (عربي)</Label>
+                    <Input
+                      dir="rtl"
+                      value={t.role.ar}
+                      onChange={(e) => {
+                        const updated = form.testimonials.map((s, j) => j === i ? { ...s, role: { ...s.role, ar: e.target.value } } : s);
+                        setForm({ ...form, testimonials: updated });
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label>Rating (1-5)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={5}
+                      value={t.rating}
+                      onChange={(e) => {
+                        const updated = form.testimonials.map((s, j) => j === i ? { ...s, rating: Number(e.target.value) || 5 } : s);
+                        setForm({ ...form, testimonials: updated });
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setForm({
+                  ...form,
+                  testimonials: [
+                    ...(form.testimonials || []),
+                    { quote: { en: "", ar: "" }, author: { en: "", ar: "" }, role: { en: "", ar: "" }, rating: 5 },
+                  ],
+                })
+              }
+            >
+              + Add testimonial
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle className="font-display text-lg">Page Visibility</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">

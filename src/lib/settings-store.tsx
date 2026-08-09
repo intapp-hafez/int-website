@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 export type Bilingual = { en: string; ar: string };
 export type InvoiceWatermark = "none" | "draft" | "paid" | "unpaid" | "void" | "copy";
 export type HomepageStat = { value: number; suffix: string; label: Bilingual };
+export type Testimonial = { quote: Bilingual; author: Bilingual; role: Bilingual; rating: number };
 export type PageKey =
   | "home"
   | "about"
@@ -45,6 +46,7 @@ export type SiteSettings = {
   visibility: PageVisibility;
   sticky: StickyConfig;
   stats: HomepageStat[];
+  testimonials: Testimonial[];
 };
 
 const env = (import.meta as any).env ?? {};
@@ -92,6 +94,35 @@ export const defaultSettings: SiteSettings = {
     { value: 350, suffix: "+", label: { en: "Projects Delivered", ar: "مشروع منجز" } },
     { value: 20,  suffix: "+", label: { en: "Years of Experience", ar: "سنوات خبرة" } },
     { value: 80,  suffix: "+", label: { en: "Certified Engineers", ar: "مهندس معتمد" } },
+  ],
+  testimonials: [
+    {
+      quote: {
+        en: "Integrated Technics completely transformed our IT infrastructure. Their team is highly professional and delivered on time.",
+        ar: "قامت إنتجريتد تكنيكس بتحويل بنيتنا التحتية لتكنولوجيا المعلومات بالكامل. فريقهم محترف للغاية وسلم المشروع في الوقت المحدد."
+      },
+      author: { en: "Ahmed Hassan", ar: "أحمد حسن" },
+      role: { en: "CTO, Global Tech", ar: "المدير التقني، جلوبال تك" },
+      rating: 5,
+    },
+    {
+      quote: {
+        en: "The security systems installed by Integrated Technics are top-notch. We feel much more secure now.",
+        ar: "الأنظمة الأمنية التي تم تركيبها بواسطة إنتجريتد تكنيكس من الدرجة الأولى. نشعر بأمان أكبر الآن."
+      },
+      author: { en: "Sarah Johnson", ar: "سارة جونسون" },
+      role: { en: "Operations Manager", ar: "مديرة العمليات" },
+      rating: 5,
+    },
+    {
+      quote: {
+        en: "Their smart home solutions are incredibly intuitive and easy to use. Highly recommended for anyone looking to upgrade.",
+        ar: "حلول المنزل الذكي لديهم بديهية وسهلة الاستخدام بشكل لا يصدق. نوصي بها بشدة لأي شخص يبحث عن الترقية."
+      },
+      author: { en: "Omar Ali", ar: "عمر علي" },
+      role: { en: "Real Estate Developer", ar: "مطور عقاري" },
+      rating: 5,
+    }
   ],
   visibility: {
     home: true,
@@ -160,6 +191,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
               label: { ...defaultSettings.stats[i].label, ...(s.label ?? {}) },
             }))
           : defaultSettings.stats,
+        testimonials: Array.isArray(parsed.testimonials)
+          ? parsed.testimonials.map((t: Testimonial) => ({
+              ...t,
+              quote: { ...t.quote },
+              author: { ...t.author },
+              role: { ...t.role },
+            }))
+          : defaultSettings.testimonials,
         visibility: { ...defaultSettings.visibility, ...(parsed.visibility ?? {}) },
         sticky: {
           ...defaultSettings.sticky,
@@ -198,6 +237,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         ogImage: { ...settings.contactSeo.ogImage, ...(((patch as any).contactSeo?.ogImage) ?? {}) },
       },
       stats: (patch as any).stats ?? settings.stats,
+      testimonials: (patch as any).testimonials ?? settings.testimonials,
       visibility: { ...settings.visibility, ...((patch as any).visibility ?? {}) },
       sticky: {
         ...settings.sticky,
