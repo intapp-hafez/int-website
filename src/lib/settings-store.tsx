@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 
 export type Bilingual = { en: string; ar: string };
 export type InvoiceWatermark = "none" | "draft" | "paid" | "unpaid" | "void" | "copy";
+export type HomepageStat = { value: number; suffix: string; label: Bilingual };
 export type PageKey =
   | "home"
   | "about"
@@ -43,6 +44,7 @@ export type SiteSettings = {
   invoiceWatermark: InvoiceWatermark;
   visibility: PageVisibility;
   sticky: StickyConfig;
+  stats: HomepageStat[];
 };
 
 const env = (import.meta as any).env ?? {};
@@ -85,6 +87,12 @@ export const defaultSettings: SiteSettings = {
     ogImage: { en: "", ar: "" },
   },
   invoiceWatermark: "none",
+  stats: [
+    { value: 150, suffix: "+", label: { en: "Clients Served", ar: "عميل" } },
+    { value: 350, suffix: "+", label: { en: "Projects Delivered", ar: "مشروع منجز" } },
+    { value: 20,  suffix: "+", label: { en: "Years of Experience", ar: "سنوات خبرة" } },
+    { value: 80,  suffix: "+", label: { en: "Certified Engineers", ar: "مهندس معتمد" } },
+  ],
   visibility: {
     home: true,
     about: true,
@@ -145,6 +153,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           description: { ...defaultSettings.contactSeo.description, ...((parsed.contactSeo?.description) ?? {}) },
           ogImage: { ...defaultSettings.contactSeo.ogImage, ...((parsed.contactSeo?.ogImage) ?? {}) },
         },
+        stats: Array.isArray(parsed.stats) && parsed.stats.length === 4
+          ? parsed.stats.map((s: HomepageStat, i: number) => ({
+              ...defaultSettings.stats[i],
+              ...s,
+              label: { ...defaultSettings.stats[i].label, ...(s.label ?? {}) },
+            }))
+          : defaultSettings.stats,
         visibility: { ...defaultSettings.visibility, ...(parsed.visibility ?? {}) },
         sticky: {
           ...defaultSettings.sticky,
@@ -182,6 +197,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         description: { ...settings.contactSeo.description, ...(((patch as any).contactSeo?.description) ?? {}) },
         ogImage: { ...settings.contactSeo.ogImage, ...(((patch as any).contactSeo?.ogImage) ?? {}) },
       },
+      stats: (patch as any).stats ?? settings.stats,
       visibility: { ...settings.visibility, ...((patch as any).visibility ?? {}) },
       sticky: {
         ...settings.sticky,

@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Section } from "@/components/site/Section";
 import { StatCounter } from "@/components/site/Stat";
 import { useI18n } from "@/lib/i18n";
-import { services, industries, projects, stats } from "@/data/site";
+import { services, industries, projects } from "@/data/site";
+import { useSettings } from "@/lib/settings-store";
 import { usePartners } from "@/lib/partners-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import heroImg from "@/assets/hero.png";
@@ -289,6 +290,7 @@ function ProjectsCarouselSection() {
 function Home() {
   const { t, lang, dir } = useI18n();
   const isRtl = dir === "rtl";
+  const { settings } = useSettings();
   const { slides } = useSlides();
   const activeSlides = slides.filter(s => s.active);
   const autoplay = useRef(Autoplay({ delay: 5500, stopOnInteraction: false, stopOnMouseEnter: true }));
@@ -402,10 +404,10 @@ function Home() {
       {/* Stats */}
       <section className="border-y bg-muted/30">
         <div className="container mx-auto px-4 lg:px-8 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map(s => (
-            <div key={s.labelKey} className="text-center">
+          {settings.stats.map((s, i) => (
+            <div key={i} className="text-center">
               <StatCounter value={s.value} suffix={s.suffix} />
-              <div className="text-sm text-muted-foreground mt-2 font-medium">{t(s.labelKey)}</div>
+              <div className="text-sm text-muted-foreground mt-2 font-medium">{lang === "ar" ? s.label.ar : s.label.en}</div>
             </div>
           ))}
         </div>

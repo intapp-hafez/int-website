@@ -292,6 +292,112 @@ function SettingsPage() {
 
         <Card>
           <CardHeader>
+            <CardTitle className="font-display text-lg">Homepage Stats</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Edit the four counter figures shown in the stats banner on the homepage (e.g. 150+ Clients Served).
+            </p>
+            {form.stats.map((stat, i) => (
+              <div key={i} className="rounded-md border p-4 space-y-3">
+                <div className="text-sm font-semibold text-muted-foreground">Stat {i + 1}</div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`stat_val_${i}`}>Value</Label>
+                    <Input
+                      id={`stat_val_${i}`}
+                      type="number"
+                      min={0}
+                      value={stat.value}
+                      onChange={(e) => {
+                        const updated = form.stats.map((s, j) =>
+                          j === i ? { ...s, value: Number(e.target.value) || 0 } : s
+                        );
+                        setForm({ ...form, stats: updated });
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`stat_sfx_${i}`}>Suffix</Label>
+                    <Input
+                      id={`stat_sfx_${i}`}
+                      value={stat.suffix}
+                      onChange={(e) => {
+                        const updated = form.stats.map((s, j) =>
+                          j === i ? { ...s, suffix: e.target.value } : s
+                        );
+                        setForm({ ...form, stats: updated });
+                      }}
+                      placeholder="e.g. +"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`stat_lbl_en_${i}`}>Label (English)</Label>
+                    <Input
+                      id={`stat_lbl_en_${i}`}
+                      value={stat.label.en}
+                      onChange={(e) => {
+                        const updated = form.stats.map((s, j) =>
+                          j === i ? { ...s, label: { ...s.label, en: e.target.value } } : s
+                        );
+                        setForm({ ...form, stats: updated });
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`stat_lbl_ar_${i}`}>التسمية (عربي)</Label>
+                    <Input
+                      id={`stat_lbl_ar_${i}`}
+                      dir="rtl"
+                      value={stat.label.ar}
+                      onChange={(e) => {
+                        const updated = form.stats.map((s, j) =>
+                          j === i ? { ...s, label: { ...s.label, ar: e.target.value } } : s
+                        );
+                        setForm({ ...form, stats: updated });
+                      }}
+                    />
+                  </div>
+                </div>
+                {/* Live preview + delete */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-baseline gap-1 text-accent font-display">
+                    <span className="text-2xl font-bold">{stat.value}{stat.suffix}</span>
+                    <span className="text-sm text-muted-foreground font-normal">{stat.label.en}</span>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    aria-label="Remove stat"
+                    onClick={() => setForm({ ...form, stats: form.stats.filter((_, j) => j !== i) })}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setForm({
+                  ...form,
+                  stats: [
+                    ...form.stats,
+                    { value: 0, suffix: "+", label: { en: "", ar: "" } },
+                  ],
+                })
+              }
+            >
+              + Add stat
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle className="font-display text-lg">Page Visibility</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
