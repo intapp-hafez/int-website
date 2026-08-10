@@ -35,6 +35,19 @@ export const ADMIN_PAGES: AdminPage[] = [
   { key: "careers_analytics", en: "Careers Analytics", ar: "تحليلات التوظيف" },
   { key: "products", en: "Products", ar: "المنتجات" },
   { key: "news", en: "News", ar: "الأخبار" },
+  { key: "partners", en: "Partners", ar: "الشركاء" },
+  { key: "orders", en: "Orders", ar: "الطلبات" },
+  { key: "quotes", en: "Quote Requests", ar: "طلبات التسعير" },
+  { key: "recommendations", en: "Recommendation Engine", ar: "محرك التوصيات" },
+  { key: "helpdesk", en: "Helpdesk Overview", ar: "نظرة عامة على الدعم" },
+  { key: "helpdesk_tickets", en: "Helpdesk Tickets", ar: "تذاكر الدعم الفني" },
+  { key: "helpdesk_categories", en: "Helpdesk Categories", ar: "تصنيفات الدعم" },
+  { key: "helpdesk_branches", en: "Helpdesk Branches", ar: "فروع الدعم" },
+  { key: "helpdesk_devices", en: "Helpdesk Devices", ar: "أجهزة الدعم" },
+  { key: "helpdesk_sla", en: "Helpdesk SLA", ar: "اتفاقية مستوى الخدمة" },
+  { key: "helpdesk_performance", en: "Helpdesk Performance", ar: "أداء الدعم" },
+  { key: "helpdesk_invoice_recipients", en: "Invoice Recipients", ar: "مستلمو الفواتير" },
+  { key: "notifications", en: "Notification Settings", ar: "إعدادات الإشعارات" },
   { key: "security", en: "Security Center", ar: "مركز الأمان" },
   { key: "locations", en: "Locations", ar: "المواقع" },
   { key: "nationalities", en: "Nationalities", ar: "الجنسيات" },
@@ -72,10 +85,24 @@ export type PermPreset = {
   perms: UserPerms;
 };
 
-const AGENT_PAGES = new Set(["overview", "leads", "tickets", "clients", "quotations"]);
-const MANAGER_RESTRICTED = new Set(["users", "permissions", "settings", "reports"]);
-const SEO_PAGES = new Set(["overview", "seo", "news", "products", "services", "sliders", "faqs", "settings", "about"]);
-const TECHNICIAN_PAGES = new Set(["overview", "tickets", "services", "projects", "clients", "products", "faqs"]);
+const AGENT_PAGES = new Set(["overview", "leads", "tickets", "clients", "quotations", "quotes", "orders", "helpdesk_tickets"]);
+const MANAGER_RESTRICTED = new Set(["users", "permissions", "settings", "reports", "security"]);
+const SEO_PAGES = new Set(["overview", "seo", "news", "products", "services", "sliders", "faqs", "settings", "about", "partners"]);
+const TECHNICIAN_PAGES = new Set([
+  "overview",
+  "tickets",
+  "services",
+  "projects",
+  "clients",
+  "products",
+  "faqs",
+  "helpdesk",
+  "helpdesk_tickets",
+  "helpdesk_devices",
+  "helpdesk_categories",
+  "helpdesk_branches",
+  "helpdesk_sla",
+]);
 
 export const BUILTIN_PRESETS: PermPreset[] = [
   {
