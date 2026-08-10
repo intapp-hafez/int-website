@@ -54,6 +54,7 @@ function AdminRecoPage() {
 }
 
 function BusinessTypesTab() {
+  const _perms = useCurrentPagePerms();
   const { businessTypes, upsertBusinessType, removeBusinessType } = useRecommendations();
   const [d, setD] = useState({ key: "", name_en: "", name_ar: "" });
   const list = [...businessTypes].sort((a, b) => a.sort_order - b.sort_order);
@@ -85,6 +86,7 @@ function BusinessTypesTab() {
 }
 
 function QuestionsTab() {
+  const _perms = useCurrentPagePerms();
   const { sections, questions, upsertSection, removeSection, upsertQuestion, removeQuestion } = useRecommendations();
   const [newSec, setNewSec] = useState({ title_en: "", title_ar: "" });
   const sorted = [...sections].sort((a, b) => a.order - b.order);
@@ -137,6 +139,7 @@ function QuestionsTab() {
 }
 
 function SolutionsTab() {
+  const _perms = useCurrentPagePerms();
   const { categories, solutions, upsertCategory, removeCategory, upsertSolution, removeSolution } = useRecommendations();
   const [nc, setNc] = useState({ key: "", name_en: "", name_ar: "" });
   return (
@@ -210,6 +213,7 @@ function SolutionsTab() {
 }
 
 function RulesTab() {
+  const _perms = useCurrentPagePerms();
   const { rules, questions, solutions, businessTypes, upsertRule, removeRule } = useRecommendations();
   return (
     <div className="space-y-4">
