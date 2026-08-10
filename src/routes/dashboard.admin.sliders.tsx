@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/dashboard/admin/sliders")({
 });
 
 function SlidersPage() {
+  const _perms = useCurrentPagePerms();
   const { slides, loading, upsert, remove } = useSlides();
   const [saving, setSaving] = useState(false);
   const emptyDraft = {

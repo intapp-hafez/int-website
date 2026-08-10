@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ type Cat = { id: string; value: string; name_en: string; name_ar: string; defaul
 type Sla = { id: string; name_en: string };
 
 function Page() {
+  const _perms = useCurrentPagePerms();
   const { lang } = useI18n();
   const isAr = lang === "ar";
   const [items, setItems] = useState<Cat[]>([]);

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ const emptyDraft = {
 };
 
 function NewsAdminPage() {
+  const _perms = useCurrentPagePerms();
   const { posts, loading, upsert, remove, refresh } = useNews();
   const [draft, setDraft] = useState(emptyDraft);
   const [saving, setSaving] = useState(false);

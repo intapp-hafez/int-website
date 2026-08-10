@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/dashboard/admin/helpdesk/invoice-recipien
 type Row = { id: string; department: string; email: string; active: boolean; sort_order: number };
 
 function Page() {
+  const _perms = useCurrentPagePerms();
   const { lang } = useI18n();
   const isAr = lang === "ar";
   const [rows, setRows] = useState<Row[]>([]);

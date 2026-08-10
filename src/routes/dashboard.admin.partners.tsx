@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ async function uploadLogo(file: File): Promise<string> {
 }
 
 function PartnersAdminPage() {
+  const _perms = useCurrentPagePerms();
   const { partners, loading, upsert, remove, move } = usePartners();
   const sorted = [...partners].sort((a, b) => a.sort_order - b.sort_order);
   const [saving, setSaving] = useState(false);

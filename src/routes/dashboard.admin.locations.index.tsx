@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useEffect, useState, useRef } from "react";
 import * as XLSX from "xlsx";
 import { useAdminT } from "@/lib/admin-i18n";
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/dashboard/admin/locations/")({
 });
 
 function LocationsPage() {
+  const _perms = useCurrentPagePerms();
   const { t, lang } = useAdminT();
   const isAr = lang === "ar";
   

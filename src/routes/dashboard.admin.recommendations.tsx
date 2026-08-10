@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/dashboard/admin/recommendations")({
 });
 
 function AdminRecoPage() {
+  const _perms = useCurrentPagePerms();
   const r = useRecommendations();
   return (
     <div className="space-y-6">
