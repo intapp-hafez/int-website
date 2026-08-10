@@ -120,7 +120,7 @@ function ProductsAdmin() {
             <Input className="ps-8 w-[220px]" placeholder="Search name, SKU, slug…" value={search} onChange={ev => setSearch(ev.target.value)} />
           </div>
           <label className="text-xs inline-flex items-center gap-2"><Switch checked={filterFeatured} onCheckedChange={setFilterFeatured} /> Featured only</label>
-          <Button disabled={!_perms.edit} onClick={() => setEditing({ ...emptyProduct })}><Plus className="h-4 w-4 me-2" /> New product</Button>
+          <Button disabled={!_perms.add} onClick={() => setEditing({ ...emptyProduct })}><Plus className="h-4 w-4 me-2" /> New product</Button>
         </div>
       </div>
 
@@ -215,7 +215,7 @@ function ProductsAdmin() {
             </div>
           )}
           <DialogFooter>
-            <Button disabled={!_perms.edit} variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
             <Button onClick={save} disabled={!_perms.edit || (saving)}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}</Button>
           </DialogFooter>
         </DialogContent>

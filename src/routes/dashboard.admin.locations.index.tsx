@@ -159,7 +159,7 @@ function LocationsPage() {
             {submitting ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Upload className="h-4 w-4 me-2" />} 
             {isAr ? "استيراد ملف Excel" : "Import Excel"}
           </Button>
-          <Button onClick={() => setEditing({ id: "new", country_en: "", country_ar: "", city_en: "", city_ar: "", is_active: true })} disabled={!_perms.edit || (submitting)}>
+          <Button onClick={() => setEditing({ id: "new", country_en: "", country_ar: "", city_en: "", city_ar: "", is_active: true })} disabled={!_perms.add || (submitting)}>
             <Plus className="h-4 w-4 me-2" /> {isAr ? "إضافة موقع جديد" : "Add New Location"}
           </Button>
         </div>
@@ -243,7 +243,7 @@ function LocationsPage() {
             </div>
           )}
           <DialogFooter>
-            <Button disabled={!_perms.edit} variant="outline" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button>
+            <Button variant="outline" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button>
             <Button onClick={onSave} disabled={!_perms.edit || (submitting)}>
               {submitting && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
               {isAr ? "حفظ" : "Save"}

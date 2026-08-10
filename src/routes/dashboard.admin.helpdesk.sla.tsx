@@ -70,7 +70,7 @@ function Page() {
           <h1 className="text-xl font-semibold flex items-center gap-2"><Clock className="h-5 w-5" /> {isAr ? "سياسات اتفاقية مستوى الخدمة" : "SLA Policies"}</h1>
           <p className="text-sm text-muted-foreground">{isAr ? "أهداف الاستجابة والحل المطبَّقة على التذاكر الجديدة حسب الأولوية." : "Response and resolve targets applied to new tickets by priority."}</p>
         </div>
-        <Button disabled={!_perms.edit} onClick={() => setEditing({ priority: "medium", first_response_minutes: 60, resolve_minutes: 480, active: true })}><Plus className="h-4 w-4 mr-1" /> {isAr ? "إضافة سياسة" : "Add policy"}</Button>
+        <Button disabled={!_perms.add} onClick={() => setEditing({ priority: "medium", first_response_minutes: 60, resolve_minutes: 480, active: true })}><Plus className="h-4 w-4 mr-1" /> {isAr ? "إضافة سياسة" : "Add policy"}</Button>
       </div>
 
       <Card><CardContent className="p-0">
@@ -121,7 +121,7 @@ function Page() {
             <div className="flex items-center gap-2"><Switch checked={!!editing?.business_hours_only} onCheckedChange={(v) => setEditing({ ...editing!, business_hours_only: v })} /> <Label>{isAr ? "ساعات العمل فقط" : "Business hours only"}</Label></div>
             <div className="flex items-center gap-2"><Switch checked={editing?.active ?? true} onCheckedChange={(v) => setEditing({ ...editing!, active: v })} /> <Label>{isAr ? "مفعّلة" : "Active"}</Label></div>
           </div>
-          <DialogFooter><Button disabled={!_perms.edit} variant="ghost" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button><Button disabled={!_perms.edit} onClick={save}>{isAr ? "حفظ" : "Save"}</Button></DialogFooter>
+          <DialogFooter><Button variant="ghost" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button><Button disabled={!_perms.edit} onClick={save}>{isAr ? "حفظ" : "Save"}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

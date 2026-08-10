@@ -71,7 +71,7 @@ function Page() {
           <h1 className="text-xl font-semibold flex items-center gap-2"><Cpu className="h-5 w-5" /> {isAr ? "الأجهزة" : "Devices"}</h1>
           <p className="text-sm text-muted-foreground">{isAr ? "الأجهزة المُدارة المُشار إليها بالرقم التسلسلي في التذاكر." : "Managed devices referenced by serial number on tickets."}</p>
         </div>
-        <Button disabled={!_perms.edit} onClick={() => setEditing({ active: true })}><Plus className="h-4 w-4 mr-1" /> {isAr ? "إضافة جهاز" : "Add device"}</Button>
+        <Button disabled={!_perms.add} onClick={() => setEditing({ active: true })}><Plus className="h-4 w-4 mr-1" /> {isAr ? "إضافة جهاز" : "Add device"}</Button>
       </div>
       <Card><CardContent className="p-0">
         {loading ? <div className="py-12 text-center"><Loader2 className="h-5 w-5 animate-spin inline" /></div> : (
@@ -117,7 +117,7 @@ function Page() {
             <div><Label>{isAr ? "ملاحظات" : "Notes"}</Label><Textarea rows={2} value={editing?.notes || ""} onChange={(e) => setEditing({ ...editing!, notes: e.target.value })} /></div>
             <div className="flex items-center gap-2"><Switch checked={editing?.active ?? true} onCheckedChange={(v) => setEditing({ ...editing!, active: v })} /> <Label>{isAr ? "مفعّل" : "Active"}</Label></div>
           </div>
-          <DialogFooter><Button disabled={!_perms.edit} variant="ghost" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button><Button disabled={!_perms.edit} onClick={save}>{isAr ? "حفظ" : "Save"}</Button></DialogFooter>
+          <DialogFooter><Button variant="ghost" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button><Button disabled={!_perms.edit} onClick={save}>{isAr ? "حفظ" : "Save"}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
