@@ -32,8 +32,8 @@ const adminGroups: NavGroup[] = [
     en: "Sales & Customers", ar: "المبيعات والعملاء", icon: Inbox,
     items: [
       { to: "/dashboard/admin/leads", en: "Leads", ar: "العملاء المحتملون", icon: Inbox, role: "admin", pageKey: "leads" },
-      { to: "/dashboard/admin/leads/quotes", en: "Quote Requests", ar: "طلبات عروض الأسعار", icon: Inbox, role: "admin", pageKey: "leads" },
-      { to: "/dashboard/admin/orders", en: "Orders", ar: "الطلبات", icon: ShoppingBag, role: "admin", pageKey: "leads" },
+      { to: "/dashboard/admin/leads/quotes", en: "Quote Requests", ar: "طلبات عروض الأسعار", icon: Inbox, role: "admin", pageKey: "quotes" },
+      { to: "/dashboard/admin/orders", en: "Orders", ar: "الطلبات", icon: ShoppingBag, role: "admin", pageKey: "orders" },
       { to: "/dashboard/admin/clients", en: "Clients", ar: "العملاء", icon: UserSquare2, role: "admin", pageKey: "clients" },
       { to: "/dashboard/admin/quotations", en: "Quotations", ar: "عروض الأسعار", icon: FileText, role: "admin", pageKey: "quotations" },
     ],
@@ -41,7 +41,7 @@ const adminGroups: NavGroup[] = [
   {
     en: "Helpdesk", ar: "مكتب الدعم", icon: LifeBuoy, adminOnly: true,
     items: [
-      { to: "/dashboard/admin/helpdesk/tickets", en: "Tickets", ar: "التذاكر", icon: LifeBuoy, role: "admin", pageKey: "tickets", adminOnly: true },
+      { to: "/dashboard/admin/helpdesk/tickets", en: "Tickets", ar: "التذاكر", icon: LifeBuoy, role: "admin", pageKey: "helpdesk_tickets", adminOnly: true },
       { to: "/dashboard/admin/reviews", en: "Reviews", ar: "المراجعات", icon: Star, role: "admin", pageKey: "reviews", adminOnly: true },
     ],
   },
@@ -64,8 +64,8 @@ const adminGroups: NavGroup[] = [
     en: "Content", ar: "المحتوى", icon: FileCog,
     items: [
       { to: "/dashboard/admin/sliders", en: "Sliders", ar: "العروض المتحركة", icon: Images, role: "admin", pageKey: "sliders" },
-      { to: "/dashboard/admin/partners", en: "Partners", ar: "الشركاء", icon: Users, role: "admin", pageKey: "sliders" },
-      { to: "/dashboard/admin/recommendations", en: "Recommendations", ar: "التوصيات الذكية", icon: HelpCircle, role: "admin", pageKey: "sliders" },
+      { to: "/dashboard/admin/partners", en: "Partners", ar: "الشركاء", icon: Users, role: "admin", pageKey: "partners" },
+      { to: "/dashboard/admin/recommendations", en: "Recommendations", ar: "التوصيات الذكية", icon: HelpCircle, role: "admin", pageKey: "recommendations" },
       { to: "/dashboard/admin/news", en: "News", ar: "الأخبار", icon: Newspaper, role: "admin", pageKey: "news" },
       { to: "/dashboard/admin/about", en: "About Page", ar: "صفحة من نحن", icon: Info, role: "admin", pageKey: "about" },
       { to: "/dashboard/admin/faqs", en: "FAQs", ar: "الأسئلة الشائعة", icon: HelpCircle, role: "admin", pageKey: "faqs" },
@@ -78,7 +78,7 @@ const adminGroups: NavGroup[] = [
     items: [
       { to: "/dashboard/admin/seo", en: "SEO", ar: "تحسين محركات البحث", icon: Search, role: "admin", pageKey: "seo" },
       { to: "/dashboard/admin/chatbot", en: "Chatbot", ar: "المساعد الذكي", icon: MessageCircle, role: "admin", pageKey: "chatbot" },
-      { to: "/dashboard/admin/notifications", en: "Notifications", ar: "الإشعارات", icon: Bell, role: "admin", pageKey: "settings" },
+      { to: "/dashboard/admin/notifications", en: "Notifications", ar: "الإشعارات", icon: Bell, role: "admin", pageKey: "notifications" },
     ],
   },
   {
@@ -105,18 +105,40 @@ const adminGroups: NavGroup[] = [
   },
 ];
 
-/** Map a current pathname to an ADMIN_PAGES key + the action being attempted. */
+/** Nested admin paths that map to a dedicated permission key. */
+const NESTED_PAGE_KEYS: Array<{ prefix: string; pageKey: string }> = [
+  { prefix: "leads/quotes", pageKey: "quotes" },
+  { prefix: "careers/applications", pageKey: "careers_applications" },
+  { prefix: "careers/analytics", pageKey: "careers_analytics" },
+  { prefix: "helpdesk/tickets", pageKey: "helpdesk_tickets" },
+  { prefix: "helpdesk/categories", pageKey: "helpdesk_categories" },
+  { prefix: "helpdesk/branches", pageKey: "helpdesk_branches" },
+  { prefix: "helpdesk/devices", pageKey: "helpdesk_devices" },
+  { prefix: "helpdesk/sla", pageKey: "helpdesk_sla" },
+  { prefix: "helpdesk/performance", pageKey: "helpdesk_performance" },
+  { prefix: "helpdesk/invoice-recipients", pageKey: "helpdesk_invoice_recipients" },
+];
+
+/**
+ * Map a current pathname to an ADMIN_PAGES key + the action being attempted.
+ * Returns `{ pageKey: "__unknown__" }` for unrecognised admin paths so they are
+ * denied by default instead of silently bypassing the permission gate.
+ */
 function resolveAdminPage(pathname: string): { pageKey: string; action: "view" | "add" | "edit" } | null {
   if (!pathname.startsWith("/dashboard/admin")) return null;
   const rest = pathname.replace(/^\/dashboard\/admin\/?/, "").replace(/\/$/, "");
-  if (!rest) return { pageKey: "overview", action: "view" };
+  const action: "view" | "add" | "edit" = rest.endsWith("/new")
+    ? "add"
+    : rest.endsWith("/edit")
+      ? "edit"
+      : "view";
+  if (!rest) return { pageKey: "overview", action };
+  const nested = NESTED_PAGE_KEYS.find((n) => rest === n.prefix || rest.startsWith(n.prefix + "/"));
+  if (nested) return { pageKey: nested.pageKey, action };
   const seg = rest.split("/")[0];
   const known = ADMIN_PAGES.find((p) => p.key === seg);
-  if (!known) return null;
-  let action: "view" | "add" | "edit" = "view";
-  if (rest.endsWith("/new")) action = "add";
-  else if (rest.endsWith("/edit")) action = "edit";
-  return { pageKey: known.key, action };
+  // Unknown admin sub-path: deny by default for non-admins.
+  return { pageKey: known?.key ?? "__unknown__", action };
 }
 
 function DashboardLayout() {
