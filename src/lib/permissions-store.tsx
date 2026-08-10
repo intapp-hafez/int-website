@@ -405,3 +405,40 @@ export function useCanAccess(pageKey: string) {
     return getUserPerms(matched.id)[pageKey] ?? noPerms();
   }, [user, pageKey, getUserPerms]);
 }
+
+/** Nested admin paths that map to a dedicated permission key. */
+export const NESTED_PAGE_KEYS: Array<{ prefix: string; pageKey: string }> = [
+  { prefix: "leads/quotes", pageKey: "quotes" },
+  { prefix: "careers/applications", pageKey: "careers_applications" },
+  { prefix: "careers/analytics", pageKey: "careers_analytics" },
+  { prefix: "helpdesk/tickets", pageKey: "helpdesk_tickets" },
+  { prefix: "helpdesk/categories", pageKey: "helpdesk_categories" },
+  { prefix: "helpdesk/branches", pageKey: "helpdesk_branches" },
+  { prefix: "helpdesk/devices", pageKey: "helpdesk_devices" },
+  { prefix: "helpdesk/sla", pageKey: "helpdesk_sla" },
+  { prefix: "helpdesk/performance", pageKey: "helpdesk_performance" },
+  { prefix: "helpdesk/invoice-recipients", pageKey: "helpdesk_invoice_recipients" },
+];
+
+/**
+ * Map an admin pathname to an ADMIN_PAGES key + the action being attempted.
+ * Unrecognised admin sub-paths resolve to `__unknown__`, which nobody can be
+ * granted — unknown routes are denied by default instead of bypassing the gate.
+ */
+export function resolveAdminPage(
+  pathname: string,
+): { pageKey: string; action: "view" | "add" | "edit" } | null {
+  if (!pathname.startsWith("/dashboard/admin")) return null;
+  const rest = pathname.replace(/^\/dashboard\/admin\/?/, "").replace(/\/$/, "");
+  const action: "view" | "add" | "edit" = rest.endsWith("/new")
+    ? "add"
+    : rest.endsWith("/edit")
+      ? "edit"
+      : "view";
+  if (!rest) return { pageKey: "overview", action };
+  const nested = NESTED_PAGE_KEYS.find((n) => rest === n.prefix || rest.startsWith(n.prefix + "/"));
+  if (nested) return { pageKey: nested.pageKey, action };
+  const seg = rest.split("/")[0];
+  const known = ADMIN_PAGES.find((p) => p.key === seg);
+  return { pageKey: known?.key ?? "__unknown__", action };
+}
