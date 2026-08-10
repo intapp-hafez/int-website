@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Layers, Sparkles, Trash2, Users } from "lucide-react";
+import { Copy, Layers, Pencil, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { demoUsers } from "@/data/demo";
 import { useAdminT } from "@/lib/admin-i18n";
@@ -23,6 +23,9 @@ import {
   ADMIN_PAGES,
   PERM_ACTIONS,
   usePermissions,
+  noPerms,
+  type UserPerms,
+  type PermAction,
   type PermPreset,
 } from "@/lib/permissions-store";
 
@@ -51,7 +54,8 @@ function presetSummary(p: PermPreset) {
 
 export function PermissionPresets({ activeUserId }: { activeUserId?: string }) {
   const { lang } = useAdminT();
-  const { presets, applyPreset, saveCustomPreset, deleteCustomPreset } = usePermissions();
+  const { presets, applyPreset, saveCustomPreset, updateCustomPreset, duplicatePreset, deleteCustomPreset } =
+    usePermissions();
 
   const [selectedPreset, setSelectedPreset] = useState<string>(presets[0]?.id ?? "");
   const [targetUsers, setTargetUsers] = useState<string[]>(activeUserId ? [activeUserId] : []);
@@ -59,6 +63,59 @@ export function PermissionPresets({ activeUserId }: { activeUserId?: string }) {
   const [openSave, setOpenSave] = useState(false);
   const [presetNameEn, setPresetNameEn] = useState("");
   const [presetNameAr, setPresetNameAr] = useState("");
+
+  const [editing, setEditing] = useState<PermPreset | null>(null);
+  const [editNameEn, setEditNameEn] = useState("");
+  const [editNameAr, setEditNameAr] = useState("");
+  const [editPerms, setEditPerms] = useState<UserPerms>({});
+
+  const ACTION_LABEL: Record<PermAction, { en: string; ar: string }> = {
+    view: { en: "View", ar: "عرض" },
+    add: { en: "Add", ar: "إضافة" },
+    edit: { en: "Edit", ar: "تعديل" },
+    delete: { en: "Delete", ar: "حذف" },
+  };
+
+  const openEditor = (p: PermPreset) => {
+    const cloned: UserPerms = {};
+    for (const page of ADMIN_PAGES) cloned[page.key] = { ...(p.perms[page.key] ?? noPerms()) };
+    setEditing(p);
+    setEditPerms(cloned);
+    setEditNameEn(p.builtin ? `${p.name.en} (copy)` : p.name.en);
+    setEditNameAr(p.builtin ? `${p.name.ar} (نسخة)` : p.name.ar);
+  };
+
+  const togglePerm = (pageKey: string, action: PermAction) =>
+    setEditPerms((prev) => ({
+      ...prev,
+      [pageKey]: { ...(prev[pageKey] ?? noPerms()), [action]: !prev[pageKey]?.[action] },
+    }));
+
+  const setRow = (pageKey: string, value: boolean) =>
+    setEditPerms((prev) => ({
+      ...prev,
+      [pageKey]: { view: value, add: value, edit: value, delete: value },
+    }));
+
+  const onSaveEdit = () => {
+    if (!editing) return;
+    if (editing.builtin) {
+      const created = duplicatePreset(editing.id, { en: editNameEn, ar: editNameAr }, editPerms);
+      if (!created) {
+        toast.error(lang === "ar" ? "أدخل اسمًا صالحًا" : "Enter a valid name");
+        return;
+      }
+      toast.success(lang === "ar" ? "تم إنشاء نسخة قابلة للتعديل" : "Editable copy created");
+    } else {
+      const ok = updateCustomPreset(editing.id, { name: { en: editNameEn, ar: editNameAr }, perms: editPerms });
+      if (!ok) {
+        toast.error(lang === "ar" ? "تعذّر حفظ القالب" : "Could not save preset");
+        return;
+      }
+      toast.success(lang === "ar" ? "تم تحديث القالب" : "Preset updated");
+    }
+    setEditing(null);
+  };
 
   const total = ADMIN_PAGES.length * PERM_ACTIONS.length;
   const eligible = demoUsers.filter((u) => u.role !== "admin");
@@ -167,6 +224,24 @@ export function PermissionPresets({ activeUserId }: { activeUserId?: string }) {
                     )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7 text-muted-foreground hover:text-accent"
+                      onClick={() => openEditor(p)}
+                      aria-label={p.builtin ? "Duplicate and edit preset" : "Edit preset"}
+                      title={
+                        p.builtin
+                          ? lang === "ar"
+                            ? "نسخ وتعديل"
+                            : "Duplicate & edit"
+                          : lang === "ar"
+                            ? "تعديل"
+                            : "Edit"
+                      }
+                    >
+                      {p.builtin ? <Copy className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
+                    </Button>
                     {p.builtin ? (
                       <Badge variant="secondary" className="text-[10px]">
                         {lang === "ar" ? "مدمج" : "Built-in"}
@@ -208,6 +283,94 @@ export function PermissionPresets({ activeUserId }: { activeUserId?: string }) {
             );
           })}
         </div>
+
+        <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {editing?.builtin
+                  ? lang === "ar"
+                    ? "نسخ وتعديل القالب"
+                    : "Duplicate & edit preset"
+                  : lang === "ar"
+                    ? "تعديل القالب"
+                    : "Edit preset"}
+              </DialogTitle>
+              <DialogDescription>
+                {editing?.builtin
+                  ? lang === "ar"
+                    ? "القوالب المدمجة للقراءة فقط — سيتم حفظ تعديلاتك كقالب جديد."
+                    : "Built-in presets are read-only — your changes are saved as a new custom preset."
+                  : lang === "ar"
+                    ? "عدّل الاسم والصلاحيات لهذا القالب."
+                    : "Update the name and permissions for this preset."}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <Label htmlFor="edit-en">{lang === "ar" ? "الاسم (إنجليزي)" : "Name (English)"}</Label>
+                  <Input id="edit-en" value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)} />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="edit-ar">{lang === "ar" ? "الاسم (عربي)" : "Name (Arabic)"}</Label>
+                  <Input id="edit-ar" dir="rtl" value={editNameAr} onChange={(e) => setEditNameAr(e.target.value)} />
+                </div>
+              </div>
+              <div className="max-h-[50vh] overflow-y-auto rounded-md border">
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 bg-muted/80 backdrop-blur">
+                    <tr>
+                      <th className="p-2 text-start font-medium">{lang === "ar" ? "الصفحة" : "Page"}</th>
+                      {PERM_ACTIONS.map((a) => (
+                        <th key={a} className="p-2 font-medium w-16">
+                          {lang === "ar" ? ACTION_LABEL[a].ar : ACTION_LABEL[a].en}
+                        </th>
+                      ))}
+                      <th className="p-2 w-20" />
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {ADMIN_PAGES.map((page) => (
+                      <tr key={page.key} className="hover:bg-muted/40">
+                        <td className="p-2">{lang === "ar" ? page.ar : page.en}</td>
+                        {PERM_ACTIONS.map((a) => (
+                          <td key={a} className="p-2 text-center">
+                            <Checkbox
+                              checked={!!editPerms[page.key]?.[a]}
+                              onCheckedChange={() => togglePerm(page.key, a)}
+                              aria-label={`${page.en} ${a}`}
+                            />
+                          </td>
+                        ))}
+                        <td className="p-2 text-center">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 text-[11px]"
+                            onClick={() =>
+                              setRow(page.key, !PERM_ACTIONS.every((a) => editPerms[page.key]?.[a]))
+                            }
+                          >
+                            {PERM_ACTIONS.every((a) => editPerms[page.key]?.[a])
+                              ? lang === "ar" ? "مسح" : "None"
+                              : lang === "ar" ? "الكل" : "All"}
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditing(null)}>
+                {lang === "ar" ? "إلغاء" : "Cancel"}
+              </Button>
+              <Button onClick={onSaveEdit}>{lang === "ar" ? "حفظ" : "Save"}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Dialog open={openApply} onOpenChange={setOpenApply}>
           <DialogContent className="max-w-lg">

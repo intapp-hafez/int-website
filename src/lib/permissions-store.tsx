@@ -171,6 +171,8 @@ type Ctx = {
   presets: PermPreset[];
   applyPreset: (presetId: string, userIds: string[]) => number;
   saveCustomPreset: (name: { en: string; ar: string }, fromUserId: string) => PermPreset | null;
+  updateCustomPreset: (presetId: string, patch: { name?: { en: string; ar: string }; perms?: UserPerms }) => boolean;
+  duplicatePreset: (presetId: string, name: { en: string; ar: string }, perms?: UserPerms) => PermPreset | null;
   deleteCustomPreset: (presetId: string) => void;
 };
 
@@ -289,6 +291,40 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     persistPresets(customPresets.filter((p) => p.id !== presetId));
   };
 
+  const clonePerms = (source: UserPerms): UserPerms => {
+    const cloned: UserPerms = {};
+    for (const p of ADMIN_PAGES) cloned[p.key] = { ...(source[p.key] ?? noPerms()) };
+    return cloned;
+  };
+
+  const updateCustomPreset: Ctx["updateCustomPreset"] = (presetId, patch) => {
+    const idx = customPresets.findIndex((p) => p.id === presetId);
+    if (idx === -1) return false;
+    const current = customPresets[idx];
+    const name = patch.name
+      ? { en: patch.name.en.trim() || current.name.en, ar: patch.name.ar.trim() || patch.name.en.trim() || current.name.ar }
+      : current.name;
+    const next = [...customPresets];
+    next[idx] = { ...current, name, perms: patch.perms ? clonePerms(patch.perms) : current.perms };
+    persistPresets(next);
+    return true;
+  };
+
+  const duplicatePreset: Ctx["duplicatePreset"] = (presetId, name, perms) => {
+    const source = [...BUILTIN_PRESETS, ...customPresets].find((p) => p.id === presetId);
+    if (!source) return null;
+    const trimmed = name.en.trim();
+    if (!trimmed) return null;
+    const preset: PermPreset = {
+      id: `preset-${Date.now()}`,
+      name: { en: trimmed, ar: name.ar.trim() || trimmed },
+      description: source.description,
+      perms: clonePerms(perms ?? source.perms),
+    };
+    persistPresets([...customPresets, preset]);
+    return preset;
+  };
+
   const value = useMemo<Ctx>(
     () => ({
       perms,
@@ -301,6 +337,8 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       presets,
       applyPreset,
       saveCustomPreset,
+      updateCustomPreset,
+      duplicatePreset,
       deleteCustomPreset,
     }),
     [perms, presets],
