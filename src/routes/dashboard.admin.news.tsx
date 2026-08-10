@@ -182,7 +182,7 @@ function NewsAdminPage() {
             <label className="inline-flex items-center gap-2"><Switch checked={draft.featured} onCheckedChange={(v) => setDraft({ ...draft, featured: v })} /><span className="text-sm">Featured (hero card)</span></label>
           </div>
           <div className="md:col-span-2">
-            <Button onClick={add} disabled={saving}>{saving ? <Loader2 className="h-4 w-4 me-1 animate-spin" /> : <Plus className="h-4 w-4 me-1" />}Add post</Button>
+            <Button onClick={add} disabled={!_perms.add || (saving)}>{saving ? <Loader2 className="h-4 w-4 me-1 animate-spin" /> : <Plus className="h-4 w-4 me-1" />}Add post</Button>
           </div>
         </CardContent>
       </Card>
@@ -213,10 +213,10 @@ function NewsAdminPage() {
                   <label className="flex items-center justify-between gap-2 text-xs"><span>Active</span><Switch checked={p.active} onCheckedChange={(v) => toggleActive(p, v)} /></label>
                   <label className="flex items-center justify-between gap-2 text-xs"><span>Featured</span><Switch checked={p.featured} onCheckedChange={(v) => toggleFeatured(p, v)} /></label>
                 </div>
-                <Button size="sm" onClick={() => saveRow(p)} disabled={!editing[p.id]}><Save className="h-4 w-4 me-1" />Save changes</Button>
+                <Button size="sm" onClick={() => saveRow(p)} disabled={!_perms.edit || (!editing[p.id])}><Save className="h-4 w-4 me-1" />Save changes</Button>
                 <div className="grid grid-cols-2 gap-2">
                   <a href={`/news/${p.slug}`} target="_blank" rel="noreferrer" className="text-xs inline-flex items-center justify-center gap-1 text-accent hover:underline border rounded-md py-1.5"><ExternalLink className="h-3 w-3" />View</a>
-                  <Button variant="destructive" size="sm" onClick={() => del(p.id)}><Trash2 className="h-4 w-4 me-1" />Delete</Button>
+                  <Button disabled={!_perms.delete} variant="destructive" size="sm" onClick={() => del(p.id)}><Trash2 className="h-4 w-4 me-1" />Delete</Button>
                 </div>
               </div>
               <Tabs defaultValue="content" className="w-full">

@@ -153,7 +153,7 @@ function NationalitiesPage() {
             {submitting ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Upload className="h-4 w-4 me-2" />} 
             {isAr ? "استيراد ملف Excel" : "Import Excel"}
           </Button>
-          <Button onClick={() => setEditing({ id: "new", name_en: "", name_ar: "", is_active: true })} disabled={submitting}>
+          <Button onClick={() => setEditing({ id: "new", name_en: "", name_ar: "", is_active: true })} disabled={!_perms.edit || (submitting)}>
             <Plus className="h-4 w-4 me-2" /> {isAr ? "إضافة جنسية" : "Add Nationality"}
           </Button>
         </div>
@@ -192,8 +192,8 @@ function NationalitiesPage() {
                   <div className={`inline-flex w-2 h-2 rounded-full ${row.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
                 </td>
                 <td className="px-4 py-3 text-end space-x-2 space-x-reverse">
-                  <Button variant="ghost" size="icon" onClick={() => setEditing(row)}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => onDelete(row.id)}><Trash2 className="h-4 w-4" /></Button>
+                  <Button disabled={!_perms.edit} variant="ghost" size="icon" onClick={() => setEditing(row)}><Pencil className="h-4 w-4" /></Button>
+                  <Button disabled={!_perms.delete} variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => onDelete(row.id)}><Trash2 className="h-4 w-4" /></Button>
                 </td>
               </tr>
             ))}
@@ -225,8 +225,8 @@ function NationalitiesPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button>
-            <Button onClick={onSave} disabled={submitting}>
+            <Button disabled={!_perms.edit} variant="outline" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button>
+            <Button onClick={onSave} disabled={!_perms.edit || (submitting)}>
               {submitting && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
               {isAr ? "حفظ" : "Save"}
             </Button>

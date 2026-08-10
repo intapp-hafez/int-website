@@ -149,7 +149,7 @@ function SlidersPage() {
             </div>
           </div>
           <div className="md:col-span-2">
-            <Button onClick={add} disabled={saving}>
+            <Button onClick={add} disabled={!_perms.add || (saving)}>
               {saving ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Plus className="h-4 w-4 me-2" />}
               Add slide
             </Button>
@@ -194,7 +194,7 @@ function SlidersPage() {
                   <Switch checked={s.active} onCheckedChange={(v) => toggleActive(s, v)} />
                   <span className="text-xs text-muted-foreground">Visible</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => del(s.id)}><Trash2 className="h-4 w-4" /></Button>
+                <Button disabled={!_perms.delete} variant="ghost" size="sm" onClick={() => del(s.id)}><Trash2 className="h-4 w-4" /></Button>
               </div>
             </CardContent>
           </Card>

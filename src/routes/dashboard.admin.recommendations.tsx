@@ -63,7 +63,7 @@ function BusinessTypesTab() {
         <div><Label>Key</Label><Input value={d.key} onChange={(e) => setD({ ...d, key: e.target.value })} placeholder="hospital" /></div>
         <div><Label>Name (EN)</Label><Input value={d.name_en} onChange={(e) => setD({ ...d, name_en: e.target.value })} /></div>
         <div dir="rtl"><Label className="text-right block font-arabic">الاسم (AR)</Label><Input dir="rtl" className="text-right font-arabic" value={d.name_ar} onChange={(e) => setD({ ...d, name_ar: e.target.value })} /></div>
-        <Button onClick={() => { if (!d.key) return toast.error("Key required"); upsertBusinessType(d as any); setD({ key: "", name_en: "", name_ar: "" }); toast.success("Added"); }}><Plus className="h-4 w-4 me-2" /> Add</Button>
+        <Button disabled={!_perms.edit} onClick={() => { if (!d.key) return toast.error("Key required"); upsertBusinessType(d as any); setD({ key: "", name_en: "", name_ar: "" }); toast.success("Added"); }}><Plus className="h-4 w-4 me-2" /> Add</Button>
       </CardContent></Card>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
         {list.map((b) => (
@@ -72,7 +72,7 @@ function BusinessTypesTab() {
               <code className="text-xs px-2 py-0.5 rounded bg-muted">{b.key}</code>
               <div className="flex items-center gap-2">
                 <Switch checked={b.active} onCheckedChange={(v) => upsertBusinessType({ ...b, active: v })} />
-                <Button variant="ghost" size="sm" onClick={() => removeBusinessType(b.id)}><Trash2 className="h-4 w-4" /></Button>
+                <Button disabled={!_perms.delete} variant="ghost" size="sm" onClick={() => removeBusinessType(b.id)}><Trash2 className="h-4 w-4" /></Button>
               </div>
             </div>
             <Input value={b.name_en} onChange={(e) => upsertBusinessType({ ...b, name_en: e.target.value })} />
@@ -93,7 +93,7 @@ function QuestionsTab() {
       <Card><CardContent className="p-4 grid md:grid-cols-4 gap-2 items-end">
         <div className="md:col-span-2"><Label>New section (EN)</Label><Input value={newSec.title_en} onChange={(e) => setNewSec({ ...newSec, title_en: e.target.value })} /></div>
         <div dir="rtl"><Label className="text-right block font-arabic">قسم جديد (AR)</Label><Input dir="rtl" className="text-right font-arabic" value={newSec.title_ar} onChange={(e) => setNewSec({ ...newSec, title_ar: e.target.value })} /></div>
-        <Button onClick={() => { if (!newSec.title_en) return; upsertSection(newSec as any); setNewSec({ title_en: "", title_ar: "" }); }}><Plus className="h-4 w-4 me-2" /> Add section</Button>
+        <Button disabled={!_perms.edit} onClick={() => { if (!newSec.title_en) return; upsertSection(newSec as any); setNewSec({ title_en: "", title_ar: "" }); }}><Plus className="h-4 w-4 me-2" /> Add section</Button>
       </CardContent></Card>
 
       {sorted.map((sec) => {
@@ -103,7 +103,7 @@ function QuestionsTab() {
             <div className="flex items-center gap-2">
               <Input value={sec.title_en} onChange={(e) => upsertSection({ ...sec, title_en: e.target.value })} className="flex-1" />
               <Input dir="rtl" className="flex-1 text-right font-arabic" value={sec.title_ar} onChange={(e) => upsertSection({ ...sec, title_ar: e.target.value })} />
-              <Button variant="ghost" size="sm" onClick={() => removeSection(sec.id)}><Trash2 className="h-4 w-4" /></Button>
+              <Button disabled={!_perms.delete} variant="ghost" size="sm" onClick={() => removeSection(sec.id)}><Trash2 className="h-4 w-4" /></Button>
             </div>
             <div className="space-y-2">
               {qs.map((q) => (
@@ -122,10 +122,10 @@ function QuestionsTab() {
                     </SelectContent>
                   </Select>
                   <div className="col-span-1 flex items-center gap-1"><Switch checked={q.enabled} onCheckedChange={(v) => upsertQuestion({ ...q, enabled: v })} /></div>
-                  <Button variant="ghost" size="sm" className="col-span-1" onClick={() => removeQuestion(q.id)}><Trash2 className="h-4 w-4" /></Button>
+                  <Button disabled={!_perms.delete} variant="ghost" size="sm" className="col-span-1" onClick={() => removeQuestion(q.id)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               ))}
-              <Button size="sm" variant="outline" onClick={() => upsertQuestion({ sectionId: sec.id, key: `q_${Date.now().toString(36)}`, label_en: "New question", label_ar: "سؤال جديد", type: "text", enabled: true, order: qs.length })}>
+              <Button disabled={!_perms.add} size="sm" variant="outline" onClick={() => upsertQuestion({ sectionId: sec.id, key: `q_${Date.now().toString(36)}`, label_en: "New question", label_ar: "سؤال جديد", type: "text", enabled: true, order: qs.length })}>
                 <Plus className="h-3.5 w-3.5 me-1" /> Add question
               </Button>
             </div>
@@ -147,7 +147,7 @@ function SolutionsTab() {
           <div><Label>Key</Label><Input value={nc.key} onChange={(e) => setNc({ ...nc, key: e.target.value })} /></div>
           <div><Label>Name EN</Label><Input value={nc.name_en} onChange={(e) => setNc({ ...nc, name_en: e.target.value })} /></div>
           <div dir="rtl"><Label className="text-right block font-arabic">الاسم AR</Label><Input dir="rtl" className="text-right font-arabic" value={nc.name_ar} onChange={(e) => setNc({ ...nc, name_ar: e.target.value })} /></div>
-          <Button onClick={() => { if (!nc.key) return; upsertCategory(nc as any); setNc({ key: "", name_en: "", name_ar: "" }); }}><Plus className="h-4 w-4 me-2" />Add</Button>
+          <Button disabled={!_perms.edit} onClick={() => { if (!nc.key) return; upsertCategory(nc as any); setNc({ key: "", name_en: "", name_ar: "" }); }}><Plus className="h-4 w-4 me-2" />Add</Button>
         </div>
         <div className="flex flex-wrap gap-2">
           {categories.map((c) => (
@@ -161,7 +161,7 @@ function SolutionsTab() {
 
       <div className="flex items-center justify-between">
         <div className="text-sm font-semibold">Solutions ({solutions.length})</div>
-        <Button size="sm" variant="outline" onClick={() => upsertSolution({ key: `sol_${Date.now().toString(36)}`, categoryKey: categories[0]?.key ?? "", name_en: "New solution", name_ar: "حل جديد", description_en: "", description_ar: "", defaultPriority: "medium", benefits_en: [], benefits_ar: [], nextStep_en: "", nextStep_ar: "" })}>
+        <Button disabled={!_perms.add} size="sm" variant="outline" onClick={() => upsertSolution({ key: `sol_${Date.now().toString(36)}`, categoryKey: categories[0]?.key ?? "", name_en: "New solution", name_ar: "حل جديد", description_en: "", description_ar: "", defaultPriority: "medium", benefits_en: [], benefits_ar: [], nextStep_en: "", nextStep_ar: "" })}>
           <Plus className="h-4 w-4 me-2" /> Add solution
         </Button>
       </div>
@@ -171,7 +171,7 @@ function SolutionsTab() {
           <Card key={s.id}><CardContent className="p-4 space-y-2">
             <div className="flex items-center justify-between">
               <code className="text-xs px-2 py-0.5 rounded bg-muted">{s.key}</code>
-              <Button variant="ghost" size="sm" onClick={() => removeSolution(s.id)}><Trash2 className="h-4 w-4" /></Button>
+              <Button disabled={!_perms.delete} variant="ghost" size="sm" onClick={() => removeSolution(s.id)}><Trash2 className="h-4 w-4" /></Button>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Input value={s.name_en} onChange={(e) => upsertSolution({ ...s, name_en: e.target.value })} placeholder="Name EN" />
@@ -214,7 +214,7 @@ function RulesTab() {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button size="sm" onClick={() => upsertRule({ name: "New rule", groupLogic: "and", groups: [{ logic: "and", conditions: [] }], actions: [], enabled: true })}>
+        <Button disabled={!_perms.add} size="sm" onClick={() => upsertRule({ name: "New rule", groupLogic: "and", groups: [{ logic: "and", conditions: [] }], actions: [], enabled: true })}>
           <Plus className="h-4 w-4 me-2" /> New rule
         </Button>
       </div>
@@ -232,7 +232,7 @@ function RulesTab() {
                   </SelectContent>
                 </Select>
                 <Switch checked={rule.enabled} onCheckedChange={(v) => upsertRule({ ...rule, enabled: v })} />
-                <Button variant="ghost" size="sm" onClick={() => removeRule(rule.id)}><Trash2 className="h-4 w-4" /></Button>
+                <Button disabled={!_perms.delete} variant="ghost" size="sm" onClick={() => removeRule(rule.id)}><Trash2 className="h-4 w-4" /></Button>
               </div>
             </div>
             <RuleBuilder rule={rule} questions={questions} solutions={solutions} onChange={(r) => upsertRule(r)} />

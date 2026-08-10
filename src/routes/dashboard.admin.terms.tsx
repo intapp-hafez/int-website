@@ -66,7 +66,7 @@ function TermsPage() {
             minHeight="300px"
           />
         </div>
-        <Button onClick={save}>Save Terms</Button>
+        <Button disabled={!_perms.edit} onClick={save}>Save Terms</Button>
       </CardContent></Card>
     </div>
   );

@@ -66,7 +66,7 @@ function PoliciesPage() {
             minHeight="300px"
           />
         </div>
-        <Button onClick={save}>Save Policy</Button>
+        <Button disabled={!_perms.edit} onClick={save}>Save Policy</Button>
       </CardContent></Card>
     </div>
   );

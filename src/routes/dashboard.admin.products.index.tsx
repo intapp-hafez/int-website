@@ -120,7 +120,7 @@ function ProductsAdmin() {
             <Input className="ps-8 w-[220px]" placeholder="Search name, SKU, slug…" value={search} onChange={ev => setSearch(ev.target.value)} />
           </div>
           <label className="text-xs inline-flex items-center gap-2"><Switch checked={filterFeatured} onCheckedChange={setFilterFeatured} /> Featured only</label>
-          <Button onClick={() => setEditing({ ...emptyProduct })}><Plus className="h-4 w-4 me-2" /> New product</Button>
+          <Button disabled={!_perms.edit} onClick={() => setEditing({ ...emptyProduct })}><Plus className="h-4 w-4 me-2" /> New product</Button>
         </div>
       </div>
 
@@ -145,10 +145,10 @@ function ProductsAdmin() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button size="sm" variant="outline" onClick={() => toggleFeatured(p)}><Star className={`h-3.5 w-3.5 ${p.featured ? "fill-amber-500 text-amber-500" : ""}`} /></Button>
+                  <Button disabled={!_perms.edit} size="sm" variant="outline" onClick={() => toggleFeatured(p)}><Star className={`h-3.5 w-3.5 ${p.featured ? "fill-amber-500 text-amber-500" : ""}`} /></Button>
                   <Switch checked={p.active} onCheckedChange={() => toggleActive(p)} />
-                  <Button size="sm" variant="outline" onClick={() => setEditing(p)}><Pencil className="h-3.5 w-3.5" /></Button>
-                  <Button size="sm" variant="outline" onClick={() => remove(p.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                  <Button disabled={!_perms.edit} size="sm" variant="outline" onClick={() => setEditing(p)}><Pencil className="h-3.5 w-3.5" /></Button>
+                  <Button disabled={!_perms.delete} size="sm" variant="outline" onClick={() => remove(p.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
               </CardContent>
             </Card>
@@ -215,8 +215,8 @@ function ProductsAdmin() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-            <Button onClick={save} disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}</Button>
+            <Button disabled={!_perms.edit} variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+            <Button onClick={save} disabled={!_perms.edit || (saving)}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
