@@ -85,10 +85,24 @@ export type PermPreset = {
   perms: UserPerms;
 };
 
-const AGENT_PAGES = new Set(["overview", "leads", "tickets", "clients", "quotations"]);
-const MANAGER_RESTRICTED = new Set(["users", "permissions", "settings", "reports"]);
-const SEO_PAGES = new Set(["overview", "seo", "news", "products", "services", "sliders", "faqs", "settings", "about"]);
-const TECHNICIAN_PAGES = new Set(["overview", "tickets", "services", "projects", "clients", "products", "faqs"]);
+const AGENT_PAGES = new Set(["overview", "leads", "tickets", "clients", "quotations", "quotes", "orders", "helpdesk_tickets"]);
+const MANAGER_RESTRICTED = new Set(["users", "permissions", "settings", "reports", "security"]);
+const SEO_PAGES = new Set(["overview", "seo", "news", "products", "services", "sliders", "faqs", "settings", "about", "partners"]);
+const TECHNICIAN_PAGES = new Set([
+  "overview",
+  "tickets",
+  "services",
+  "projects",
+  "clients",
+  "products",
+  "faqs",
+  "helpdesk",
+  "helpdesk_tickets",
+  "helpdesk_devices",
+  "helpdesk_categories",
+  "helpdesk_branches",
+  "helpdesk_sla",
+]);
 
 export const BUILTIN_PRESETS: PermPreset[] = [
   {
