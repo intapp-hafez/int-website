@@ -4,7 +4,7 @@ import { useAuth, type Role } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, Star, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin } from "lucide-react";
-import { useCanAccess, usePermissions, ADMIN_PAGES } from "@/lib/permissions-store";
+import { useCanAccess, usePermissions, resolveAdminPage } from "@/lib/permissions-store";
 import { demoUsers } from "@/data/demo";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -104,42 +104,6 @@ const adminGroups: NavGroup[] = [
     ],
   },
 ];
-
-/** Nested admin paths that map to a dedicated permission key. */
-const NESTED_PAGE_KEYS: Array<{ prefix: string; pageKey: string }> = [
-  { prefix: "leads/quotes", pageKey: "quotes" },
-  { prefix: "careers/applications", pageKey: "careers_applications" },
-  { prefix: "careers/analytics", pageKey: "careers_analytics" },
-  { prefix: "helpdesk/tickets", pageKey: "helpdesk_tickets" },
-  { prefix: "helpdesk/categories", pageKey: "helpdesk_categories" },
-  { prefix: "helpdesk/branches", pageKey: "helpdesk_branches" },
-  { prefix: "helpdesk/devices", pageKey: "helpdesk_devices" },
-  { prefix: "helpdesk/sla", pageKey: "helpdesk_sla" },
-  { prefix: "helpdesk/performance", pageKey: "helpdesk_performance" },
-  { prefix: "helpdesk/invoice-recipients", pageKey: "helpdesk_invoice_recipients" },
-];
-
-/**
- * Map a current pathname to an ADMIN_PAGES key + the action being attempted.
- * Returns `{ pageKey: "__unknown__" }` for unrecognised admin paths so they are
- * denied by default instead of silently bypassing the permission gate.
- */
-function resolveAdminPage(pathname: string): { pageKey: string; action: "view" | "add" | "edit" } | null {
-  if (!pathname.startsWith("/dashboard/admin")) return null;
-  const rest = pathname.replace(/^\/dashboard\/admin\/?/, "").replace(/\/$/, "");
-  const action: "view" | "add" | "edit" = rest.endsWith("/new")
-    ? "add"
-    : rest.endsWith("/edit")
-      ? "edit"
-      : "view";
-  if (!rest) return { pageKey: "overview", action };
-  const nested = NESTED_PAGE_KEYS.find((n) => rest === n.prefix || rest.startsWith(n.prefix + "/"));
-  if (nested) return { pageKey: nested.pageKey, action };
-  const seg = rest.split("/")[0];
-  const known = ADMIN_PAGES.find((p) => p.key === seg);
-  // Unknown admin sub-path: deny by default for non-admins.
-  return { pageKey: known?.key ?? "__unknown__", action };
-}
 
 function DashboardLayout() {
   const { user, ready, signOut } = useAuth();
