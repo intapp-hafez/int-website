@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ async function uploadLogo(file: File): Promise<string> {
 }
 
 function PartnersAdminPage() {
+  const _perms = useCurrentPagePerms();
   const { partners, loading, upsert, remove, move } = usePartners();
   const sorted = [...partners].sort((a, b) => a.sort_order - b.sort_order);
   const [saving, setSaving] = useState(false);
@@ -133,7 +135,7 @@ function PartnersAdminPage() {
             </div>
           </div>
           <div className="md:col-span-2">
-            <Button onClick={add} disabled={saving}>
+            <Button onClick={add} disabled={!_perms.add || (saving)}>
               {saving ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Plus className="h-4 w-4 me-2" />}
               Add partner
             </Button>
@@ -156,8 +158,8 @@ function PartnersAdminPage() {
                   {p.featured && <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-accent text-accent-foreground px-1.5 py-0.5 rounded"><Star className="h-3 w-3 fill-current" /> Featured</span>}
                 </div>
                 <div className="absolute top-2 end-2 flex flex-col gap-1">
-                  <Button type="button" size="sm" variant="secondary" className="h-6 w-6 p-0" disabled={i === 0} onClick={() => move(p.id, -1)} title="Move up"><ArrowUp className="h-3 w-3" /></Button>
-                  <Button type="button" size="sm" variant="secondary" className="h-6 w-6 p-0" disabled={i === sorted.length - 1} onClick={() => move(p.id, 1)} title="Move down"><ArrowDown className="h-3 w-3" /></Button>
+                  <Button type="button" size="sm" variant="secondary" className="h-6 w-6 p-0" disabled={!_perms.edit || (i === 0)} onClick={() => move(p.id, -1)} title="Move up"><ArrowUp className="h-3 w-3" /></Button>
+                  <Button type="button" size="sm" variant="secondary" className="h-6 w-6 p-0" disabled={!_perms.edit || (i === sorted.length - 1)} onClick={() => move(p.id, 1)} title="Move down"><ArrowDown className="h-3 w-3" /></Button>
                 </div>
                 <label className="absolute bottom-2 end-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-background/90 backdrop-blur border text-xs hover:bg-background cursor-pointer">
                   {uploading === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImageIcon className="h-3.5 w-3.5" />}
@@ -184,7 +186,7 @@ function PartnersAdminPage() {
                     <Switch checked={!!p.featured} onCheckedChange={(v) => upsert({ ...p, featured: v })} />
                     <span className="inline-flex items-center gap-1"><Star className={`h-3.5 w-3.5 ${p.featured ? "fill-accent text-accent" : ""}`} /> Featured</span>
                   </label>
-                  <Button variant="ghost" size="sm" onClick={() => remove(p.id)}><Trash2 className="h-4 w-4" /></Button>
+                  <Button disabled={!_perms.delete} variant="ghost" size="sm" onClick={() => remove(p.id)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               </CardContent>
             </Card>

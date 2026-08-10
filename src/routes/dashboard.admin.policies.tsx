@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/dashboard/admin/policies")({
 const KEY = "site.privacy";
 
 function PoliciesPage() {
+  const _perms = useCurrentPagePerms();
   const [text, setText] = useState<Bilingual>(demoPrivacy);
   useEffect(() => {
     const s = localStorage.getItem(KEY);
@@ -64,7 +66,7 @@ function PoliciesPage() {
             minHeight="300px"
           />
         </div>
-        <Button onClick={save}>Save Policy</Button>
+        <Button disabled={!_perms.edit} onClick={save}>Save Policy</Button>
       </CardContent></Card>
     </div>
   );

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ type Cat = { id: string; value: string; name_en: string; name_ar: string; defaul
 type Sla = { id: string; name_en: string };
 
 function Page() {
+  const _perms = useCurrentPagePerms();
   const { lang } = useI18n();
   const isAr = lang === "ar";
   const [items, setItems] = useState<Cat[]>([]);
@@ -74,7 +76,7 @@ function Page() {
           <h1 className="text-xl font-semibold flex items-center gap-2"><Tag className="h-5 w-5" /> {isAr ? "فئات التذاكر" : "Ticket Categories"}</h1>
           <p className="text-sm text-muted-foreground">{isAr ? "فئات ثنائية اللغة تُستخدم عند إنشاء التذاكر." : "Bilingual categories used when creating tickets."}</p>
         </div>
-        <Button onClick={() => setEditing({ active: true, sort_order: items.length })}><Plus className="h-4 w-4 mr-1" /> {isAr ? "إضافة فئة" : "Add category"}</Button>
+        <Button disabled={!_perms.add} onClick={() => setEditing({ active: true, sort_order: items.length })}><Plus className="h-4 w-4 mr-1" /> {isAr ? "إضافة فئة" : "Add category"}</Button>
       </div>
       <Card><CardContent className="p-0">
         {loading ? <div className="py-12 text-center"><Loader2 className="h-5 w-5 animate-spin inline" /></div> : (
@@ -93,8 +95,8 @@ function Page() {
                   <TableCell>{it.sort_order}</TableCell>
                   <TableCell>{it.active ? (isAr ? "نعم" : "Yes") : (isAr ? "لا" : "No")}</TableCell>
                   <TableCell className="text-right">
-                    <Button size="sm" variant="ghost" onClick={() => setEditing(it)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button size="sm" variant="ghost" onClick={() => remove(it.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                    <Button disabled={!_perms.edit} size="sm" variant="ghost" onClick={() => setEditing(it)}><Pencil className="h-3.5 w-3.5" /></Button>
+                    <Button disabled={!_perms.delete} size="sm" variant="ghost" onClick={() => remove(it.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -124,7 +126,7 @@ function Page() {
               <div className="flex items-center gap-2 pb-2"><Switch checked={editing?.active ?? true} onCheckedChange={(v) => setEditing({ ...editing!, active: v })} /> <Label>{isAr ? "مفعّلة" : "Active"}</Label></div>
             </div>
           </div>
-          <DialogFooter><Button variant="ghost" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button><Button onClick={save}>{isAr ? "حفظ" : "Save"}</Button></DialogFooter>
+          <DialogFooter><Button variant="ghost" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button><Button disabled={!_perms.edit} onClick={save}>{isAr ? "حفظ" : "Save"}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

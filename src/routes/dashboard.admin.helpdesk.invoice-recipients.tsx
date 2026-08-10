@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/dashboard/admin/helpdesk/invoice-recipien
 type Row = { id: string; department: string; email: string; active: boolean; sort_order: number };
 
 function Page() {
+  const _perms = useCurrentPagePerms();
   const { lang } = useI18n();
   const isAr = lang === "ar";
   const [rows, setRows] = useState<Row[]>([]);
@@ -80,7 +82,7 @@ function Page() {
           </div>
           <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
             <DialogTrigger asChild>
-              <Button size="sm" onClick={() => setEditing({ active: true, sort_order: 0 })}><Plus className="h-4 w-4 mr-1" /> {isAr ? "إضافة مستلم" : "Add recipient"}</Button>
+              <Button disabled={!_perms.edit} size="sm" onClick={() => setEditing({ active: true, sort_order: 0 })}><Plus className="h-4 w-4 mr-1" /> {isAr ? "إضافة مستلم" : "Add recipient"}</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>{editing?.id ? (isAr ? "تعديل مستلم" : "Edit recipient") : (isAr ? "إضافة مستلم" : "Add recipient")}</DialogTitle></DialogHeader>
@@ -90,7 +92,7 @@ function Page() {
                 <div className="flex items-center gap-2"><Switch checked={editing?.active ?? true} onCheckedChange={(v) => setEditing({ ...editing!, active: v })} id="act" /><Label htmlFor="act">{isAr ? "مفعّل" : "Active"}</Label></div>
                 <div className="space-y-1.5"><Label>{isAr ? "ترتيب الفرز" : "Sort order"}</Label><Input type="number" value={editing?.sort_order ?? 0} onChange={(e) => setEditing({ ...editing!, sort_order: Number(e.target.value) })} /></div>
               </div>
-              <DialogFooter><Button variant="outline" onClick={() => setOpen(false)}>{isAr ? "إلغاء" : "Cancel"}</Button><Button onClick={save}>{isAr ? "حفظ" : "Save"}</Button></DialogFooter>
+              <DialogFooter><Button variant="outline" onClick={() => setOpen(false)}>{isAr ? "إلغاء" : "Cancel"}</Button><Button disabled={!_perms.edit} onClick={save}>{isAr ? "حفظ" : "Save"}</Button></DialogFooter>
             </DialogContent>
           </Dialog>
         </CardHeader>
@@ -107,8 +109,8 @@ function Page() {
                     <TableCell><Switch checked={r.active} onCheckedChange={() => toggle(r)} /></TableCell>
                     <TableCell>{r.sort_order}</TableCell>
                     <TableCell className="text-right space-x-1">
-                      <Button size="sm" variant="ghost" onClick={() => { setEditing(r); setOpen(true); }}>{isAr ? "تعديل" : "Edit"}</Button>
-                      <Button size="sm" variant="ghost" onClick={() => remove(r.id)}><Trash2 className="h-4 w-4" /></Button>
+                      <Button disabled={!_perms.edit} size="sm" variant="ghost" onClick={() => { setEditing(r); setOpen(true); }}>{isAr ? "تعديل" : "Edit"}</Button>
+                      <Button disabled={!_perms.delete} size="sm" variant="ghost" onClick={() => remove(r.id)}><Trash2 className="h-4 w-4" /></Button>
                     </TableCell>
                   </TableRow>
                 ))}

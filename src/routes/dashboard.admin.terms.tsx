@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/dashboard/admin/terms")({
 const KEY = "site.terms";
 
 function TermsPage() {
+  const _perms = useCurrentPagePerms();
   const [text, setText] = useState<Bilingual>(demoTerms);
   useEffect(() => {
     const s = localStorage.getItem(KEY);
@@ -64,7 +66,7 @@ function TermsPage() {
             minHeight="300px"
           />
         </div>
-        <Button onClick={save}>Save Terms</Button>
+        <Button disabled={!_perms.edit} onClick={save}>Save Terms</Button>
       </CardContent></Card>
     </div>
   );

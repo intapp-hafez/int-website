@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCurrentPagePerms } from "@/components/admin/Can";
 import { useEffect, useState, useRef } from "react";
 import * as XLSX from "xlsx";
 import { useAdminT } from "@/lib/admin-i18n";
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/dashboard/admin/locations/")({
 });
 
 function LocationsPage() {
+  const _perms = useCurrentPagePerms();
   const { t, lang } = useAdminT();
   const isAr = lang === "ar";
   
@@ -157,7 +159,7 @@ function LocationsPage() {
             {submitting ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Upload className="h-4 w-4 me-2" />} 
             {isAr ? "استيراد ملف Excel" : "Import Excel"}
           </Button>
-          <Button onClick={() => setEditing({ id: "new", country_en: "", country_ar: "", city_en: "", city_ar: "", is_active: true })} disabled={submitting}>
+          <Button onClick={() => setEditing({ id: "new", country_en: "", country_ar: "", city_en: "", city_ar: "", is_active: true })} disabled={!_perms.add || (submitting)}>
             <Plus className="h-4 w-4 me-2" /> {isAr ? "إضافة موقع جديد" : "Add New Location"}
           </Button>
         </div>
@@ -200,8 +202,8 @@ function LocationsPage() {
                   <div className={`inline-flex w-2 h-2 rounded-full ${row.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
                 </td>
                 <td className="px-4 py-3 text-end space-x-2 space-x-reverse">
-                  <Button variant="ghost" size="icon" onClick={() => setEditing(row)}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => onDelete(row.id)}><Trash2 className="h-4 w-4" /></Button>
+                  <Button disabled={!_perms.edit} variant="ghost" size="icon" onClick={() => setEditing(row)}><Pencil className="h-4 w-4" /></Button>
+                  <Button disabled={!_perms.delete} variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => onDelete(row.id)}><Trash2 className="h-4 w-4" /></Button>
                 </td>
               </tr>
             ))}
@@ -242,7 +244,7 @@ function LocationsPage() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>{isAr ? "إلغاء" : "Cancel"}</Button>
-            <Button onClick={onSave} disabled={submitting}>
+            <Button onClick={onSave} disabled={!_perms.edit || (submitting)}>
               {submitting && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
               {isAr ? "حفظ" : "Save"}
             </Button>
