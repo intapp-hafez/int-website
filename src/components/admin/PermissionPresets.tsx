@@ -284,6 +284,94 @@ export function PermissionPresets({ activeUserId }: { activeUserId?: string }) {
           })}
         </div>
 
+        <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {editing?.builtin
+                  ? lang === "ar"
+                    ? "نسخ وتعديل القالب"
+                    : "Duplicate & edit preset"
+                  : lang === "ar"
+                    ? "تعديل القالب"
+                    : "Edit preset"}
+              </DialogTitle>
+              <DialogDescription>
+                {editing?.builtin
+                  ? lang === "ar"
+                    ? "القوالب المدمجة للقراءة فقط — سيتم حفظ تعديلاتك كقالب جديد."
+                    : "Built-in presets are read-only — your changes are saved as a new custom preset."
+                  : lang === "ar"
+                    ? "عدّل الاسم والصلاحيات لهذا القالب."
+                    : "Update the name and permissions for this preset."}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <Label htmlFor="edit-en">{lang === "ar" ? "الاسم (إنجليزي)" : "Name (English)"}</Label>
+                  <Input id="edit-en" value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)} />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="edit-ar">{lang === "ar" ? "الاسم (عربي)" : "Name (Arabic)"}</Label>
+                  <Input id="edit-ar" dir="rtl" value={editNameAr} onChange={(e) => setEditNameAr(e.target.value)} />
+                </div>
+              </div>
+              <div className="max-h-[50vh] overflow-y-auto rounded-md border">
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 bg-muted/80 backdrop-blur">
+                    <tr>
+                      <th className="p-2 text-start font-medium">{lang === "ar" ? "الصفحة" : "Page"}</th>
+                      {PERM_ACTIONS.map((a) => (
+                        <th key={a} className="p-2 font-medium w-16">
+                          {lang === "ar" ? ACTION_LABEL[a].ar : ACTION_LABEL[a].en}
+                        </th>
+                      ))}
+                      <th className="p-2 w-20" />
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {ADMIN_PAGES.map((page) => (
+                      <tr key={page.key} className="hover:bg-muted/40">
+                        <td className="p-2">{lang === "ar" ? page.ar : page.en}</td>
+                        {PERM_ACTIONS.map((a) => (
+                          <td key={a} className="p-2 text-center">
+                            <Checkbox
+                              checked={!!editPerms[page.key]?.[a]}
+                              onCheckedChange={() => togglePerm(page.key, a)}
+                              aria-label={`${page.en} ${a}`}
+                            />
+                          </td>
+                        ))}
+                        <td className="p-2 text-center">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 text-[11px]"
+                            onClick={() =>
+                              setRow(page.key, !PERM_ACTIONS.every((a) => editPerms[page.key]?.[a]))
+                            }
+                          >
+                            {PERM_ACTIONS.every((a) => editPerms[page.key]?.[a])
+                              ? lang === "ar" ? "مسح" : "None"
+                              : lang === "ar" ? "الكل" : "All"}
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditing(null)}>
+                {lang === "ar" ? "إلغاء" : "Cancel"}
+              </Button>
+              <Button onClick={onSaveEdit}>{lang === "ar" ? "حفظ" : "Save"}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <Dialog open={openApply} onOpenChange={setOpenApply}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
