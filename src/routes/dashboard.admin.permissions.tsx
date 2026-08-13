@@ -22,6 +22,7 @@ import { useAdminT } from "@/lib/admin-i18n";
 import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
 import { PermissionPresets } from "@/components/admin/PermissionPresets";
 import { ADMIN_PAGES, PERM_ACTIONS, usePermissions } from "@/lib/permissions-store";
+import { AccessRequestQueue } from "@/components/admin/AccessRequestQueue";
 
 export const Route = createFileRoute("/dashboard/admin/permissions")({
   head: () => ({ meta: [{ title: "Permissions — Admin" }] }),
@@ -174,6 +175,8 @@ function PermissionsPage() {
       </Card>
 
       <PermissionPresets activeUserId={user && !isAdmin ? user.id : undefined} />
+
+      <AccessRequestQueue />
 
       {user ? (
         <PermissionsMatrix userId={user.id} isAdmin={isAdmin} />
