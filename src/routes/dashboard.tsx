@@ -7,6 +7,7 @@ import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAler
 import { useCanAccess, usePermissions, resolveAdminPage } from "@/lib/permissions-store";
 import { demoUsers } from "@/data/demo";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { PermissionsDebugPanel } from "@/components/admin/PermissionsDebugPanel";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Integrated Technics" }] }),
@@ -178,6 +179,7 @@ function DashboardLayout() {
       <section className="min-w-0">
         {denied || helpdeskDenied || permDenied ? <Unauthorized reason={permDenied ? "perm" : "role"} /> : <Outlet />}
       </section>
+      {isAdminPath && user.role !== "client" && <PermissionsDebugPanel />}
     </div>
   );
 }
