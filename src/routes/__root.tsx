@@ -15,6 +15,7 @@ import { SettingsProvider } from "@/lib/settings-store";
 import { AboutProvider } from "@/lib/about-store";
 import { ProjectsProvider } from "@/lib/projects-store";
 import { PermissionsProvider } from "@/lib/permissions-store";
+import { AccessRequestsProvider } from "@/lib/access-requests";
 import { SlidesProvider } from "@/lib/slides-store";
 import { NewsProvider } from "@/lib/news-store";
 import { PartnersProvider } from "@/lib/partners-store";
@@ -141,6 +142,7 @@ function RootComponent() {
           <AboutProvider>
           <ProjectsProvider>
           <PermissionsProvider>
+          <AccessRequestsProvider>
           <SlidesProvider>
           <PartnersProvider>
           <RecommendationsProvider>
@@ -170,6 +172,7 @@ function RootComponent() {
           </RecommendationsProvider>
           </PartnersProvider>
           </SlidesProvider>
+          </AccessRequestsProvider>
           </PermissionsProvider>
           </ProjectsProvider>
           </AboutProvider>
