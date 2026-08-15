@@ -1,3 +1,6 @@
+-- Part 2: tables, functions, triggers, RLS policies, storage buckets.
+-- Run AFTER 01_types.sql.
+
 -- ===== 20260509205659_795c0da3-106e-42b2-b7db-ee37c8067d75.sql =====
 create table if not exists public.about_content (
   id text primary key default 'main',
@@ -50,9 +53,7 @@ create policy "Anyone can delete about images"
 
 -- ===== 20260509211155_6b8407e4-c338-40c9-98b6-751bd805dd9c.sql =====
 -- Roles enum + user_roles table
-DO $guard$ BEGIN
-  CREATE TYPE public.app_role AS ENUM ('admin', 'moderator', 'user');
-EXCEPTION WHEN duplicate_object THEN null; END $guard$;
+-- (enum moved to 01_types.sql)
 
 CREATE TABLE IF NOT EXISTS public.user_roles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -198,9 +199,7 @@ CREATE POLICY "Admins can delete slide images"
 
 -- ===== 20260510122641_265f2358-b4b1-4339-abcc-25e8d270d509.sql =====
 -- Notification type enum
-DO $$ BEGIN
-  CREATE TYPE public.notification_type AS ENUM ('lead', 'slide', 'system');
-EXCEPTION WHEN duplicate_object THEN null; END $$;
+-- (enum moved to 01_types.sql)
 
 CREATE TABLE IF NOT EXISTS public.admin_notifications (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -511,13 +510,9 @@ INSERT INTO public.smtp_settings (id) VALUES ('main') ON CONFLICT DO NOTHING;
 
 -- ===== 20260515131925_df480131-aff5-4476-95b8-045ec18c72ab.sql =====
 -- Status enum for application workflow
-DO $$ BEGIN
-  CREATE TYPE public.career_app_status AS ENUM ('new','reviewed','shortlisted','interviewed','offered','accepted','rejected','withdrawn');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+-- (enum moved to 01_types.sql)
 
-DO $guard$ BEGIN
-  CREATE TYPE public.career_employment_type AS ENUM ('full_time','part_time','contract','internship');
-EXCEPTION WHEN duplicate_object THEN null; END $guard$;
+-- (enum moved to 01_types.sql)
 
 -- Jobs
 CREATE TABLE IF NOT EXISTS public.career_jobs (
@@ -650,13 +645,9 @@ CREATE POLICY "Trigger can insert events for new app"
 
 -- ===== 20260516101800_905642fd-c5da-488c-8c1a-75ed04276f78.sql =====
 -- Job postings: richer fields
-DO $$ BEGIN
-  CREATE TYPE public.career_experience_level AS ENUM ('intern','junior','mid','senior','lead');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+-- (enum moved to 01_types.sql)
 
-DO $$ BEGIN
-  CREATE TYPE public.career_remote_policy AS ENUM ('onsite','hybrid','remote');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+-- (enum moved to 01_types.sql)
 
 ALTER TABLE public.career_jobs
   ADD COLUMN IF NOT EXISTS experience_level public.career_experience_level NOT NULL DEFAULT 'mid',
@@ -896,18 +887,14 @@ CREATE TRIGGER trg_notify_admins_new_lead
 REVOKE EXECUTE ON FUNCTION public.notify_admins_new_lead() FROM PUBLIC, anon, authenticated;
 
 -- ===== 20260518194632_088c7608-89b1-43e2-aa55-e03d8168fdee.sql =====
-ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'helpdesk_manager';
-ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'technician';
-ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'client_user';
+-- (enum value moved to 01_types.sql)
+-- (enum value moved to 01_types.sql)
+-- (enum value moved to 01_types.sql)
 
 -- ===== 20260518194726_d05403f3-1ff9-4ed8-b0a7-b37386d6daf0.sql =====
-DO $$ BEGIN
-  CREATE TYPE public.ticket_priority AS ENUM ('low','medium','high','urgent');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+-- (enum moved to 01_types.sql)
 
-DO $$ BEGIN
-  CREATE TYPE public.ticket_status AS ENUM ('new','open','in_progress','waiting_client','resolved','closed','cancelled');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+-- (enum moved to 01_types.sql)
 
 CREATE OR REPLACE FUNCTION public.can_manage_tickets(_user_id uuid)
 RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
