@@ -83,3 +83,22 @@ $grants$;
 
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated;
+
+-- ------------------------------------------------- career resumes bucket
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('career-resumes', 'career-resumes', false)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Anyone can upload a resume" ON storage.objects;
+CREATE POLICY "Anyone can upload a resume" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'career-resumes');
+
+DROP POLICY IF EXISTS "Admins can read resumes" ON storage.objects;
+CREATE POLICY "Admins can read resumes" ON storage.objects
+  FOR SELECT TO authenticated
+  USING (bucket_id = 'career-resumes' AND public.has_role(auth.uid(), 'admin'::public.app_role));
+
+DROP POLICY IF EXISTS "Admins can delete resumes" ON storage.objects;
+CREATE POLICY "Admins can delete resumes" ON storage.objects
+  FOR DELETE TO authenticated
+  USING (bucket_id = 'career-resumes' AND public.has_role(auth.uid(), 'admin'::public.app_role));
