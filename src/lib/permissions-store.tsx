@@ -438,8 +438,12 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       updateCustomPreset,
       duplicatePreset,
       deleteCustomPreset,
+      grants: activeGrants,
+      grantAccess,
+      revokeGrant,
+      grantsForUser,
     }),
-    [perms, presets],
+    [perms, presets, grants, activeGrants],
   );
 
   return <PermsContext.Provider value={value}>{children}</PermsContext.Provider>;
