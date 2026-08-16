@@ -423,6 +423,27 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     return preset;
   };
 
+  const grantAccess: Ctx["grantAccess"] = ({ userId, pageKey, actions, days, grantedBy, note, requestId }) => {
+    const grant: AccessGrant = {
+      id: `AG-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      userId,
+      pageKey,
+      actions: actions.length ? actions : ["view"],
+      expiresAt: days && days > 0 ? new Date(Date.now() + days * 86_400_000).toISOString() : null,
+      grantedBy,
+      note,
+      requestId,
+      createdAt: new Date().toISOString(),
+    };
+    persistGrants([grant, ...grants]);
+    return grant;
+  };
+
+  const revokeGrant: Ctx["revokeGrant"] = (grantId) => persistGrants(grants.filter((g) => g.id !== grantId));
+
+  const grantsForUser: Ctx["grantsForUser"] = (userId) =>
+    activeGrants.filter((g) => g.userId === userId);
+
   const value = useMemo<Ctx>(
     () => ({
       perms,
