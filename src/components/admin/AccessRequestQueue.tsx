@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Inbox, Check, X } from "lucide-react";
+import { Inbox, Check, X, Clock, ShieldOff } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { useAdminT } from "@/lib/admin-i18n";
@@ -15,14 +16,24 @@ const STATUS_STYLE: Record<AccessRequestStatus, string> = {
   denied: "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300",
 };
 
+/** Selectable grant durations, in days. `0` means permanent. */
+const DURATIONS: Array<{ days: number; en: string; ar: string }> = [
+  { days: 1, en: "1 day", ar: "يوم واحد" },
+  { days: 7, en: "7 days", ar: "٧ أيام" },
+  { days: 30, en: "30 days", ar: "٣٠ يومًا" },
+  { days: 90, en: "90 days", ar: "٩٠ يومًا" },
+  { days: 0, en: "Permanent", ar: "دائم" },
+];
+
 /** Approval queue for admin-section access requests. Managers and admins only. */
 export function AccessRequestQueue() {
   const { lang } = useAdminT();
   const ar = lang === "ar";
   const { user } = useAuth();
   const { requests, decide } = useAccessRequests();
-  const { setPagePerms } = usePermissions();
+  const { grants, grantAccess, revokeGrant } = usePermissions();
   const [showAll, setShowAll] = useState(false);
+  const [durations, setDurations] = useState<Record<string, string>>({});
 
   const canApprove = user?.role === "admin" || user?.role === "manager";
   if (!canApprove) return null;
@@ -37,13 +48,29 @@ export function AccessRequestQueue() {
   const approve = (id: string) => {
     const req = requests.find((r) => r.id === id);
     if (!req) return;
-    const patch: Partial<Record<PermAction, boolean>> = {};
-    for (const a of PERM_ACTIONS) if (req.actions.includes(a)) patch[a] = true;
+    const days = Number(durations[id] ?? "7");
     // Granting any action implies being able to open the page.
-    patch.view = true;
-    setPagePerms(req.userId, req.pageKey, patch);
-    decide(id, "approved", user?.name || user?.email || "manager");
-    toast.success(ar ? "تمت الموافقة ومنح الصلاحية" : "Approved and permissions granted");
+    const actions = Array.from(
+      new Set<PermAction>(["view", ...PERM_ACTIONS.filter((a) => req.actions.includes(a))]),
+    );
+    const grant = grantAccess({
+      userId: req.userId,
+      pageKey: req.pageKey,
+      actions,
+      days: days > 0 ? days : null,
+      grantedBy: user?.name || user?.email || "manager",
+      requestId: id,
+    });
+    decide(id, "approved", user?.name || user?.email || "manager", undefined, grant.expiresAt);
+    toast.success(
+      grant.expiresAt
+        ? ar
+          ? `تمت الموافقة حتى ${new Date(grant.expiresAt).toLocaleString("ar-EG")}`
+          : `Approved until ${new Date(grant.expiresAt).toLocaleString("en-GB")}`
+        : ar
+          ? "تمت الموافقة ومنح صلاحية دائمة"
+          : "Approved with permanent access",
+    );
   };
 
   const deny = (id: string) => {
@@ -86,6 +113,16 @@ export function AccessRequestQueue() {
                   {new Date(r.createdAt).toLocaleString(ar ? "ar-EG" : "en-GB")}
                   {r.decidedBy ? ` · ${ar ? "بواسطة" : "by"} ${r.decidedBy}` : ""}
                 </div>
+                {r.status === "approved" && (
+                  <div className="text-[11px] mt-1 inline-flex items-center gap-1 text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    {r.expiresAt
+                      ? `${ar ? "ينتهي" : "Expires"} ${new Date(r.expiresAt).toLocaleString(ar ? "ar-EG" : "en-GB")}`
+                      : ar
+                        ? "صلاحية دائمة"
+                        : "Permanent access"}
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className={STATUS_STYLE[r.status]}>
@@ -95,6 +132,21 @@ export function AccessRequestQueue() {
                 </Badge>
                 {r.status === "pending" && (
                   <>
+                    <Select
+                      value={durations[r.id] ?? "7"}
+                      onValueChange={(v) => setDurations((p) => ({ ...p, [r.id]: v }))}
+                    >
+                      <SelectTrigger className="h-9 w-[130px]" aria-label={ar ? "مدة الصلاحية" : "Grant duration"}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DURATIONS.map((d) => (
+                          <SelectItem key={d.days} value={String(d.days)}>
+                            {ar ? d.ar : d.en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Button size="sm" variant="outline" onClick={() => deny(r.id)}>
                       <X className="h-4 w-4 me-1" />{ar ? "رفض" : "Deny"}
                     </Button>
@@ -106,6 +158,34 @@ export function AccessRequestQueue() {
               </div>
             </div>
           ))
+        )}
+
+        {grants.length > 0 && (
+          <div className="pt-4 mt-2 border-t space-y-2">
+            <div className="text-sm font-medium">{ar ? "الصلاحيات المؤقتة النشطة" : "Active grants"}</div>
+            {grants.map((g) => (
+              <div key={g.id} className="flex items-center justify-between gap-3 text-xs border rounded-lg px-3 py-2 flex-wrap">
+                <div className="min-w-0">
+                  <span className="font-medium">{label(g.pageKey)}</span>{" "}
+                  <span className="font-mono text-muted-foreground">{g.userId}</span>
+                  <div className="mt-1 flex flex-wrap items-center gap-1">
+                    {g.actions.map((a) => (
+                      <Badge key={a} variant="outline" className="font-mono text-[10px]">{a}</Badge>
+                    ))}
+                    <span className="text-muted-foreground ms-1 inline-flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {g.expiresAt
+                        ? `${ar ? "ينتهي" : "expires"} ${new Date(g.expiresAt).toLocaleString(ar ? "ar-EG" : "en-GB")}`
+                        : ar ? "دائم" : "permanent"}
+                    </span>
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => { revokeGrant(g.id); toast.success(ar ? "تم سحب الصلاحية" : "Grant revoked"); }}>
+                  <ShieldOff className="h-4 w-4 me-1" />{ar ? "سحب" : "Revoke"}
+                </Button>
+              </div>
+            ))}
+          </div>
         )}
       </CardContent>
     </Card>
