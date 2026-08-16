@@ -15,14 +15,24 @@ export type AccessRequest = {
   decidedAt?: string;
   decidedBy?: string;
   decisionNote?: string;
+  /** Days the approval is valid for. null/undefined = permanent. */
+  durationDays?: number | null;
+  /** Absolute expiry stamped at approval time. */
+  expiresAt?: string | null;
 };
 
 type Ctx = {
   requests: AccessRequest[];
   createRequest: (
-    input: Omit<AccessRequest, "id" | "status" | "createdAt" | "decidedAt" | "decidedBy" | "decisionNote">,
+    input: Omit<AccessRequest, "id" | "status" | "createdAt" | "decidedAt" | "decidedBy" | "decisionNote" | "expiresAt">,
   ) => AccessRequest;
-  decide: (id: string, status: Exclude<AccessRequestStatus, "pending">, by: string, note?: string) => AccessRequest | null;
+  decide: (
+    id: string,
+    status: Exclude<AccessRequestStatus, "pending">,
+    by: string,
+    note?: string,
+    expiresAt?: string | null,
+  ) => AccessRequest | null;
   removeRequest: (id: string) => void;
 };
 
@@ -62,7 +72,7 @@ export function AccessRequestsProvider({ children }: { children: ReactNode }) {
     return req;
   };
 
-  const decide: Ctx["decide"] = (id, status, by, note) => {
+  const decide: Ctx["decide"] = (id, status, by, note, expiresAt) => {
     const idx = requests.findIndex((r) => r.id === id);
     if (idx === -1) return null;
     const updated: AccessRequest = {
@@ -71,6 +81,7 @@ export function AccessRequestsProvider({ children }: { children: ReactNode }) {
       decidedAt: new Date().toISOString(),
       decidedBy: by,
       decisionNote: note,
+      expiresAt: status === "approved" ? (expiresAt ?? null) : null,
     };
     const next = [...requests];
     next[idx] = updated;
