@@ -57,6 +57,7 @@ export const PERM_ACTIONS: PermAction[] = ["view", "add", "edit", "delete"];
 
 const KEY = "it_user_perms_v1";
 const PRESETS_KEY = "it_perm_presets_v1";
+const GRANTS_KEY = "it_temp_grants_v1";
 const STORAGE_VERSION = 1;
 
 export const noPerms = (): PagePerms => ({ view: false, add: false, edit: false, delete: false });
@@ -84,6 +85,26 @@ export type PermPreset = {
   builtin?: boolean;
   perms: UserPerms;
 };
+
+/**
+ * Time-limited permission grant. `expiresAt === null` means permanent.
+ * Expired grants are ignored when resolving permissions and are pruned from
+ * storage, so access revokes itself without any manual step.
+ */
+export type AccessGrant = {
+  id: string;
+  userId: string;
+  pageKey: string;
+  actions: PermAction[];
+  expiresAt: string | null;
+  grantedBy: string;
+  note?: string;
+  requestId?: string;
+  createdAt: string;
+};
+
+export const isGrantActive = (g: AccessGrant, now = Date.now()) =>
+  g.expiresAt === null || new Date(g.expiresAt).getTime() > now;
 
 const AGENT_PAGES = new Set(["overview", "leads", "tickets", "clients", "quotations", "quotes", "orders", "helpdesk_tickets"]);
 const MANAGER_RESTRICTED = new Set(["users", "permissions", "settings", "reports", "security"]);
@@ -201,6 +222,19 @@ type Ctx = {
   updateCustomPreset: (presetId: string, patch: { name?: { en: string; ar: string }; perms?: UserPerms }) => boolean;
   duplicatePreset: (presetId: string, name: { en: string; ar: string }, perms?: UserPerms) => PermPreset | null;
   deleteCustomPreset: (presetId: string) => void;
+  /** Active (non-expired) temporary grants, newest first. */
+  grants: AccessGrant[];
+  grantAccess: (input: {
+    userId: string;
+    pageKey: string;
+    actions: PermAction[];
+    days: number | null;
+    grantedBy: string;
+    note?: string;
+    requestId?: string;
+  }) => AccessGrant;
+  revokeGrant: (grantId: string) => void;
+  grantsForUser: (userId: string) => AccessGrant[];
 };
 
 const PermsContext = createContext<Ctx | null>(null);
@@ -208,6 +242,8 @@ const PermsContext = createContext<Ctx | null>(null);
 export function PermissionsProvider({ children }: { children: ReactNode }) {
   const [perms, setPerms] = useState<PermsMap>({});
   const [customPresets, setCustomPresets] = useState<PermPreset[]>([]);
+  const [grants, setGrants] = useState<AccessGrant[]>([]);
+  const [, setTick] = useState(0);
 
   useEffect(() => {
     try {
@@ -226,7 +262,30 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch {}
+    try {
+      const raw = localStorage.getItem(GRANTS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.data)) {
+          setGrants((parsed.data as AccessGrant[]).filter((g) => isGrantActive(g)));
+        }
+      }
+    } catch {}
   }, []);
+
+  // Re-evaluate expiry on a timer so access disappears without a reload.
+  useEffect(() => {
+    const t = setInterval(() => setTick((n) => n + 1), 30_000);
+    return () => clearInterval(t);
+  }, []);
+
+  const activeGrants = useMemo(() => grants.filter((g) => isGrantActive(g)), [grants]);
+
+  const persistGrants = (next: AccessGrant[]) => {
+    const cleaned = next.filter((g) => isGrantActive(g));
+    setGrants(cleaned);
+    try { localStorage.setItem(GRANTS_KEY, JSON.stringify({ v: STORAGE_VERSION, data: cleaned })); } catch {}
+  };
 
   const persist = (next: PermsMap) => {
     setPerms(next);
@@ -240,13 +299,25 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
 
   const getUserPerms: Ctx["getUserPerms"] = (userId) => {
     const existing = perms[userId];
+    let base: UserPerms;
     if (existing) {
       // Backfill any missing pages
-      const merged: UserPerms = { ...defaultUserPerms(), ...existing };
-      return merged;
+      base = { ...defaultUserPerms(), ...existing };
+    } else {
+      const matchedUser = demoUsers.find((u) => u.id === userId);
+      base = defaultPermsForRole(matchedUser?.role);
     }
-    const matchedUser = demoUsers.find((u) => u.id === userId);
-    return defaultPermsForRole(matchedUser?.role);
+    // Layer active time-limited grants on top; expired ones simply vanish.
+    const now = Date.now();
+    const mine = grants.filter((g) => g.userId === userId && isGrantActive(g, now));
+    if (mine.length === 0) return base;
+    const merged: UserPerms = { ...base };
+    for (const g of mine) {
+      const page = { ...(merged[g.pageKey] ?? noPerms()) };
+      for (const a of g.actions) page[a] = true;
+      merged[g.pageKey] = page;
+    }
+    return merged;
   };
 
   const setPagePerms: Ctx["setPagePerms"] = (userId, pageKey, patch) => {
@@ -352,6 +423,27 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     return preset;
   };
 
+  const grantAccess: Ctx["grantAccess"] = ({ userId, pageKey, actions, days, grantedBy, note, requestId }) => {
+    const grant: AccessGrant = {
+      id: `AG-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      userId,
+      pageKey,
+      actions: actions.length ? actions : ["view"],
+      expiresAt: days && days > 0 ? new Date(Date.now() + days * 86_400_000).toISOString() : null,
+      grantedBy,
+      note,
+      requestId,
+      createdAt: new Date().toISOString(),
+    };
+    persistGrants([grant, ...grants]);
+    return grant;
+  };
+
+  const revokeGrant: Ctx["revokeGrant"] = (grantId) => persistGrants(grants.filter((g) => g.id !== grantId));
+
+  const grantsForUser: Ctx["grantsForUser"] = (userId) =>
+    activeGrants.filter((g) => g.userId === userId);
+
   const value = useMemo<Ctx>(
     () => ({
       perms,
@@ -367,8 +459,12 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       updateCustomPreset,
       duplicatePreset,
       deleteCustomPreset,
+      grants: activeGrants,
+      grantAccess,
+      revokeGrant,
+      grantsForUser,
     }),
-    [perms, presets],
+    [perms, presets, grants, activeGrants],
   );
 
   return <PermsContext.Provider value={value}>{children}</PermsContext.Provider>;
