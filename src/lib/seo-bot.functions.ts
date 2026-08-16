@@ -21,7 +21,8 @@ const attachSupabaseBearer = createMiddleware({ type: "function" }).client(async
   return next(token ? { headers: { Authorization: `Bearer ${token}` } } : {});
 });
 
-async function isAdmin(supabaseAdmin: any, userId: string) {
+async function isAdmin(supabaseAdmin: any, userId?: string) {
+  if (!userId) return false;
   const { data } = await supabaseAdmin
     .from("user_roles")
     .select("role")
@@ -31,15 +32,16 @@ async function isAdmin(supabaseAdmin: any, userId: string) {
   return !!data;
 }
 
-async function ensureAdmin(supabaseAdmin: any, userId: string) {
-  if (!(await isAdmin(supabaseAdmin, userId))) throw new Error("Forbidden");
+async function ensureAdmin(supabaseAdmin: any, userId?: string) {
+  if (!userId || !(await isAdmin(supabaseAdmin, userId))) throw new Error("Forbidden");
 }
 
 export const getSeoBotState = createServerFn({ method: "GET" })
   .middleware([attachSupabaseBearer, requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const userId = (context as any)?.userId;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    if (!(await isAdmin(supabaseAdmin, context.userId))) {
+    if (!userId || !(await isAdmin(supabaseAdmin, userId))) {
       return { settings: null, runs: [], findings: [] };
     }
     const [settings, runs, lastRun] = await Promise.all([
@@ -68,8 +70,9 @@ export const runSeoBotNow = createServerFn({ method: "POST" })
   .middleware([attachSupabaseBearer, requireSupabaseAuth])
   .inputValidator((d?: { full?: boolean }) => d ?? {})
   .handler(async ({ context, data }) => {
+    const userId = (context as any)?.userId;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await ensureAdmin(supabaseAdmin, context.userId);
+    await ensureAdmin(supabaseAdmin, userId);
     const { runSeoBot } = await import("./seo-bot.server");
     return await runSeoBot("manual", { full: !!data?.full });
   });
@@ -78,8 +81,9 @@ export const updateSeoBotSettings = createServerFn({ method: "POST" })
   .middleware([attachSupabaseBearer, requireSupabaseAuth])
   .inputValidator((d: { daily_enabled?: boolean; schedule_cron?: string }) => d)
   .handler(async ({ context, data }) => {
+    const userId = (context as any)?.userId;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await ensureAdmin(supabaseAdmin, context.userId);
+    await ensureAdmin(supabaseAdmin, userId);
     const patch = {
       ...(typeof data.daily_enabled === "boolean" ? { daily_enabled: data.daily_enabled } : {}),
       ...(typeof data.schedule_cron === "string" ? { schedule_cron: data.schedule_cron } : {}),
@@ -93,8 +97,9 @@ export const applyFindingSuggestion = createServerFn({ method: "POST" })
   .middleware([attachSupabaseBearer, requireSupabaseAuth])
   .inputValidator((d: { finding_id: string }) => d)
   .handler(async ({ context, data }) => {
+    const userId = (context as any)?.userId;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await ensureAdmin(supabaseAdmin, context.userId);
+    await ensureAdmin(supabaseAdmin, userId);
     const { data: f, error } = await supabaseAdmin
       .from("seo_bot_findings").select("*").eq("id", data.finding_id).maybeSingle();
     if (error || !f) throw new Error(error?.message || "Finding not found");

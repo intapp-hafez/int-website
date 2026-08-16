@@ -9,8 +9,8 @@ import type { Database } from './types'
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
     
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+    const SUPABASE_URL = process.env.SUPABASE_URL || "https://hdbzvoitzyvehyeqygmq.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkYnp2b2l0enl2ZWh5ZXF5Z21xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMzQyMzcsImV4cCI6MjEwMDgxMDIzN30.ugn8yH29LtLDzNh_1IaUEsI7csbGy93lwI-JzQDLPOQ";
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
       const missing = [

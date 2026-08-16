@@ -69,8 +69,19 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-primary-foreground/10">
-        <div className="container mx-auto px-4 lg:px-8 py-5 text-xs opacity-70 text-center">
-          © {year} Integrated Technics. {t("footer.rights")}
+        <div className="container mx-auto px-4 lg:px-8 py-5 text-xs opacity-75 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-start">
+          <div>
+            © {year} Integrated Technics. {t("footer.rights")}
+          </div>
+          <div className="flex items-center gap-4 flex-wrap justify-center text-xs">
+            <Link to="/terms" className="hover:text-accent hover:underline transition-colors">
+              {lang === "ar" ? "الشروط والأحكام" : "Terms of Service"}
+            </Link>
+            <span className="opacity-40">•</span>
+            <Link to="/policies" className="hover:text-accent hover:underline transition-colors">
+              {lang === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

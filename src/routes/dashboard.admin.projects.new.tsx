@@ -19,8 +19,8 @@ function NewProject() {
       <Button asChild variant="ghost" size="sm"><Link to="/dashboard/admin/projects"><ArrowLeft className={`h-4 w-4 me-2 ${isRtl ? "rotate-180" : ""}`} /> {t("back")}</Link></Button>
       <ProjectForm
         title={t("newProject")}
-        initial={{ image: "/placeholder.svg", title: { en: "", ar: "" }, industry: "", desc: { en: "", ar: "" } }}
-        onSubmit={(d) => { const p = add(d); navigate({ to: "/dashboard/admin/projects/$id", params: { id: String(p.id) } }); }}
+        initial={{ image: "/placeholder.svg", title: { en: "", ar: "" }, industry: "", desc: { en: "", ar: "" }, active: true }}
+        onSubmit={async (d) => { const p = await add(d); navigate({ to: "/dashboard/admin/projects/$id", params: { id: String(p?.id ?? "") } }); }}
         onCancel={() => navigate({ to: "/dashboard/admin/projects" })}
       />
     </div>

@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth";
 import { demoUsers } from "@/data/demo";
+import { supabase } from "@/integrations/supabase/client";
+
+const db = supabase as any;
 
 export type PermAction = "view" | "add" | "edit" | "delete";
 export type PagePerms = Record<PermAction, boolean>;
@@ -232,9 +235,10 @@ type Ctx = {
     grantedBy: string;
     note?: string;
     requestId?: string;
-  }) => AccessGrant;
-  revokeGrant: (grantId: string) => void;
+  }) => Promise<AccessGrant | null>;
+  revokeGrant: (grantId: string) => Promise<void>;
   grantsForUser: (userId: string) => AccessGrant[];
+  refreshGrants: () => Promise<void>;
 };
 
 const PermsContext = createContext<Ctx | null>(null);
@@ -244,6 +248,31 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
   const [customPresets, setCustomPresets] = useState<PermPreset[]>([]);
   const [grants, setGrants] = useState<AccessGrant[]>([]);
   const [, setTick] = useState(0);
+
+  const refreshGrants = async () => {
+    const { data, error } = await db
+      .from("access_grants")
+      .select("*")
+      .is("revoked_at", null);
+      
+    if (error) {
+      console.error("[permissions] failed to load grants", error);
+      return;
+    }
+    
+    const mapped: AccessGrant[] = data.map((g: any) => ({
+      id: g.id,
+      userId: g.user_id,
+      pageKey: g.page_key,
+      actions: g.actions as PermAction[],
+      expiresAt: g.expires_at,
+      grantedBy: g.granted_by,
+      note: g.note,
+      requestId: g.request_id,
+      createdAt: g.created_at,
+    }));
+    setGrants(mapped);
+  };
 
   useEffect(() => {
     try {
@@ -262,15 +291,19 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch {}
-    try {
-      const raw = localStorage.getItem(GRANTS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && Array.isArray(parsed.data)) {
-          setGrants((parsed.data as AccessGrant[]).filter((g) => isGrantActive(g)));
-        }
-      }
-    } catch {}
+    
+    void refreshGrants();
+    
+    const channel = supabase
+      .channel("access_grants_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "access_grants" }, () => {
+        void refreshGrants();
+      })
+      .subscribe();
+      
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, []);
 
   // Re-evaluate expiry on a timer so access disappears without a reload.
@@ -281,11 +314,7 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
 
   const activeGrants = useMemo(() => grants.filter((g) => isGrantActive(g)), [grants]);
 
-  const persistGrants = (next: AccessGrant[]) => {
-    const cleaned = next.filter((g) => isGrantActive(g));
-    setGrants(cleaned);
-    try { localStorage.setItem(GRANTS_KEY, JSON.stringify({ v: STORAGE_VERSION, data: cleaned })); } catch {}
-  };
+
 
   const persist = (next: PermsMap) => {
     setPerms(next);
@@ -423,23 +452,51 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     return preset;
   };
 
-  const grantAccess: Ctx["grantAccess"] = ({ userId, pageKey, actions, days, grantedBy, note, requestId }) => {
-    const grant: AccessGrant = {
-      id: `AG-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      userId,
-      pageKey,
-      actions: actions.length ? actions : ["view"],
-      expiresAt: days && days > 0 ? new Date(Date.now() + days * 86_400_000).toISOString() : null,
-      grantedBy,
-      note,
-      requestId,
-      createdAt: new Date().toISOString(),
+  const grantAccess: Ctx["grantAccess"] = async ({ userId, pageKey, actions, days, grantedBy, note, requestId }) => {
+    const expiresAt = days && days > 0 ? new Date(Date.now() + days * 86_400_000).toISOString() : null;
+    
+    const { data, error } = await db
+      .from("access_grants")
+      .insert({
+        user_id: userId,
+        page_key: pageKey,
+        actions: actions.length ? actions : ["view"],
+        expires_at: expiresAt,
+        granted_by: grantedBy,
+        note,
+        request_id: requestId,
+      })
+      .select()
+      .single();
+      
+    if (error) {
+      console.error("[permissions] failed to grant access", error);
+      return null;
+    }
+    
+    return {
+      id: data.id,
+      userId: data.user_id,
+      pageKey: data.page_key,
+      actions: data.actions as PermAction[],
+      expiresAt: data.expires_at,
+      grantedBy: data.granted_by,
+      note: data.note,
+      requestId: data.request_id,
+      createdAt: data.created_at,
     };
-    persistGrants([grant, ...grants]);
-    return grant;
   };
 
-  const revokeGrant: Ctx["revokeGrant"] = (grantId) => persistGrants(grants.filter((g) => g.id !== grantId));
+  const revokeGrant: Ctx["revokeGrant"] = async (grantId) => {
+    const { error } = await db
+      .from("access_grants")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("id", grantId);
+      
+    if (error) {
+      console.error("[permissions] failed to revoke access", error);
+    }
+  };
 
   const grantsForUser: Ctx["grantsForUser"] = (userId) =>
     activeGrants.filter((g) => g.userId === userId);
@@ -463,6 +520,7 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       grantAccess,
       revokeGrant,
       grantsForUser,
+      refreshGrants,
     }),
     [perms, presets, grants, activeGrants],
   );

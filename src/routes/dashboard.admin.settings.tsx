@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useSettings, type SiteSettings, type InvoiceWatermark } from "@/lib/settings-store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle2, RotateCcw, Download, Upload, History, Trash2 } from "lucide-react";
+import { CheckCircle2, RotateCcw, Download, Upload, History, Trash2, Loader2 } from "lucide-react";
 import { useAdminT } from "@/lib/admin-i18n";
 import { toast } from "sonner";
 import { useRef } from "react";
@@ -25,8 +25,9 @@ export const Route = createFileRoute("/dashboard/admin/settings")({
 });
 
 function SettingsPage() {
-  const { settings, update, reset } = useSettings();
+  const { settings, loading, update, reset } = useSettings();
   const [form, setForm] = useState<SiteSettings>(settings);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const { t: at } = useAdminT();
   const { lang } = useI18n();
@@ -35,6 +36,11 @@ function SettingsPage() {
   const HISTORY_KEY = "it_backups_v1";
   const [history, setHistory] = useState<BackupSnapshot[]>([]);
   const [pending, setPending] = useState<{ source: "history" | "file"; payload: Record<string, unknown>; label: string } | null>(null);
+
+  // Sync form state when database settings load or change in real-time
+  useEffect(() => {
+    setForm(settings);
+  }, [settings]);
 
   useEffect(() => {
     try {
@@ -108,34 +114,46 @@ function SettingsPage() {
     persistHistory(history.filter((h) => h.id !== id));
   };
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!form.email || !/^\S+@\S+\.\S+$/.test(form.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (!form.phone.trim()) {
+      toast.error("Phone number is required.");
+      return;
+    }
+    if (!form.address.en.trim() && !form.address.ar.trim()) {
+      toast.error("Please provide an address (English or Arabic).");
+      return;
+    }
+
+    setSaving(true);
     try {
-      if (!form.email || !/^\S+@\S+\.\S+$/.test(form.email)) {
-        toast.error("Please enter a valid email address.");
-        return;
-      }
-      if (!form.phone.trim()) {
-        toast.error("Phone number is required.");
-        return;
-      }
-      if (!form.address.en.trim() && !form.address.ar.trim()) {
-        toast.error("Please provide an address (English or Arabic).");
-        return;
-      }
-      update(form);
+      await update(form);
       setSaved(true);
-      toast.success("Settings saved — address, phone, and email updated site-wide.");
+      toast.success("Settings saved — synced across the database and site in real time.");
       setTimeout(() => setSaved(false), 2500);
-    } catch {
-      toast.error("Could not save settings. Please try again.");
+    } catch (err: any) {
+      toast.error(err?.message || "Could not save settings. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
-  const onReset = () => {
-    reset();
-    setForm({ ...settings });
-    setTimeout(() => window.location.reload(), 100);
+  const onReset = async () => {
+    if (confirm("Reset all settings to default values?")) {
+      setSaving(true);
+      try {
+        await reset();
+        toast.success("Settings reset to defaults.");
+      } catch (err: any) {
+        toast.error(err?.message || "Failed to reset settings.");
+      } finally {
+        setSaving(false);
+      }
+    }
   };
 
   return (
@@ -153,9 +171,126 @@ function SettingsPage() {
             <Field label="Phone" id="phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
             <Field label="Sales email" id="sales_email" type="email" value={form.salesEmail} onChange={(v) => setForm({ ...form, salesEmail: v })} hint="Shown on the Contact page as the sales department address." />
             <Field label="Support email" id="support_email" type="email" value={form.supportEmail} onChange={(v) => setForm({ ...form, supportEmail: v })} hint="Shown on the Contact page as the technical support address." />
-            <Field label="WhatsApp number" id="wa" value={form.whatsapp} onChange={(v) => setForm({ ...form, whatsapp: v })} hint="Digits only, e.g. 966110000000" />
+            <Field label="WhatsApp number" id="wa" value={form.whatsapp} onChange={(v) => setForm({ ...form, whatsapp: v })} hint="Digits with country code, e.g. +201007419344" />
             <Field label="Address (English)" id="address_en" value={form.address.en} onChange={(v) => setForm({ ...form, address: { ...form.address, en: v } })} />
             <Field label="العنوان (عربي)" id="address_ar" value={form.address.ar} onChange={(v) => setForm({ ...form, address: { ...form.address, ar: v } })} dir="rtl" />
+          </CardContent>
+        </Card>
+
+        {/* Contact Page Hero Header & Working Hours */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-display text-lg">Contact Page Content & Working Hours</CardTitle>
+          </CardHeader>
+          <CardContent className="grid md:grid-cols-2 gap-4">
+            <Field
+              label="Header Badge (English)"
+              id="c_badge_en"
+              value={form.contactHeader?.badge?.en || ""}
+              onChange={(v) =>
+                setForm({
+                  ...form,
+                  contactHeader: {
+                    ...form.contactHeader,
+                    badge: { ...form.contactHeader?.badge, en: v },
+                  },
+                })
+              }
+            />
+            <Field
+              label="شارة العنوان (عربي)"
+              id="c_badge_ar"
+              dir="rtl"
+              value={form.contactHeader?.badge?.ar || ""}
+              onChange={(v) =>
+                setForm({
+                  ...form,
+                  contactHeader: {
+                    ...form.contactHeader,
+                    badge: { ...form.contactHeader?.badge, ar: v },
+                  },
+                })
+              }
+            />
+            <Field
+              label="Hero Title (English)"
+              id="c_title_en"
+              value={form.contactHeader?.title?.en || ""}
+              onChange={(v) =>
+                setForm({
+                  ...form,
+                  contactHeader: {
+                    ...form.contactHeader,
+                    title: { ...form.contactHeader?.title, en: v },
+                  },
+                })
+              }
+            />
+            <Field
+              label="العنوان الرئيسي (عربي)"
+              id="c_title_ar"
+              dir="rtl"
+              value={form.contactHeader?.title?.ar || ""}
+              onChange={(v) =>
+                setForm({
+                  ...form,
+                  contactHeader: {
+                    ...form.contactHeader,
+                    title: { ...form.contactHeader?.title, ar: v },
+                  },
+                })
+              }
+            />
+            <div className="space-y-1.5 md:col-span-2">
+              <Label htmlFor="c_sub_en">Hero Subtitle (English)</Label>
+              <textarea
+                id="c_sub_en"
+                value={form.contactHeader?.subtitle?.en || ""}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    contactHeader: {
+                      ...form.contactHeader,
+                      subtitle: { ...form.contactHeader?.subtitle, en: e.target.value },
+                    },
+                  })
+                }
+                className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs"
+              />
+            </div>
+            <div className="space-y-1.5 md:col-span-2">
+              <Label htmlFor="c_sub_ar">الوصف الفرعي (عربي)</Label>
+              <textarea
+                id="c_sub_ar"
+                dir="rtl"
+                value={form.contactHeader?.subtitle?.ar || ""}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    contactHeader: {
+                      ...form.contactHeader,
+                      subtitle: { ...form.contactHeader?.subtitle, ar: e.target.value },
+                    },
+                  })
+                }
+                className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs"
+              />
+            </div>
+            <Field
+              label="Working Hours (English)"
+              id="c_hours_en"
+              value={form.contactHours?.en || ""}
+              onChange={(v) => setForm({ ...form, contactHours: { ...form.contactHours, en: v } })}
+              hint="Shown in the business hours card on /contact."
+            />
+            <Field
+              label="مواعيد العمل (عربي)"
+              id="c_hours_ar"
+              dir="rtl"
+              value={form.contactHours?.ar || ""}
+              onChange={(v) => setForm({ ...form, contactHours: { ...form.contactHours, ar: v } })}
+              hint="تظهر في بطاقة ساعات العمل في صفحة التواصل."
+            />
           </CardContent>
         </Card>
 
@@ -647,8 +782,11 @@ function SettingsPage() {
         </Card>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit">Save changes</Button>
-          <Button type="button" variant="outline" onClick={onReset}>
+          <Button type="submit" disabled={saving}>
+            {saving && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
+            Save changes
+          </Button>
+          <Button type="button" variant="outline" onClick={() => void onReset()} disabled={saving}>
             <RotateCcw className="h-4 w-4 me-2" /> Reset to defaults
           </Button>
           {saved && (

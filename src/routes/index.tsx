@@ -8,10 +8,11 @@ import { services, industries, projects } from "@/data/site";
 import { useSettings } from "@/lib/settings-store";
 import { usePartners } from "@/lib/partners-store";
 import { Skeleton } from "@/components/ui/skeleton";
-import heroImg from "@/assets/hero.png";
-import heroImg800 from "@/assets/hero-800.png";
-import heroImg1200 from "@/assets/hero-1200.png";
+
 import { useSlides } from "@/lib/slides-store";
+import { useIndustries } from "@/lib/industries-store";
+import { useProjects } from "@/lib/projects-store";
+import { useServices, getServiceIcon } from "@/lib/services-store";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { CarouselDots } from "@/components/ui/carousel-dots";
 import Autoplay from "embla-carousel-autoplay";
@@ -19,22 +20,13 @@ import { useRef, useState } from "react";
 import { useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
 import { FeaturedProducts } from "@/components/site/FeaturedProducts";
 import { LatestNews } from "@/components/site/LatestNews";
+import { InteractiveHeroWheel } from "@/components/site/InteractiveHeroWheel";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Integrated Technics — Enterprise System Integrator" },
       { name: "description", content: "Turnkey security, ICT, AV and data center integration delivered end-to-end by certified engineers." },
-    ],
-    links: [
-      {
-        rel: "preload",
-        as: "image",
-        href: heroImg1200,
-        imagesrcset: `${heroImg800} 800w, ${heroImg1200} 1200w, ${heroImg} 1600w`,
-        imagesizes: "(max-width: 640px) 90vw, (max-width: 1024px) 60vw, 600px",
-        fetchpriority: "high",
-      } as any,
     ],
   }),
   component: Home,
@@ -50,24 +42,31 @@ function TestimonialsSection() {
 
   return (
     <Section eyebrow="Testimonials" title={lang === "ar" ? "ماذا يقول عملاؤنا" : "What Our Clients Say"} center className="bg-muted/30">
-      <div className="grid md:grid-cols-3 gap-6">
-        {settings.testimonials.map((t, i) => (
-          <div key={i} className="bg-card border rounded-2xl p-6 md:p-8 flex flex-col relative glow-on-hover">
-            <Quote className="absolute top-6 right-6 h-8 w-8 text-accent/20" />
-            <div className="flex gap-1 mb-4">
-              {[...Array(t.rating)].map((_, j) => (
-                <Star key={j} className="h-4 w-4 fill-amber-400 text-amber-400" />
-              ))}
+      <div className={`grid gap-6 ${settings.testimonials.length % 2 === 0 ? "sm:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"}`}>
+        {settings.testimonials.map((t, i) => {
+          const quote = t.quote?.[lang] || t.quote?.en || t.quote?.ar || "";
+          const author = t.author?.[lang] || t.author?.en || t.author?.ar || "";
+          const role = t.role?.[lang] || t.role?.en || t.role?.ar || "";
+          const rating = t.rating || 5;
+
+          return (
+            <div key={i} className="bg-card border rounded-2xl p-6 md:p-8 flex flex-col relative glow-on-hover transition-all duration-300 hover:-translate-y-1 hover:border-accent/60">
+              <Quote className="absolute top-6 end-6 h-8 w-8 text-accent/20" />
+              <div className="flex gap-1 mb-4">
+                {[...Array(rating)].map((_, j) => (
+                  <Star key={j} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground italic mb-6 flex-1 leading-relaxed">
+                "{quote}"
+              </p>
+              <div className="border-t pt-3">
+                <div className="font-semibold text-foreground text-sm">{author}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">{role}</div>
+              </div>
             </div>
-            <p className="text-sm md:text-base text-muted-foreground italic mb-6 flex-1 leading-relaxed">
-              "{t.quote[lang]}"
-            </p>
-            <div>
-              <div className="font-semibold text-foreground">{t.author[lang]}</div>
-              <div className="text-xs text-muted-foreground">{t.role[lang]}</div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </Section>
   );
@@ -76,8 +75,13 @@ function TestimonialsSection() {
 function ServicesCarouselSection() {
   const { t, lang, dir } = useI18n();
   const isRtl = dir === "rtl";
+  const { services } = useServices();
   const { autoplayRef, containerRef } = useCarouselAutoplay(4000);
   const [api, setApi] = useState<CarouselApi>();
+
+  const activeServices = services.filter((s) => s.published !== false);
+  if (activeServices.length === 0) return null;
+
   return (
     <Section eyebrow="Services" title={t("services.title")} sub={t("services.sub")} center>
       <Carousel
@@ -90,21 +94,31 @@ function ServicesCarouselSection() {
         aria-label={lang === "ar" ? "خدماتنا" : "Services carousel"}
       >
         <CarouselContent className="-ml-3 sm:-ml-5">
-          {services.slice(0, 6).map((s, idx, arr) => {
-            const Icon = s.icon;
+          {activeServices.slice(0, 8).map((s, idx, arr) => {
+            const Icon = getServiceIcon(s.iconName);
+            const title = s.title?.[lang] || s.title?.en || "Service";
+            const rawDesc = s.desc?.[lang] || s.desc?.en || "";
+            const plainDesc = rawDesc.replace(/<[^>]*>?/gm, "").trim();
+
             return (
               <CarouselItem
                 key={s.slug}
                 className="pl-3 sm:pl-5 basis-full md:basis-1/2 lg:basis-1/4"
-                aria-label={`${s.title[lang]} (${idx + 1} ${lang === "ar" ? "من" : "of"} ${arr.length})`}
+                aria-label={`${title} (${idx + 1} ${lang === "ar" ? "من" : "of"} ${arr.length})`}
               >
-                <Link to="/services/$slug" params={{ slug: s.slug }} className="group h-full p-4 sm:p-6 rounded-2xl border bg-card glow-on-hover flex flex-col">
-                  <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl gradient-hero flex items-center justify-center text-primary-foreground mb-3 sm:mb-5">
-                    <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                <Link
+                  to="/services/$slug"
+                  params={{ slug: s.slug }}
+                  className="group h-full p-4 sm:p-6 rounded-2xl border bg-card glow-on-hover flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-accent/60"
+                >
+                  <div>
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl gradient-hero flex items-center justify-center text-primary-foreground mb-3 sm:mb-5 shadow-sm group-hover:scale-105 transition-transform">
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </div>
+                    <h3 className="text-base sm:text-xl font-semibold mb-1.5 sm:mb-2 group-hover:text-accent transition-colors">{title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-3 sm:mb-4 line-clamp-3 flex-1">{plainDesc}</p>
                   </div>
-                  <h3 className="text-base sm:text-xl font-semibold mb-1.5 sm:mb-2">{s.title[lang]}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-none flex-1">{s.desc[lang]}</p>
-                  <span className="text-xs sm:text-sm font-medium text-accent inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                  <span className="text-xs sm:text-sm font-medium text-accent inline-flex items-center gap-1 group-hover:gap-2 transition-all pt-2 border-t">
                     {t("cta.learn")} <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
                   </span>
                 </Link>
@@ -265,11 +279,21 @@ function ImageWithSkeleton({ src, alt, className }: { src: string; alt: string; 
   );
 }
 
+import { ProjectDetailDialog } from "@/components/site/ProjectDetailDialog";
+import type { Project } from "@/lib/projects-store";
+
 function ProjectsCarouselSection() {
   const { t, lang, dir } = useI18n();
   const isRtl = dir === "rtl";
+  const { items: projectItems } = useProjects();
   const { autoplayRef, containerRef } = useCarouselAutoplay(4000);
   const [api, setApi] = useState<CarouselApi>();
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const activeProjects = projectItems.filter((p) => p.active === true);
+  const displayedProjects = activeProjects.slice(0, 6);
+
+  if (displayedProjects.length === 0) return null;
+
   return (
     <Section eyebrow="Case Studies" title={t("projects.title")} sub={t("projects.sub")}>
       <Carousel
@@ -282,19 +306,22 @@ function ProjectsCarouselSection() {
         aria-label={lang === "ar" ? "مشاريع مميزة" : "Featured projects carousel"}
       >
         <CarouselContent className="-ml-3 sm:-ml-5">
-          {projects.slice(0, 3).map((p, idx, arr) => (
+          {displayedProjects.map((p, idx, arr) => (
             <CarouselItem
               key={p.id}
               className="pl-3 sm:pl-5 basis-full md:basis-1/2 lg:basis-1/3"
               aria-label={`${p.title[lang]} (${idx + 1} ${lang === "ar" ? "من" : "of"} ${arr.length})`}
             >
-              <article className="group h-full rounded-2xl overflow-hidden border bg-card glow-on-hover flex flex-col">
+              <article
+                onClick={() => setSelectedProject(p)}
+                className="group h-full rounded-2xl overflow-hidden border bg-card glow-on-hover flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:border-accent/60"
+              >
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                   <ImageWithSkeleton src={p.image} alt={p.title[lang]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-3 sm:p-6 flex flex-col flex-1">
                   <div className="text-[10px] sm:text-xs font-semibold text-accent uppercase tracking-wider mb-1 sm:mb-2">{p.industry}</div>
-                  <h3 className="text-sm sm:text-lg font-semibold mb-1 sm:mb-2 line-clamp-2">{p.title[lang]}</h3>
+                  <h3 className="text-sm sm:text-lg font-semibold mb-1 sm:mb-2 line-clamp-2 group-hover:text-accent transition-colors">{p.title[lang]}</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-none">{p.desc[lang]}</p>
                 </div>
               </article>
@@ -314,6 +341,14 @@ function ProjectsCarouselSection() {
       <div className="text-center mt-10">
         <Button asChild variant="outline"><Link to="/projects">{t("nav.projects")} <ArrowRight className="h-4 w-4 ms-2 rtl:rotate-180" /></Link></Button>
       </div>
+
+      <ProjectDetailDialog
+        project={selectedProject}
+        open={Boolean(selectedProject)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedProject(null);
+        }}
+      />
     </Section>
   );
 }
@@ -413,20 +448,8 @@ function Home() {
               </Button>
             </div>
           </div>
-          <div className="relative animate-scale-in order-1 lg:order-2 mx-auto w-full max-w-sm sm:max-w-md lg:max-w-none">
-            <div className="absolute inset-6 gradient-hero rounded-full blur-3xl opacity-25" />
-            <img
-              src={heroImg1200}
-              srcSet={`${heroImg800} 800w, ${heroImg1200} 1200w, ${heroImg} 1600w`}
-              sizes="(max-width: 640px) 90vw, (max-width: 1024px) 60vw, 600px"
-              alt="Integrated Technics — security, network, AV and automation solutions"
-              width={1200}
-              height={1200}
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-              className="relative w-full h-auto aspect-square object-contain"
-            />
+          <div className="relative animate-scale-in order-1 lg:order-2 mx-auto w-full flex items-center justify-center">
+            <InteractiveHeroWheel />
           </div>
         </div>
       </section>
@@ -448,44 +471,7 @@ function Home() {
       <ServicesCarouselSection />
 
       {/* Industries */}
-
-      {/* Industries */}
-      <Section className="bg-muted/30 overflow-hidden" eyebrow="Industries" title={t("industries.title")} sub={t("industries.sub")}>
-        <div className="flex flex-col gap-6 relative py-4">
-          <style>{`
-            @keyframes marquee {
-              0% { transform: translateX(0%); }
-              100% { transform: translateX(-50%); }
-            }
-            .animate-marquee { animation: marquee 40s linear infinite; }
-            .animate-marquee-reverse { animation: marquee 40s linear infinite reverse; }
-          `}</style>
-          
-          <div className="flex w-full overflow-hidden group">
-            <div className={`flex w-max min-w-full ${isRtl ? 'animate-marquee-reverse' : 'animate-marquee'} group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3`}>
-              {[...industries.slice(0, Math.ceil(industries.length / 2)), ...industries.slice(0, Math.ceil(industries.length / 2)), ...industries.slice(0, Math.ceil(industries.length / 2)), ...industries.slice(0, Math.ceil(industries.length / 2))].map((i, idx) => (
-                <div key={`${i.slug}-${idx}`} className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex items-end text-start p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
-                  <img src={(i as any).image} alt={i.title[lang]} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
-                  <span className="relative font-display font-bold text-white drop-shadow-lg z-10 text-sm sm:text-lg">{i.title[lang]}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="flex w-full overflow-hidden group">
-            <div className={`flex w-max min-w-full ${isRtl ? 'animate-marquee' : 'animate-marquee-reverse'} group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3`}>
-              {[...industries.slice(Math.ceil(industries.length / 2)), ...industries.slice(Math.ceil(industries.length / 2)), ...industries.slice(Math.ceil(industries.length / 2)), ...industries.slice(Math.ceil(industries.length / 2))].map((i, idx) => (
-                <div key={`${i.slug}-${idx}`} className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex items-end text-start p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
-                  <img src={(i as any).image} alt={i.title[lang]} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
-                  <span className="relative font-display font-bold text-white drop-shadow-lg z-10 text-sm sm:text-lg">{i.title[lang]}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Section>
+      <IndustriesSection />
 
       {/* Featured projects */}
       <ProjectsCarouselSection />
@@ -539,5 +525,67 @@ function Home() {
       {/* Testimonials */}
       <TestimonialsSection />
     </div>
+  );
+}
+
+function IndustriesSection() {
+  const { t, lang } = useI18n();
+  const { industries } = useIndustries();
+  const activeIndustries = industries.filter((i) => i.active !== false);
+  const isRtl = lang === "ar";
+
+  if (activeIndustries.length === 0) return null;
+
+  const half = Math.ceil(activeIndustries.length / 2);
+  const row1 = activeIndustries.slice(0, half);
+  const row2 = activeIndustries.slice(half).length > 0 ? activeIndustries.slice(half) : row1;
+
+  // Duplicate for smooth infinite CSS marquee loop
+  const list1 = [...row1, ...row1, ...row1, ...row1];
+  const list2 = [...row2, ...row2, ...row2, ...row2];
+
+  return (
+    <Section className="bg-muted/30 overflow-hidden" eyebrow="Industries" title={t("industries.title")} sub={t("industries.sub")}>
+      <div className="flex flex-col gap-6 relative py-4">
+        <style>{`
+          @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+          }
+          .animate-marquee { animation: marquee 40s linear infinite; }
+          .animate-marquee-reverse { animation: marquee 40s linear infinite reverse; }
+        `}</style>
+        
+        <div className="flex w-full overflow-hidden group">
+          <div className={`flex w-max min-w-full ${isRtl ? 'animate-marquee-reverse' : 'animate-marquee'} group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3`}>
+            {list1.map((i, idx) => {
+              const title = lang === "ar" ? (i.title_ar || i.title_en) : (i.title_en || i.title_ar);
+              return (
+                <div key={`${i.id}-${idx}`} className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex items-end text-start p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
+                  <img src={i.image} alt={title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
+                  <span className="relative font-display font-bold text-white drop-shadow-lg z-10 text-sm sm:text-lg">{title}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        
+        <div className="flex w-full overflow-hidden group">
+          <div className={`flex w-max min-w-full ${isRtl ? 'animate-marquee' : 'animate-marquee-reverse'} group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3`}>
+            {list2.map((i, idx) => {
+              const title = lang === "ar" ? (i.title_ar || i.title_en) : (i.title_en || i.title_ar);
+              return (
+                <div key={`${i.id}-${idx}`} className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex items-end text-start p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
+                  <img src={i.image} alt={title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
+                  <span className="relative font-display font-bold text-white drop-shadow-lg z-10 text-sm sm:text-lg">{title}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </Section>
   );
 }

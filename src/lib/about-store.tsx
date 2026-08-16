@@ -25,7 +25,20 @@ export function pickBi(
   return fallback;
 }
 
-export type TeamMember = { key: string; name: Bilingual; role: Bilingual };
+export type TeamMember = {
+  key: string;
+  name: Bilingual;
+  role: Bilingual;
+  image?: string;
+  department?: Bilingual;
+};
+
+export type AboutStat = {
+  value: string;
+  label: Bilingual;
+  sub: Bilingual;
+  iconName?: string;
+};
 
 export type AboutContent = {
   eyebrow: Bilingual;
@@ -47,9 +60,11 @@ export type AboutContent = {
   ownerName: Bilingual;
   ownerRole: Bilingual;
   ownerBio: Bilingual;
+  ownerImage?: string;
   teamTitle: Bilingual;
   teamSub: Bilingual;
   team: TeamMember[];
+  stats?: AboutStat[];
 };
 
 export type AboutHero = {
@@ -72,6 +87,33 @@ const tk = (k: keyof typeof translations.en): Bilingual => ({
   en: (translations.en as any)[k] ?? "",
   ar: (translations.ar as any)[k] ?? "",
 });
+
+export const DEFAULT_ABOUT_STATS: AboutStat[] = [
+  {
+    value: "20+",
+    label: { en: "Years of Engineering Mastery", ar: "عاماً من التميز الهندسي" },
+    sub: { en: "Since 2004", ar: "منذ عام 2004" },
+    iconName: "Clock",
+  },
+  {
+    value: "500+",
+    label: { en: "Mega Turnkey Projects", ar: "مشروع متكامل تم تسليمه" },
+    sub: { en: "Government & Enterprise", ar: "حكومي وخاص" },
+    iconName: "Building2",
+  },
+  {
+    value: "100%",
+    label: { en: "Certified Engineers & SLA", ar: "مهندسون معتمدون ودعم 24/7" },
+    sub: { en: "Tier-3 & BICSI certified", ar: "معتمدون دولياً" },
+    iconName: "ShieldCheck",
+  },
+  {
+    value: "99.9%",
+    label: { en: "Mission-Critical Uptime", ar: "جاهزية واستقرار تشغيلي" },
+    sub: { en: "24/7 NOC Monitoring", ar: "مراقبة مستمرة" },
+    iconName: "Zap",
+  },
+];
 
 export const defaultAboutContent: AboutContent = {
   eyebrow: { en: "About Us", ar: "من نحن" },
@@ -100,6 +142,7 @@ export const defaultAboutContent: AboutContent = {
     en: "For over two decades, I have believed that technology should serve people, not the other way around. Integrated Technics was built to bring world-class engineering, uncompromising ethics, and a client-first mindset to every project we touch.",
     ar: "على مدى أكثر من عقدين، آمنت بأن التكنولوجيا يجب أن تخدم الناس لا العكس. بُنيت Integrated Technics لتقدم هندسة عالمية المستوى، وأخلاقيات لا تُساوم، ونهج يضع العميل في المقام الأول.",
   },
+  ownerImage: "https://integratedtechnics.com/wp-content/uploads/2026/05/fghjkm.webp",
   teamTitle: { en: "Meet the Team", ar: "تعرف على الفريق" },
   teamSub: { en: "Certified engineers, project leaders and advisors who turn complexity into reliable outcomes.", ar: "مهندسون معتمدون وقادة مشاريع ومستشارون يحولون التعقيد إلى نتائج موثوقة." },
   team: [
@@ -110,6 +153,7 @@ export const defaultAboutContent: AboutContent = {
     { key: "security", name: { en: "Samir Haddad", ar: "سمير حداد" }, role: { en: "Security Practice Lead", ar: "مدير ممارسة الأمن" } },
     { key: "ict", name: { en: "Dina Rizk", ar: "دينا رزق" }, role: { en: "ICT Practice Lead", ar: "مديرة ممارسة تقنية المعلومات والاتصالات" } },
   ],
+  stats: DEFAULT_ABOUT_STATS,
 };
 
 const KEY = "it_about_content_v1";
@@ -160,22 +204,52 @@ export function AboutProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void load();
-    // Legacy: clean up old localStorage cache
-    try { localStorage.removeItem(KEY); } catch {}
+    
+    const channel = supabase
+      .channel("about_content_realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "about_content" }, () => {
+        void load();
+      })
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, []);
 
   const save: Ctx["save"] = async (next) => {
-    const { saveAboutContent } = await import("./about.functions");
-    await saveAboutContent({
-      data: {
-        data: next.content,
-        hero_image_url: next.hero.image_url,
-        hero_focal_x: next.hero.focal_x,
-        hero_focal_y: next.hero.focal_y,
-        hero_zoom: next.hero.zoom,
-        hero_mirror_rtl: next.hero.mirror_rtl,
-      },
-    });
+    const payload = {
+      id: "main",
+      data: next.content as any,
+      hero_image_url: next.hero.image_url,
+      hero_focal_x: next.hero.focal_x,
+      hero_focal_y: next.hero.focal_y,
+      hero_zoom: next.hero.zoom,
+      hero_mirror_rtl: next.hero.mirror_rtl,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from("about_content").upsert(payload);
+    if (error) {
+      console.warn("[about] client upsert fallback to server fn...", error);
+      try {
+        const { saveAboutContent } = await import("./about.functions");
+        await saveAboutContent({
+          data: {
+            data: next.content as any,
+            hero_image_url: next.hero.image_url,
+            hero_focal_x: next.hero.focal_x,
+            hero_focal_y: next.hero.focal_y,
+            hero_zoom: next.hero.zoom,
+            hero_mirror_rtl: next.hero.mirror_rtl,
+          },
+        });
+      } catch (err) {
+        console.error("[about] save error", err);
+        throw error;
+      }
+    }
+
     setContent(next.content);
     setHero(next.hero);
     setUpdatedAt(new Date().toISOString());

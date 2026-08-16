@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Loader2, Sparkles, Users } from "lucide-react";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -390,8 +391,31 @@ function JobsAdmin() {
 
               <div><Label>Skills (comma-separated)</Label><Input placeholder="React, TypeScript, SQL" value={skillsInput} onChange={ev => setSkillsInput(ev.target.value)} /></div>
 
-              <div><Label>Short description (EN) *</Label><Textarea rows={3} value={e.description_en} onChange={ev => setEditing({ ...e, description_en: ev.target.value })} /></div>
-              <div><Label>Short description (AR) *</Label><Textarea dir="rtl" rows={3} value={e.description_ar} onChange={ev => setEditing({ ...e, description_ar: ev.target.value })} /></div>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label>Job Description (EN) *</Label>
+                  <span className="text-xs text-muted-foreground">Rich Text (LTR)</span>
+                </div>
+                <RichTextEditor
+                  dir="ltr"
+                  value={e.description_en}
+                  onChange={(val) => setEditing({ ...e, description_en: val })}
+                  placeholder="Comprehensive job role description in English..."
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label>الوصف الوظيفي (AR) *</Label>
+                  <span className="text-xs text-muted-foreground">محرر نصوص منسقة (RTL)</span>
+                </div>
+                <RichTextEditor
+                  dir="rtl"
+                  value={e.description_ar}
+                  onChange={(val) => setEditing({ ...e, description_ar: val })}
+                  placeholder="الوصف التفصيلي للدور الوظيفي بالعربية..."
+                />
+              </div>
 
               <div className="grid sm:grid-cols-2 gap-3">
                 <div><Label>Responsibilities (EN) *</Label><Textarea rows={5} placeholder="One per line" value={e.responsibilities_en} onChange={ev => setEditing({ ...e, responsibilities_en: ev.target.value })} /></div>

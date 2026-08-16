@@ -1,73 +1,104 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCurrentPagePerms } from "@/components/admin/Can";
-import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { demoTerms } from "@/data/demo";
-import type { Bilingual } from "@/data/demo";
+import { useLegalContent, DEFAULT_TERMS } from "@/lib/legal-store";
+import { useAdminT } from "@/lib/admin-i18n";
 import { toast } from "sonner";
+import { Save, Loader2, ScrollText, ExternalLink } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/dashboard/admin/terms")({
-  head: () => ({ meta: [{ title: "Terms — Admin" }] }),
-  component: TermsPage,
+  head: () => ({ meta: [{ title: "Terms of Service — Admin" }] }),
+  component: TermsAdminPage,
 });
 
-const KEY = "site.terms";
-
-function TermsPage() {
+function TermsAdminPage() {
   const _perms = useCurrentPagePerms();
-  const [text, setText] = useState<Bilingual>(demoTerms);
-  useEffect(() => {
-    const s = localStorage.getItem(KEY);
-    if (s) {
-      try {
-        const parsed = JSON.parse(s);
-        if (parsed && typeof parsed === "object" && "en" in parsed) setText(parsed);
-        else if (typeof parsed === "string") setText({ en: parsed, ar: demoTerms.ar });
-      } catch {
-        setText({ en: s, ar: demoTerms.ar });
-      }
+  const { lang } = useAdminT();
+  const ar = lang === "ar";
+  const { content, setContent, save, saving, loading } = useLegalContent("terms_content", DEFAULT_TERMS);
+
+  const handleSave = async () => {
+    const ok = await save(content);
+    if (ok) {
+      toast.success(ar ? "تم حفظ شروط الخدمة وتحديث قاعدة البيانات بنجاح!" : "Terms of Service saved and synced to database!");
+    } else {
+      toast.info(ar ? "تم الحفظ محلياً بنجاح (سيتم المزامنة تلقائياً)" : "Saved locally (will sync with database)");
     }
-  }, []);
-  const save = () => { localStorage.setItem(KEY, JSON.stringify(text)); toast.success("Terms saved"); };
+  };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold">Terms of Service</h1>
-        <p className="text-sm text-muted-foreground mt-1">Rich text editor for legal terms — supports headings, lists, bold, links, and more (EN & AR).</p>
+    <div className="space-y-6 max-w-5xl">
+      <div className="flex items-center justify-between gap-4 flex-wrap pb-4 border-b">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="font-display text-2xl md:text-3xl font-bold">
+              {ar ? "شروط الخدمة (Terms of Service)" : "Terms of Service"}
+            </h1>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            {ar
+              ? "محرر نصوص متقدم لصياغة الشروط والأحكام والاتفاقيات القانونية باللغتين العربية والإنجليزية."
+              : "Rich text editor for legal terms and master service agreements (EN & AR) synced with the database."}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild className="text-xs">
+            <Link to="/terms" target="_blank">
+              <ExternalLink className="h-3.5 w-3.5 me-1.5 text-accent" />
+              {ar ? "معاينة الصفحة العامة" : "View Public Page"}
+            </Link>
+          </Button>
+
+          <Button disabled={!_perms.edit || saving || loading} onClick={handleSave} size="sm">
+            {saving ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Save className="h-4 w-4 me-2" />}
+            {ar ? "حفظ التعديلات" : "Save Terms"}
+          </Button>
+        </div>
       </div>
-      <Card><CardContent className="p-4 space-y-6">
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label>English</Label>
-            <span className="text-xs text-muted-foreground">Rich Text (LTR)</span>
+
+      <Card>
+        <CardContent className="p-5 space-y-6">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-semibold">{ar ? "الشروط باللغة الإنجليزية (English)" : "English (LTR)"}</Label>
+              <span className="text-xs text-muted-foreground">HTML / Rich Text</span>
+            </div>
+            <RichTextEditor
+              dir="ltr"
+              value={content.en}
+              onChange={(val) => setContent({ ...content, en: val })}
+              placeholder="Write your Terms of Service in English..."
+              minHeight="320px"
+            />
           </div>
-          <RichTextEditor
-            dir="ltr"
-            value={text.en}
-            onChange={(val) => setText({ ...text, en: val })}
-            placeholder="Write your Terms of Service in English..."
-            minHeight="300px"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label>عربي</Label>
-            <span className="text-xs text-muted-foreground">محرر نصوص منسقة (RTL)</span>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-semibold">{ar ? "الشروط باللغة العربية (العربية)" : "Arabic (RTL)"}</Label>
+              <span className="text-xs text-muted-foreground">محرر نصوص منسقة</span>
+            </div>
+            <RichTextEditor
+              dir="rtl"
+              value={content.ar}
+              onChange={(val) => setContent({ ...content, ar: val })}
+              placeholder="اكتب شروط الخدمة بالعربية..."
+              minHeight="320px"
+            />
           </div>
-          <RichTextEditor
-            dir="rtl"
-            value={text.ar}
-            onChange={(val) => setText({ ...text, ar: val })}
-            placeholder="اكتب شروط الخدمة بالعربية..."
-            minHeight="300px"
-          />
-        </div>
-        <Button disabled={!_perms.edit} onClick={save}>Save Terms</Button>
-      </CardContent></Card>
+
+          <div className="flex justify-end pt-4 border-t">
+            <Button disabled={!_perms.edit || saving || loading} onClick={handleSave}>
+              {saving ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Save className="h-4 w-4 me-2" />}
+              {ar ? "حفظ التعديلات" : "Save Terms"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

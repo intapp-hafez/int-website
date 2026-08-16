@@ -131,6 +131,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+import { IndustriesProvider } from "@/lib/industries-store";
+import { ServicesProvider } from "@/lib/services-store";
+import { FaqsProvider } from "@/lib/faqs-store";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useHashScroll();
@@ -141,6 +145,9 @@ function RootComponent() {
         <SettingsProvider>
           <AboutProvider>
           <ProjectsProvider>
+          <IndustriesProvider>
+          <ServicesProvider>
+          <FaqsProvider>
           <PermissionsProvider>
           <AccessRequestsProvider>
           <SlidesProvider>
@@ -174,6 +181,9 @@ function RootComponent() {
           </SlidesProvider>
           </AccessRequestsProvider>
           </PermissionsProvider>
+          </FaqsProvider>
+          </ServicesProvider>
+          </IndustriesProvider>
           </ProjectsProvider>
           </AboutProvider>
         </SettingsProvider>

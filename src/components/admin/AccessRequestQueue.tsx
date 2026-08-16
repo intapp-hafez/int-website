@@ -14,6 +14,7 @@ const STATUS_STYLE: Record<AccessRequestStatus, string> = {
   pending: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300",
   approved: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300",
   denied: "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300",
+  revoked: "bg-slate-100 text-slate-600 dark:bg-slate-800/60 dark:text-slate-400",
 };
 
 /** Selectable grant durations, in days. `0` means permanent. */
@@ -45,7 +46,7 @@ export function AccessRequestQueue() {
     return p ? (ar ? p.ar : p.en) : key;
   };
 
-  const approve = (id: string) => {
+  const approve = async (id: string) => {
     const req = requests.find((r) => r.id === id);
     if (!req) return;
     const days = Number(durations[id] ?? "7");
@@ -53,7 +54,7 @@ export function AccessRequestQueue() {
     const actions = Array.from(
       new Set<PermAction>(["view", ...PERM_ACTIONS.filter((a) => req.actions.includes(a))]),
     );
-    const grant = grantAccess({
+    const grant = await grantAccess({
       userId: req.userId,
       pageKey: req.pageKey,
       actions,
@@ -61,9 +62,9 @@ export function AccessRequestQueue() {
       grantedBy: user?.name || user?.email || "manager",
       requestId: id,
     });
-    decide(id, "approved", user?.name || user?.email || "manager", undefined, grant.expiresAt);
+    await decide(id, "approved", user?.name || user?.email || "manager", undefined, grant?.expiresAt);
     toast.success(
-      grant.expiresAt
+      grant?.expiresAt
         ? ar
           ? `تمت الموافقة حتى ${new Date(grant.expiresAt).toLocaleString("ar-EG")}`
           : `Approved until ${new Date(grant.expiresAt).toLocaleString("en-GB")}`
@@ -73,8 +74,8 @@ export function AccessRequestQueue() {
     );
   };
 
-  const deny = (id: string) => {
-    decide(id, "denied", user?.name || user?.email || "manager");
+  const deny = async (id: string) => {
+    await decide(id, "denied", user?.name || user?.email || "manager");
     toast.success(ar ? "تم رفض الطلب" : "Request denied");
   };
 
@@ -180,7 +181,7 @@ export function AccessRequestQueue() {
                     </span>
                   </div>
                 </div>
-                <Button size="sm" variant="outline" onClick={() => { revokeGrant(g.id); toast.success(ar ? "تم سحب الصلاحية" : "Grant revoked"); }}>
+                <Button size="sm" variant="outline" onClick={() => { void revokeGrant(g.id); toast.success(ar ? "تم سحب الصلاحية" : "Grant revoked"); }}>
                   <ShieldOff className="h-4 w-4 me-1" />{ar ? "سحب" : "Revoke"}
                 </Button>
               </div>

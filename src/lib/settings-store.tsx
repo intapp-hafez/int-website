@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export type Bilingual = { en: string; ar: string };
 export type InvoiceWatermark = "none" | "draft" | "paid" | "unpaid" | "void" | "copy";
@@ -26,6 +27,21 @@ export type StickyConfig = {
   whatsapp: StickyButtonConfig;
   install: StickyButtonConfig;
 };
+export type OfficeBranch = {
+  id: string;
+  name: Bilingual;
+  address: Bilingual;
+  phone: string;
+  email: string;
+  isMain?: boolean;
+};
+
+export type ContactHeaderConfig = {
+  badge: Bilingual;
+  title: Bilingual;
+  subtitle: Bilingual;
+};
+
 export type SiteSettings = {
   email: string;
   salesEmail: string;
@@ -37,6 +53,9 @@ export type SiteSettings = {
   bio: Bilingual;
   mapUrl: string;
   social: { linkedin: string; twitter: string; facebook: string; instagram: string; youtube: string };
+  contactHeader: ContactHeaderConfig;
+  contactHours: Bilingual;
+  branches: OfficeBranch[];
   contactSeo: {
     title: Bilingual;
     description: Bilingual;
@@ -56,7 +75,7 @@ export const defaultSettings: SiteSettings = {
   salesEmail: env.VITE_SALES_EMAIL || "sales@integratedtechnics.com",
   supportEmail: env.VITE_SUPPORT_EMAIL || "support@integratedtechnics.com",
   phone: env.VITE_CONTACT_PHONE || "+20 100 741 9344",
-  whatsapp: env.VITE_CONTACT_WHATSAPP || "+20210000000",
+  whatsapp: env.VITE_CONTACT_WHATSAPP || "+201007419344",
   address: {
     en: env.VITE_CONTACT_ADDRESS_EN || env.VITE_CONTACT_ADDRESS || "Cairo, Egypt",
     ar: env.VITE_CONTACT_ADDRESS_AR || "القاهرة، مصر",
@@ -77,6 +96,36 @@ export const defaultSettings: SiteSettings = {
     instagram: env.VITE_SOCIAL_INSTAGRAM || "",
     youtube: env.VITE_SOCIAL_YOUTUBE || "",
   },
+  contactHeader: {
+    badge: { en: "Get In Touch", ar: "تواصل معنا" },
+    title: { en: "Let's Architect Your Infrastructure", ar: "لنبني معاً بنيتك التحتية المتكاملة" },
+    subtitle: {
+      en: "Talk directly to our senior certified engineers. Tailored turnkey quotations, site surveys, and technical assessments delivered within 24–48 hours.",
+      ar: "تحدث مباشرة مع كبار مهندسينا المعتمدين. عروض أسعار ودراسات فنية متكاملة للمشاريع خلال 24–48 ساعة.",
+    },
+  },
+  contactHours: {
+    en: "Sunday – Thursday: 9:00 AM – 6:00 PM (Cairo UTC+2)",
+    ar: "الأحد – الخميس: 9:00 صباحاً – 6:00 مساءً (بتوقيت القاهرة)",
+  },
+  branches: [
+    {
+      id: "cairo-hq",
+      name: { en: "Cairo Headquarters", ar: "المقر الرئيسي — القاهرة" },
+      address: { en: "15 Makram Ebeid, Nasr City, Cairo, Egypt", ar: "15 شارع مكرم عبيد، مدينة نصر، القاهرة، مصر" },
+      phone: "+20 100 741 9344",
+      email: "info@integratedtechnics.com",
+      isMain: true,
+    },
+    {
+      id: "alex-branch",
+      name: { en: "Alexandria Hub", ar: "فرع الإسكندرية والساحل" },
+      address: { en: "Fouad Street, Downtown, Alexandria, Egypt", ar: "شارع فؤاد، وسط البلد، الإسكندرية، مصر" },
+      phone: "+20 3 480 0000",
+      email: "alex@integratedtechnics.com",
+      isMain: false,
+    },
+  ],
   contactSeo: {
     title: {
       en: "Contact — Integrated Technics",
@@ -92,35 +141,44 @@ export const defaultSettings: SiteSettings = {
   stats: [
     { value: 150, suffix: "+", label: { en: "Clients Served", ar: "عميل" } },
     { value: 350, suffix: "+", label: { en: "Projects Delivered", ar: "مشروع منجز" } },
-    { value: 20,  suffix: "+", label: { en: "Years of Experience", ar: "سنوات خبرة" } },
-    { value: 80,  suffix: "+", label: { en: "Certified Engineers", ar: "مهندس معتمد" } },
+    { value: 20, suffix: "+", label: { en: "Years of Experience", ar: "سنوات خبرة" } },
+    { value: 80, suffix: "+", label: { en: "Certified Engineers", ar: "مهندس معتمد" } },
   ],
   testimonials: [
     {
       quote: {
-        en: "Integrated Technics completely transformed our IT infrastructure. Their team is highly professional and delivered on time.",
-        ar: "قامت إنتجريتد تكنيكس بتحويل بنيتنا التحتية لتكنولوجيا المعلومات بالكامل. فريقهم محترف للغاية وسلم المشروع في الوقت المحدد."
+        en: "Integrated Technics completely transformed our tier-3 data center and campus infrastructure. Their precision engineering, structured cabling, and zero-downtime execution were world-class.",
+        ar: "قامت إنتجريتد تكنيكس بتطوير مركز بيانات Tier-III والبنية التحتية لمقرنا بالكامل. تميز عملهم بالدقة الهندسية والتسليم بدون أي انقطاع في الخدمة."
       },
-      author: { en: "Ahmed Hassan", ar: "أحمد حسن" },
-      role: { en: "CTO, Global Tech", ar: "المدير التقني، جلوبال تك" },
+      author: { en: "Eng. Tarek Mansour", ar: "م. طارق منصور" },
+      role: { en: "Head of Infrastructure, Middle East Telecom", ar: "رئيس البنية التحتية، ميدل إيست تيليكوم" },
       rating: 5,
     },
     {
       quote: {
-        en: "The security systems installed by Integrated Technics are top-notch. We feel much more secure now.",
-        ar: "الأنظمة الأمنية التي تم تركيبها بواسطة إنتجريتد تكنيكس من الدرجة الأولى. نشعر بأمان أكبر الآن."
+        en: "The integrated IP surveillance, perimeter radar, and automated access control deployed across our medical campus exceeded our stringent compliance and security requirements.",
+        ar: "تجاوزت منظومة المراقبة الذكية والرادار المحيطي والتحكم في الدخول المنفذة في مجمعنا الطبي كافة متطلبات الأمان والامتثال المعتمدة لدينا."
       },
-      author: { en: "Sarah Johnson", ar: "سارة جونسون" },
-      role: { en: "Operations Manager", ar: "مديرة العمليات" },
+      author: { en: "Dr. Khaled Abdelrahman", ar: "د. خالد عبد الرحمن" },
+      role: { en: "Director of Security & Operations, Healthcare Group", ar: "مدير الأمن والعمليات، مجموعة الرعاية الصحية" },
       rating: 5,
     },
     {
       quote: {
-        en: "Their smart home solutions are incredibly intuitive and easy to use. Highly recommended for anyone looking to upgrade.",
-        ar: "حلول المنزل الذكي لديهم بديهية وسهلة الاستخدام بشكل لا يصدق. نوصي بها بشدة لأي شخص يبحث عن الترقية."
+        en: "Their hospitality AV systems, high-density Wi-Fi 6, and smart room management elevated our guest experience across 450 keys. Exceptional support and technical mastery.",
+        ar: "ساهمت شبكة Wi-Fi 6 عالية الكثافة وأنظمة إدارة الغرف الذكية والأنظمة الصوتية والمرئية في رفع مستوى تجربة ضيوفنا في 450 غرفة بشكل ملموس."
       },
-      author: { en: "Omar Ali", ar: "عمر علي" },
-      role: { en: "Real Estate Developer", ar: "مطور عقاري" },
+      author: { en: "Mona El-Sayed", ar: "منى السيد" },
+      role: { en: "Projects Director, Red Sea Hospitality", ar: "مديرة المشاريع، مجموعة فنادق البحر الأحمر" },
+      rating: 5,
+    },
+    {
+      quote: {
+        en: "Delivered a rock-solid industrial IoT and ATEX explosion-proof surveillance network for our petrochemical facility with top-tier reliability under extreme environmental conditions.",
+        ar: "قدموا شبكة إنترنت أشياء صناعية ومنظومة كاميرات مقاومة للانفجار ATEX لمصنعنا البتروكيماوي بأعلى معايير الاعتمادية تحت أقسى الظروف البيئية."
+      },
+      author: { en: "Eng. Omar Al-Ghamdi", ar: "م. عمر الغامدي" },
+      role: { en: "VP of Operations, Industrial Petrochemicals", ar: "نائب رئيس العمليات، البتروكيماويات الصناعية" },
       rating: 5,
     }
   ],
@@ -154,76 +212,121 @@ const KEY = "it_site_settings_v5";
 
 type Ctx = {
   settings: SiteSettings;
-  update: (patch: Partial<SiteSettings> & { social?: Partial<SiteSettings["social"]> }) => void;
-  reset: () => void;
+  loading: boolean;
+  update: (patch: Partial<SiteSettings> & { social?: Partial<SiteSettings["social"]> }) => Promise<void>;
+  save: (next: SiteSettings) => Promise<void>;
+  reset: () => Promise<void>;
+  refresh: () => Promise<void>;
 };
 
 const SettingsContext = createContext<Ctx | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const refresh = async () => {
     try {
-      const raw = localStorage.getItem(KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      // Migrate string address → bilingual
-      if (typeof parsed.address === "string") {
-        parsed.address = { en: parsed.address, ar: defaultSettings.address.ar };
-      }
-      setSettings({
-        ...defaultSettings,
-        ...parsed,
-        address: { ...defaultSettings.address, ...(parsed.address ?? {}) },
-        coords: { ...defaultSettings.coords, ...(parsed.coords ?? {}) },
-        bio: { ...defaultSettings.bio, ...(parsed.bio ?? {}) },
-        social: { ...defaultSettings.social, ...(parsed.social ?? {}) },
-        contactSeo: {
-          title: { ...defaultSettings.contactSeo.title, ...((parsed.contactSeo?.title) ?? {}) },
-          description: { ...defaultSettings.contactSeo.description, ...((parsed.contactSeo?.description) ?? {}) },
-          ogImage: { ...defaultSettings.contactSeo.ogImage, ...((parsed.contactSeo?.ogImage) ?? {}) },
-        },
-        stats: Array.isArray(parsed.stats) && parsed.stats.length === 4
-          ? parsed.stats.map((s: HomepageStat, i: number) => ({
-              ...defaultSettings.stats[i],
-              ...s,
-              label: { ...defaultSettings.stats[i].label, ...(s.label ?? {}) },
-            }))
-          : defaultSettings.stats,
-        testimonials: Array.isArray(parsed.testimonials)
-          ? parsed.testimonials.map((t: Testimonial) => ({
-              ...t,
-              quote: { ...t.quote },
-              author: { ...t.author },
-              role: { ...t.role },
-            }))
-          : defaultSettings.testimonials,
-        visibility: { ...defaultSettings.visibility, ...(parsed.visibility ?? {}) },
-        sticky: {
-          ...defaultSettings.sticky,
-          ...(parsed.sticky ?? {}),
-          whatsapp: {
-            ...defaultSettings.sticky.whatsapp,
-            ...(parsed.sticky?.whatsapp ?? {}),
-            text: { ...defaultSettings.sticky.whatsapp.text, ...(parsed.sticky?.whatsapp?.text ?? {}) },
-          },
-          install: {
-            ...defaultSettings.sticky.install,
-            ...(parsed.sticky?.install ?? {}),
-            text: { ...defaultSettings.sticky.install.text, ...(parsed.sticky?.install?.text ?? {}) },
-          },
-        },
-      });
-    } catch {}
-  }, []);
+      const { data, error } = await (supabase as any)
+        .from("site_settings")
+        .select("value")
+        .eq("id", "main")
+        .maybeSingle();
 
-  const persist = (next: SiteSettings) => {
-    setSettings(next);
-    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+      if (!error && data?.value) {
+        const parsed: any = data.value;
+        if (typeof parsed.address === "string") {
+          parsed.address = { en: parsed.address, ar: defaultSettings.address.ar };
+        }
+        setSettings({
+          ...defaultSettings,
+          ...parsed,
+          address: { ...defaultSettings.address, ...(parsed.address ?? {}) },
+          coords: { ...defaultSettings.coords, ...(parsed.coords ?? {}) },
+          bio: { ...defaultSettings.bio, ...(parsed.bio ?? {}) },
+          social: { ...defaultSettings.social, ...(parsed.social ?? {}) },
+          contactSeo: {
+            title: { ...defaultSettings.contactSeo.title, ...((parsed.contactSeo?.title) ?? {}) },
+            description: { ...defaultSettings.contactSeo.description, ...((parsed.contactSeo?.description) ?? {}) },
+            ogImage: { ...defaultSettings.contactSeo.ogImage, ...((parsed.contactSeo?.ogImage) ?? {}) },
+          },
+          contactHeader: {
+            badge: { ...defaultSettings.contactHeader.badge, ...(parsed.contactHeader?.badge ?? {}) },
+            title: { ...defaultSettings.contactHeader.title, ...(parsed.contactHeader?.title ?? {}) },
+            subtitle: { ...defaultSettings.contactHeader.subtitle, ...(parsed.contactHeader?.subtitle ?? {}) },
+          },
+          contactHours: { ...defaultSettings.contactHours, ...(parsed.contactHours ?? {}) },
+          branches: Array.isArray(parsed.branches) && parsed.branches.length > 0
+            ? parsed.branches
+            : defaultSettings.branches,
+          stats: Array.isArray(parsed.stats) && parsed.stats.length === 4
+            ? parsed.stats.map((s: HomepageStat, i: number) => ({
+                ...defaultSettings.stats[i],
+                ...s,
+                label: { ...defaultSettings.stats[i].label, ...(s.label ?? {}) },
+              }))
+            : defaultSettings.stats,
+          testimonials: Array.isArray(parsed.testimonials)
+            ? parsed.testimonials.map((t: Testimonial) => ({
+                ...t,
+                quote: { ...t.quote },
+                author: { ...t.author },
+                role: { ...t.role },
+              }))
+            : defaultSettings.testimonials,
+          visibility: { ...defaultSettings.visibility, ...(parsed.visibility ?? {}) },
+          sticky: {
+            ...defaultSettings.sticky,
+            ...(parsed.sticky ?? {}),
+            whatsapp: {
+              ...defaultSettings.sticky.whatsapp,
+              ...(parsed.sticky?.whatsapp ?? {}),
+              text: { ...defaultSettings.sticky.whatsapp.text, ...(parsed.sticky?.whatsapp?.text ?? {}) },
+            },
+            install: {
+              ...defaultSettings.sticky.install,
+              ...(parsed.sticky?.install ?? {}),
+              text: { ...defaultSettings.sticky.install.text, ...(parsed.sticky?.install?.text ?? {}) },
+            },
+          },
+        });
+      }
+    } catch (err) {
+      console.warn("[settings] refresh failed", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const update: Ctx["update"] = (patch) => {
+  useEffect(() => {
+    void refresh();
+
+    const channel = supabase
+      .channel("site_settings_realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, () => {
+        void refresh();
+      })
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const save = async (next: SiteSettings) => {
+    setSettings(next);
+    const { error } = await (supabase as any).from("site_settings").upsert({
+      id: "main",
+      value: next as any,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) {
+      console.error("[settings] save error", error);
+      throw new Error(error.message || "Failed to save settings");
+    }
+  };
+
+  const update: Ctx["update"] = async (patch) => {
     const next: SiteSettings = {
       ...settings,
       ...patch,
@@ -254,15 +357,15 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         },
       },
     };
-    persist(next);
+    await save(next);
   };
 
-  const reset = () => {
-    try { localStorage.removeItem(KEY); } catch {}
+  const reset = async () => {
+    await (supabase as any).from("site_settings").delete().eq("id", "main");
     setSettings(defaultSettings);
   };
 
-  return <SettingsContext.Provider value={{ settings, update, reset }}>{children}</SettingsContext.Provider>;
+  return <SettingsContext.Provider value={{ settings, loading, update, save, reset, refresh }}>{children}</SettingsContext.Provider>;
 }
 
 export function useSettings() {

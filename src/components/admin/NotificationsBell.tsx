@@ -1,14 +1,18 @@
 import { useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Bell, Briefcase, Images, Info, CheckCheck, Check, Settings, Loader2 } from "lucide-react";
+import { Bell, Briefcase, Images, Info, CheckCheck, Check, Settings, Loader2, LifeBuoy, GraduationCap, MessageCircle, ShieldCheck } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useNotifications, formatRelativeTime, type NotificationType } from "@/lib/notifications-store";
 import { useAdminT } from "@/lib/admin-i18n";
 import { cn } from "@/lib/utils";
 
 const typeMeta: Record<NotificationType, { icon: typeof Bell; tone: string; label: { en: string; ar: string } }> = {
-  lead: { icon: Briefcase, tone: "text-accent bg-accent/10", label: { en: "Lead", ar: "عميل" } },
-  slide: { icon: Images, tone: "text-primary bg-primary/10", label: { en: "Slider", ar: "شرائح" } },
+  lead: { icon: Briefcase, tone: "text-accent bg-accent/10", label: { en: "Lead", ar: "طلب عرض سعر" } },
+  ticket: { icon: LifeBuoy, tone: "text-amber-500 bg-amber-500/10", label: { en: "Ticket", ar: "تذكرة صيانة" } },
+  career: { icon: GraduationCap, tone: "text-purple-500 bg-purple-500/10", label: { en: "Career", ar: "طلب توظيف" } },
+  chat: { icon: MessageCircle, tone: "text-emerald-500 bg-emerald-500/10", label: { en: "Chatbot", ar: "المحادثة" } },
+  security: { icon: ShieldCheck, tone: "text-red-500 bg-red-500/10", label: { en: "Security", ar: "الأمان" } },
+  slide: { icon: Images, tone: "text-blue-500 bg-blue-500/10", label: { en: "Slider", ar: "شرائح" } },
   system: { icon: Info, tone: "text-muted-foreground bg-muted", label: { en: "System", ar: "النظام" } },
 };
 

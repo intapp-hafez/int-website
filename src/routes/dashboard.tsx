@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import { useAuth, type Role } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, Star, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, Star, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2 } from "lucide-react";
 import { useCanAccess, usePermissions, resolveAdminPage } from "@/lib/permissions-store";
 import { demoUsers } from "@/data/demo";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { PermissionsDebugPanel } from "@/components/admin/PermissionsDebugPanel";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Integrated Technics" }] }),
@@ -65,6 +64,7 @@ const adminGroups: NavGroup[] = [
     en: "Content", ar: "المحتوى", icon: FileCog,
     items: [
       { to: "/dashboard/admin/sliders", en: "Sliders", ar: "العروض المتحركة", icon: Images, role: "admin", pageKey: "sliders" },
+      { to: "/dashboard/admin/industries", en: "Industries", ar: "القطاعات", icon: Building2, role: "admin", pageKey: "industries" },
       { to: "/dashboard/admin/partners", en: "Partners", ar: "الشركاء", icon: Users, role: "admin", pageKey: "partners" },
       { to: "/dashboard/admin/recommendations", en: "Recommendations", ar: "التوصيات الذكية", icon: HelpCircle, role: "admin", pageKey: "recommendations" },
       { to: "/dashboard/admin/news", en: "News", ar: "الأخبار", icon: Newspaper, role: "admin", pageKey: "news" },
@@ -179,7 +179,6 @@ function DashboardLayout() {
       <section className="min-w-0">
         {denied || helpdeskDenied || permDenied ? <Unauthorized reason={permDenied ? "perm" : "role"} /> : <Outlet />}
       </section>
-      {isAdminPath && user.role !== "client" && <PermissionsDebugPanel />}
     </div>
   );
 }
@@ -231,9 +230,7 @@ function NavGroupSection({ group, lang, pathname }: { group: NavGroup; lang: str
   const canView = (pageKey: string) => {
     if (!user) return false;
     if (user.role === "admin") return true;
-    const matched = demoUsers.find((u) => u.email.toLowerCase() === user.email.toLowerCase());
-    if (!matched) return false;
-    return !!getUserPerms(matched.id)[pageKey]?.view;
+    return !!getUserPerms(user.id)[pageKey]?.view;
   };
   const visible = group.items.filter((it) => canView(it.pageKey ?? "overview"));
   const containsActive = visible.some((it) => pathname === it.to || pathname.startsWith(it.to + "/"));

@@ -1,9 +1,8 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import { Section } from "@/components/site/Section";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
-import { services } from "@/data/site";
+import { useServices, getServiceIcon } from "@/lib/services-store";
 import { useState, type FormEvent } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -12,56 +11,77 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/services/$slug")({
-  loader: ({ params }) => {
-    const s = services.find(x => x.slug === params.slug);
-    if (!s) throw notFound();
-    return { slug: params.slug };
-  },
-  head: ({ params }) => {
-    const s = services.find(x => x.slug === params?.slug);
-    return {
-      meta: [
-        { title: `${s?.title.en ?? "Service"} — Integrated Technics` },
-        { name: "description", content: s?.desc.en ?? "Service detail" },
-      ],
-    };
-  },
-  notFoundComponent: () => <div className="container mx-auto py-32 text-center">Service not found</div>,
-  errorComponent: ({ error }) => <div className="container mx-auto py-32 text-center">{error.message}</div>,
+  head: () => ({
+    meta: [
+      { title: "Service Details — Integrated Technics" },
+      { name: "description", content: "End-to-end security, ICT, AV, and data center services." },
+    ],
+  }),
+  notFoundComponent: () => (
+    <div className="container mx-auto py-32 text-center space-y-4">
+      <h1 className="text-3xl font-bold">Service not found</h1>
+      <Button asChild variant="outline"><Link to="/services">Back to Services</Link></Button>
+    </div>
+  ),
   component: ServiceDetail,
 });
 
 function ServiceDetail() {
   const { slug } = Route.useParams();
   const { t, lang } = useI18n();
-  const s = services.find(x => x.slug === slug)!;
-  const Icon = s.icon;
+  const { get, loading } = useServices();
+  const s = get(slug);
+
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
 
-  const serviceName = s.title[lang];
   const isAr = lang === "ar";
+
+  if (!s) {
+    if (loading) {
+      return (
+        <div className="container mx-auto py-32 text-center text-muted-foreground">
+          Loading service...
+        </div>
+      );
+    }
+    return (
+      <div className="container mx-auto py-32 text-center space-y-4">
+        <h1 className="text-3xl font-bold">{isAr ? "الخدمة غير موجودة" : "Service not found"}</h1>
+        <Button asChild variant="outline">
+          <Link to="/services">{isAr ? "العودة للخدمات" : "Back to Services"}</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  const Icon = getServiceIcon(s.iconName);
+  const serviceName = s.title?.[lang] || s.title?.en || "Service";
+  const desc = s.desc?.[lang] || s.desc?.en || "";
+  const isRich = /<[a-z][\s\S]*>/i.test(desc);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) return;
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, 600));
     setSubmitting(false);
     setOpen(false);
     setForm({ name: "", email: "", phone: "", company: "", message: "" });
     toast.success(isAr ? "تم إرسال طلبك بنجاح" : "Your request has been submitted");
   };
 
-  const features = [
-    { en: "Architecture & design", ar: "التصميم والمعمارية" },
-    { en: "Vendor-neutral selection", ar: "اختيار محايد للموردين" },
-    { en: "Turnkey deployment", ar: "تنفيذ شامل" },
-    { en: "Integration with existing systems", ar: "التكامل مع الأنظمة القائمة" },
-    { en: "Documentation & training", ar: "التوثيق والتدريب" },
-    { en: "Lifecycle support & SLA", ar: "دعم دورة الحياة واتفاقية SLA" },
+  const defaultFeatures = [
+    { en: "Enterprise Architecture & Engineering Design", ar: "التصميم والمعمارية الهندسية المتطورة" },
+    { en: "Vendor-Neutral Multi-Brand Technology Selection", ar: "اختيار محايد للموردين متعددي المصنعين" },
+    { en: "Turnkey Implementation & Project Governance", ar: "تنفيذ وإدارة شاملة للمشروع حتى التسليم" },
+    { en: "Seamless Integration with Legacy & Modern Systems", ar: "التكامل السلس مع الأنظمة القائمة والحديثة" },
+    { en: "Full Documentation, Schematics & Certified Training", ar: "التوثيق والمخططات الشاملة والتدريب المعتمد" },
+    { en: "24/7 SLA Lifecycle Support & Preventative Maintenance", ar: "دعم فني مستمر 24/7 وصيانة وقائية معتمدة" },
   ];
+
+  const features = (s.features && s.features.length > 0) ? s.features : defaultFeatures;
 
   return (
     <div className="container mx-auto px-4 lg:px-8 py-12 md:py-20 max-w-7xl">
@@ -71,10 +91,14 @@ function ServiceDetail() {
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
         {/* Left Side: Image */}
-        {(s as any).image && (
+        {s.image && (
           <div className="lg:col-span-5 lg:sticky lg:top-24">
             <div className="rounded-3xl overflow-hidden border bg-muted/20 relative group shadow-sm">
-              <img src={(s as any).image} alt={s.title[lang]} className="w-full h-auto aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-105" />
+              <img
+                src={s.image}
+                alt={serviceName}
+                className="w-full h-auto aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-105"
+              />
               <div className="absolute top-4 left-4 h-12 w-12 rounded-xl gradient-hero text-primary-foreground flex items-center justify-center shadow-lg">
                 <Icon className="h-6 w-6" />
               </div>
@@ -83,19 +107,27 @@ function ServiceDetail() {
         )}
 
         {/* Right Side: Contents */}
-        <div className={(s as any).image ? "lg:col-span-7" : "lg:col-span-12"}>
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">{s.title[lang]}</h1>
-          <p className="text-xl text-muted-foreground mb-10 leading-relaxed font-medium pb-8 border-b w-full">
-            {s.desc[lang]}
-          </p>
+        <div className={s.image ? "lg:col-span-7" : "lg:col-span-12"}>
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">{serviceName}</h1>
+          
+          <div className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed font-normal pb-8 border-b w-full">
+            {isRich ? (
+              <div
+                className="prose prose-lg dark:prose-invert max-w-none prose-p:leading-relaxed prose-headings:font-display"
+                dangerouslySetInnerHTML={{ __html: desc }}
+              />
+            ) : (
+              <p className="whitespace-pre-wrap">{desc}</p>
+            )}
+          </div>
           
           <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">What we deliver</h2>
+            <h2 className="text-2xl font-bold mb-6">{isAr ? "ما نقدمه في هذه الخدمة" : "What we deliver"}</h2>
             <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-4">
-              {features.map(f => (
-                <li key={f.en} className="flex items-start gap-3">
+              {features.map((f, idx) => (
+                <li key={idx} className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                  <span className="text-[16px]">{f[lang]}</span>
+                  <span className="text-[16px]">{f[lang] || f.en || f.ar}</span>
                 </li>
               ))}
             </ul>
@@ -105,13 +137,16 @@ function ServiceDetail() {
             <div className="absolute inset-0 bg-accent/5" />
             <div className="relative">
               <h3 className="text-xl font-semibold mb-3">{isAr ? "تحدث مع مهندس حلول" : "Talk to a solutions architect"}</h3>
-              <p className="text-[15px] text-muted-foreground mb-6">{isAr ? "أخبرنا عن مشروعك. سنرد خلال يوم عمل واحد." : "Tell us about your project. We respond within one business day."}</p>
-              <Button size="lg" type="button" className="w-full sm:w-auto" onClick={() => setOpen(true)}>{t("cta.proposal")}</Button>
+              <p className="text-[15px] text-muted-foreground mb-6">
+                {isAr ? "أخبرنا عن مشروعك. سنرد خلال يوم عمل واحد." : "Tell us about your project. We respond within one business day."}
+              </p>
+              <Button size="lg" type="button" className="w-full sm:w-auto" onClick={() => setOpen(true)}>
+                {t("cta.proposal")}
+              </Button>
             </div>
           </div>
         </div>
       </div>
-
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-lg">
@@ -150,7 +185,9 @@ function ServiceDetail() {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>{isAr ? "إلغاء" : "Cancel"}</Button>
-              <Button type="submit" disabled={submitting}>{submitting ? (isAr ? "جارٍ الإرسال..." : "Submitting...") : (isAr ? "إرسال الطلب" : "Submit Request")}</Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? (isAr ? "جارٍ الإرسال..." : "Submitting...") : (isAr ? "إرسال الطلب" : "Submit Request")}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

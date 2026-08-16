@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { type Product, emptyProduct, slugify, assertBilingualPairs, STOCK_OPTIONS } from "@/lib/products";
 import { ProductImagesManager } from "@/components/admin/ProductImagesManager";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 export const Route = createFileRoute("/dashboard/admin/products/")({
   component: ProductsAdmin,
@@ -182,8 +183,31 @@ function ProductsAdmin() {
                 </div>
               </div>
 
-              <div><Label>Description (EN) *</Label><Textarea rows={3} value={e.description_en} onChange={ev => setEditing({ ...e, description_en: ev.target.value })} /></div>
-              <div><Label>Description (AR) *</Label><Textarea dir="rtl" rows={3} value={e.description_ar} onChange={ev => setEditing({ ...e, description_ar: ev.target.value })} /></div>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label>Description (EN) *</Label>
+                  <span className="text-xs text-muted-foreground">Rich Text (LTR)</span>
+                </div>
+                <RichTextEditor
+                  dir="ltr"
+                  value={e.description_en}
+                  onChange={(val) => setEditing({ ...e, description_en: val })}
+                  placeholder="Detailed product specifications and description in English..."
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label>Description (AR) *</Label>
+                  <span className="text-xs text-muted-foreground">محرر نصوص منسقة (RTL)</span>
+                </div>
+                <RichTextEditor
+                  dir="rtl"
+                  value={e.description_ar}
+                  onChange={(val) => setEditing({ ...e, description_ar: val })}
+                  placeholder="المواصفات والوصف التفصيلي للمنتج بالعربية..."
+                />
+              </div>
 
               <div>
                 <Label>Product images</Label>

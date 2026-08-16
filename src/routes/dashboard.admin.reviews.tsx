@@ -28,7 +28,7 @@ function ReviewsPage() {
   const [items, setItems] = useState<Review[]>(demoReviews);
   const [selected, setSelected] = useState<string[]>([]);
   const can = useCanAccess("reviews");
-  const { view, page, sort, dir, setPage, toggleSort } = useListSearch({ defaultView: "grid" });
+  const { view, page, sort, dir, setPage, toggleSort } = useListSearch({ defaultView: "table" });
   const toggle = (id: string) => setItems(items.map(x => x.id === id ? { ...x, approved: !x.approved } : x));
   const remove = (id: string) => setItems(items.filter(x => x.id !== id));
   const sorted = useMemo(

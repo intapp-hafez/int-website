@@ -8,7 +8,18 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { useAboutContent, defaultAboutContent, defaultHero, withCacheBust, type AboutContent, type AboutHero, type Bilingual, type TeamMember } from "@/lib/about-store";
+import {
+  useAboutContent,
+  defaultAboutContent,
+  defaultHero,
+  DEFAULT_ABOUT_STATS,
+  withCacheBust,
+  type AboutContent,
+  type AboutHero,
+  type Bilingual,
+  type TeamMember,
+  type AboutStat,
+} from "@/lib/about-store";
 import { supabase } from "@/integrations/supabase/client";
 import { RotateCcw, Plus, Trash2, Upload, Loader2, Image as ImageIcon, ShieldAlert, Check, CircleAlert, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
@@ -369,17 +380,138 @@ function AboutAdminPage() {
         </CardContent>
       </Card>
 
+      {/* Key Statistics & Counter Metrics Card */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="font-display text-lg">Key Statistics & Metrics Bar</CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Customize the 4 counter metric cards displayed below the hero section on the About page.
+            </p>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid sm:grid-cols-2 gap-4">
+            {(form.stats && form.stats.length > 0 ? form.stats : DEFAULT_ABOUT_STATS).map((st, i) => (
+              <div key={i} className="p-4 rounded-xl border bg-muted/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-accent">Metric #{i + 1}</span>
+                  <div className="w-28">
+                    <Input
+                      value={st.value}
+                      placeholder="e.g. 20+"
+                      className="font-bold text-sm h-8"
+                      onChange={(e) => {
+                        const current = [...(form.stats && form.stats.length > 0 ? form.stats : DEFAULT_ABOUT_STATS)];
+                        current[i] = { ...current[i], value: e.target.value };
+                        setForm({ ...form, stats: current });
+                        setDirty(true);
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">Title (English & Arabic)</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        value={st.label?.en ?? ""}
+                        placeholder="English Title"
+                        className="text-xs h-8"
+                        onChange={(e) => {
+                          const current = [...(form.stats && form.stats.length > 0 ? form.stats : DEFAULT_ABOUT_STATS)];
+                          current[i] = {
+                            ...current[i],
+                            label: { ...current[i].label, en: e.target.value },
+                          };
+                          setForm({ ...form, stats: current });
+                          setDirty(true);
+                        }}
+                      />
+                      <Input
+                        value={st.label?.ar ?? ""}
+                        dir="rtl"
+                        placeholder="العنوان بالعربي"
+                        className="text-xs h-8"
+                        onChange={(e) => {
+                          const current = [...(form.stats && form.stats.length > 0 ? form.stats : DEFAULT_ABOUT_STATS)];
+                          current[i] = {
+                            ...current[i],
+                            label: { ...current[i].label, ar: e.target.value },
+                          };
+                          setForm({ ...form, stats: current });
+                          setDirty(true);
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">Subtitle (English & Arabic)</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        value={st.sub?.en ?? ""}
+                        placeholder="English Subtitle"
+                        className="text-xs h-8"
+                        onChange={(e) => {
+                          const current = [...(form.stats && form.stats.length > 0 ? form.stats : DEFAULT_ABOUT_STATS)];
+                          current[i] = {
+                            ...current[i],
+                            sub: { ...current[i].sub, en: e.target.value },
+                          };
+                          setForm({ ...form, stats: current });
+                          setDirty(true);
+                        }}
+                      />
+                      <Input
+                        value={st.sub?.ar ?? ""}
+                        dir="rtl"
+                        placeholder="الوصف الفرعي بالعربي"
+                        className="text-xs h-8"
+                        onChange={(e) => {
+                          const current = [...(form.stats && form.stats.length > 0 ? form.stats : DEFAULT_ABOUT_STATS)];
+                          current[i] = {
+                            ...current[i],
+                            sub: { ...current[i].sub, ar: e.target.value },
+                          };
+                          setForm({ ...form, stats: current });
+                          setDirty(true);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
-          <CardTitle className="font-display text-lg">Leadership / Founder — Live Preview</CardTitle>
+          <CardTitle className="font-display text-lg">Leadership / Founder Photo & Message</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-4">
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Founder Photo URL</Label>
+            <Input
+              value={form.ownerImage ?? ""}
+              placeholder="https://integratedtechnics.com/wp-content/uploads/2026/05/fghjkm.webp"
+              onChange={(e) => {
+                setForm({ ...form, ownerImage: e.target.value });
+                setDirty(true);
+              }}
+            />
+            <p className="text-xs text-muted-foreground">URL of the founder image displayed on the public About page.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4 pt-2">
             <LeadershipPreview content={form} dir="ltr" />
             <LeadershipPreview content={form} dir="rtl" />
           </div>
-          <p className="text-xs text-muted-foreground mt-3">
-            Reflects the Owner fields above in real time. Arabic side renders right-to-left.
+          <p className="text-xs text-muted-foreground mt-2">
+            Reflects the Owner fields and photo above in real time. Arabic side renders right-to-left.
           </p>
         </CardContent>
       </Card>
@@ -468,15 +600,25 @@ function AboutAdminPage() {
                     </Button>
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Key (used to map image asset, e.g. ceo, cto)</Label>
-                  <Input
-                    value={m.key}
-                    onChange={(e) => { const team = form.team.map((t, i) => i === idx ? { ...t, key: e.target.value } : t); setForm({ ...form, team }); setDirty(true); }}
-                    aria-invalid={!!errors[`team.${idx}.key`]}
-                    className={errors[`team.${idx}.key`] ? "border-destructive" : ""}
-                  />
-                  {errors[`team.${idx}.key`] && <p className="text-xs text-destructive">{errors[`team.${idx}.key`]}</p>}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label>Key identifier (e.g. ceo, cto, ops)</Label>
+                    <Input
+                      value={m.key}
+                      onChange={(e) => { const team = form.team.map((t, i) => i === idx ? { ...t, key: e.target.value } : t); setForm({ ...form, team }); setDirty(true); }}
+                      aria-invalid={!!errors[`team.${idx}.key`]}
+                      className={errors[`team.${idx}.key`] ? "border-destructive" : ""}
+                    />
+                    {errors[`team.${idx}.key`] && <p className="text-xs text-destructive">{errors[`team.${idx}.key`]}</p>}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Photo URL (optional)</Label>
+                    <Input
+                      value={m.image ?? ""}
+                      placeholder="https://... or image URL"
+                      onChange={(e) => { const team = form.team.map((t, i) => i === idx ? { ...t, image: e.target.value } : t); setForm({ ...form, team }); setDirty(true); }}
+                    />
+                  </div>
                 </div>
                 <BiField label="Name" value={m.name}
                   onChange={(lang, v) => { const team = form.team.map((t, i) => i === idx ? { ...t, name: { ...t.name, [lang]: v } } : t); setForm({ ...form, team }); setDirty(true); }}
