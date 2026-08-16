@@ -57,6 +57,7 @@ export const PERM_ACTIONS: PermAction[] = ["view", "add", "edit", "delete"];
 
 const KEY = "it_user_perms_v1";
 const PRESETS_KEY = "it_perm_presets_v1";
+const GRANTS_KEY = "it_temp_grants_v1";
 const STORAGE_VERSION = 1;
 
 export const noPerms = (): PagePerms => ({ view: false, add: false, edit: false, delete: false });
@@ -84,6 +85,26 @@ export type PermPreset = {
   builtin?: boolean;
   perms: UserPerms;
 };
+
+/**
+ * Time-limited permission grant. `expiresAt === null` means permanent.
+ * Expired grants are ignored when resolving permissions and are pruned from
+ * storage, so access revokes itself without any manual step.
+ */
+export type AccessGrant = {
+  id: string;
+  userId: string;
+  pageKey: string;
+  actions: PermAction[];
+  expiresAt: string | null;
+  grantedBy: string;
+  note?: string;
+  requestId?: string;
+  createdAt: string;
+};
+
+export const isGrantActive = (g: AccessGrant, now = Date.now()) =>
+  g.expiresAt === null || new Date(g.expiresAt).getTime() > now;
 
 const AGENT_PAGES = new Set(["overview", "leads", "tickets", "clients", "quotations", "quotes", "orders", "helpdesk_tickets"]);
 const MANAGER_RESTRICTED = new Set(["users", "permissions", "settings", "reports", "security"]);
