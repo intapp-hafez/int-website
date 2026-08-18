@@ -92,7 +92,7 @@ export function AboutLogoWheel({ className = "" }: { className?: string }) {
           onMouseLeave={() => setHovered(null)}
           onClick={() => {}}
         >
-          <Link to="/services/security">
+          <Link to={'/services/security' as any}>
             {/* Outer light ring segment */}
             <path className="lw-cls-8" d="M291.73,291.73,113.82,64.83A288.39,288.39,0,0,1,291.73,3.4c158.17,0,288.33,130.16,288.33,288.33A288.29,288.29,0,0,1,530.76,453Z"/>
             {/* Inner darker segment */}
@@ -107,7 +107,7 @@ export function AboutLogoWheel({ className = "" }: { className?: string }) {
           onMouseEnter={() => setHovered("av")}
           onMouseLeave={() => setHovered(null)}
         >
-          <Link to="/services/audio-video">
+          <Link to={'/services/audio-video' as any}>
             <path className="lw-cls-7" d="M291.73,291.73,531,452.63a288.31,288.31,0,0,1-405.77,74.48Z"/>
             <path fill="#9e6d21" d="M291.73,291.73l185,124.41A223,223,0,0,1,163,473.74Z"/>
           </Link>
@@ -120,7 +120,7 @@ export function AboutLogoWheel({ className = "" }: { className?: string }) {
           onMouseEnter={() => setHovered("automation")}
           onMouseLeave={() => setHovered(null)}
         >
-          <Link to="/services/integration">
+          <Link to={'/services/integration' as any}>
             <path className="lw-cls-6" d="M291.73,291.73,125.22,527.12A288.37,288.37,0,0,1,5.27,258.92Z"/>
             <path fill="#179939" d="M291.73,291.73,163,473.76a222.92,222.92,0,0,1-92.77-207.4Z"/>
           </Link>
@@ -133,7 +133,7 @@ export function AboutLogoWheel({ className = "" }: { className?: string }) {
           onMouseEnter={() => setHovered("network")}
           onMouseLeave={() => setHovered(null)}
         >
-          <Link to="/services/network">
+          <Link to={'/services/network' as any}>
             <path className="lw-cls-5" d="M291.73,291.73,5.22,259.35A288.35,288.35,0,0,1,113.81,64.84Z"/>
             <path fill="#4e8fcc" d="M291.73,291.73l-221.54-25a222.93,222.93,0,0,1,84-150.41Z"/>
           </Link>
