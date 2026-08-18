@@ -35,8 +35,8 @@ const SECTOR_INFO = {
 // Arc-ONLY paths (no lines to center) — traces just the outer curved edge of each sector
 // These are derived from the Artboard 39 outer ring paths but without the M→center lineto→close structure
 const SECTOR_ARC: Record<NonNullable<SectorKey>, string> = {
-  // Security orange: from ~upper-left edge clockwise (large arc, >180°) to lower-right edge
-  security: "M113.82,64.83 A288.39,288.39,0,1,1,530.76,453",
+  // Security orange: from upper-left edge clockwise through top → to lower-right edge (~162°, large-arc=0)
+  security: "M113.82,64.83 A288.39,288.39,0,0,1,530.76,453",
   // AV bronze: from lower-right edge, short arc to bottom edge
   av:       "M530.76,453 A288.31,288.31,0,0,1,125.22,527.12",
   // Automation green: from bottom edge, arc to left-mid edge
