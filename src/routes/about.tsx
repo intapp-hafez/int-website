@@ -236,7 +236,7 @@ function AboutPage() {
           </div>
 
           <div className="lg:col-span-6 flex items-center justify-center">
-            <div className="relative w-full max-w-md lg:max-w-xl aspect-square rounded-3xl border bg-card/95 backdrop-blur-md p-4 sm:p-6 flex flex-col items-center justify-center shadow-2xl overflow-hidden group">
+            <div className="relative w-full max-w-md lg:max-w-xl aspect-square rounded-3xl border bg-card/95 backdrop-blur-md p-4 sm:p-6 pt-8 sm:pt-10 flex flex-col items-center justify-center shadow-2xl group">
               <div className="absolute inset-0 gradient-surface opacity-60 pointer-events-none" />
               <div className="absolute -top-20 -end-20 h-60 w-60 rounded-full bg-accent/20 blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
               <div className="absolute -bottom-20 -start-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
