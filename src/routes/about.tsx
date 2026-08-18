@@ -43,6 +43,7 @@ import teamSamir from "@/assets/team-samir.jpg";
 import teamDina from "@/assets/team-dina.jpg";
 import logoImg from "@/assets/logo.png";
 import artboard39Logo from "@/assets/artboard-39.svg";
+import { InteractiveHeroWheel } from "@/components/site/InteractiveHeroWheel";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -235,16 +236,16 @@ function AboutPage() {
           </div>
 
           <div className="lg:col-span-6 flex items-center justify-center">
-            <div className="relative w-full max-w-md lg:max-w-lg aspect-square rounded-3xl border bg-card/95 backdrop-blur-md p-6 sm:p-10 flex flex-col items-center justify-center shadow-2xl overflow-hidden group">
-              <div className="absolute inset-0 gradient-surface opacity-60" />
-              <div className="absolute -top-20 -end-20 h-60 w-60 rounded-full bg-accent/25 blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
+            <div className="relative w-full max-w-md lg:max-w-xl aspect-square rounded-3xl border bg-card/95 backdrop-blur-md p-4 sm:p-6 flex flex-col items-center justify-center shadow-2xl overflow-hidden group">
+              <div className="absolute inset-0 gradient-surface opacity-60 pointer-events-none" />
+              <div className="absolute -top-20 -end-20 h-60 w-60 rounded-full bg-accent/20 blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
               <div className="absolute -bottom-20 -start-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
-              <img
-                src={artboard39Logo}
-                alt="Integrated Technics Emblem"
-                className="w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[420px] h-auto max-h-[380px] object-contain relative z-10 drop-shadow-2xl group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="relative z-10 text-center mt-6 pt-4 border-t border-border/70 w-full">
+              
+              <div className="relative z-10 w-full flex items-center justify-center">
+                <InteractiveHeroWheel />
+              </div>
+
+              <div className="relative z-10 text-center mt-3 pt-3 border-t border-border/70 w-full">
                 <div className="font-display font-bold text-base sm:text-lg text-foreground tracking-wide">Integrated Technics</div>
                 <div className="text-xs text-muted-foreground font-medium mt-0.5">{isAr ? "الأنظمة الهندسية المتكاملة" : "Certified Engineering Systems"}</div>
               </div>
