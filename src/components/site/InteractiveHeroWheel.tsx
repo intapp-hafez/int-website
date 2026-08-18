@@ -2,97 +2,132 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
 import {
-  Shield,
+  Flame,
   Volume2,
+  Tv,
+  Presentation,
+  Radio,
+  Home,
+  Lightbulb,
   Cpu,
+  Workflow,
   Network,
-  Sparkles,
-  ArrowUpRight,
+  Server,
+  Cable,
+  Cloud,
+  Calculator,
+  ScanSearch,
+  ShieldAlert,
+  UserCheck,
+  Radar,
+  Smartphone,
+  Fence,
+  Users,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-export type SectorId = "security" | "av" | "automation" | "network";
+interface SubServiceNode {
+  id: string;
+  angle: number; // degrees from top (0 deg is top)
+  icon: any;
+  title: { en: string; ar: string };
+  href: string;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+}
 
 interface SectorInfo {
-  id: SectorId;
+  id: string;
   title: { en: string; ar: string };
-  shortName: { en: string; ar: string };
-  subtitle: { en: string; ar: string };
-  icon: any;
   href: string;
   startAngle: number;
   endAngle: number;
   color: string;
-  activeGlow: string;
   bgGradient: string;
   textColor: string;
+  nodes: SubServiceNode[];
 }
 
-export function InteractiveHeroWheel({ className = "" }: { className?: string }) {
-  const { lang, dir } = useI18n();
-  const isRtl = dir === "rtl";
-  const [activeHover, setActiveHover] = useState<SectorId | null>(null);
+export function InteractiveHeroWheel() {
+  const { lang } = useI18n();
+  const [activeHover, setActiveHover] = useState<string | null>(null);
 
-  // 4 Major Sectors matching the official Integrated Technics logo
+  // 4 Major Sectors — Security expanded to 150° to accommodate all 10 items
   const sectors: SectorInfo[] = [
     {
       id: "security",
-      title: { en: "Integrated Security Solutions", ar: "حلول الأمن المتكاملة" },
-      shortName: { en: "Security Solutions", ar: "الأنظمة الأمنية" },
-      subtitle: { en: "CCTV, Access Control, Fire Alarm & Radar", ar: "المراقبة، التحكم بالأبواب وإنذار الحريق" },
-      icon: Shield,
+      title: { en: "INTEGRATED SECURITY SOLUTIONS", ar: "أنظمة الأمن المتكاملة" },
       href: "/services/security",
       startAngle: -25,
       endAngle: 125,
-      color: "#ea580c", // Brand Orange
-      activeGlow: "rgba(234, 88, 12, 0.65)",
-      bgGradient: "from-orange-500/35 via-amber-500/20 to-transparent",
+      color: "#ea580c", // Orange
+      bgGradient: "from-orange-500/20 to-amber-500/10",
       textColor: "text-orange-500 dark:text-orange-400",
+      nodes: [
+        { id: "pos", angle: -17, icon: Calculator, title: { en: "Retail & POS Security", ar: "أمن نقاط البيع والتحصيل" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+        { id: "anpr", angle: -2, icon: ScanSearch, title: { en: "ANPR / License Plate Recognition", ar: "التعرف على لوحات المركبات (LPR)" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+        { id: "uvss", angle: 13, icon: ShieldAlert, title: { en: "Under Vehicle Surveillance (UVSS)", ar: "فحص وتفتيش أسفل المركبات" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+        { id: "visitor", angle: 28, icon: UserCheck, title: { en: "Visitor & Identity Management", ar: "إدارة الزوار والهويات الرقمية" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+        { id: "perimeter", angle: 43, icon: Radar, title: { en: "Perimeter Intrusion Detection (PIDS)", ar: "حماية وكشف التسلل المحيطي" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+        { id: "fire", angle: 58, icon: Flame, title: { en: "Fire Alarm & Life Safety", ar: "إنذار الحريق والسلامة" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+        { id: "mobile-access", angle: 73, icon: Smartphone, title: { en: "Mobile Credentials & Smart Access", ar: "التحكم بالوصول عبر الجوال" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+        { id: "barriers", angle: 88, icon: Fence, title: { en: "Speed Gates, Turnstiles & Blockers", ar: "البوابات الأمنية والمصدات الهيدروليكية" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+        { id: "face-rec", angle: 103, icon: Users, title: { en: "Facial Recognition & Video AI", ar: "التعرف على الوجوه وتحليلات الفيديو" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+        { id: "wireless-cctv", angle: 118, icon: Radio, title: { en: "Wireless CCTV Transmission", ar: "النقل اللاسلكي لكاميرات المراقبة" }, href: "/services/security", color: "#ea580c", bgColor: "bg-orange-500", borderColor: "border-orange-300" },
+      ],
     },
     {
       id: "av",
-      title: { en: "Audio / Video", ar: "الصوتيات والمرئيات" },
-      shortName: { en: "Audio & Video", ar: "الصوتيات والمرئيات" },
-      subtitle: { en: "LED Walls, Smart Boardrooms & PA", ar: "شاشات العرض وقاعات المؤتمرات الذكية" },
-      icon: Volume2,
+      title: { en: "AUDIO / VIDEO", ar: "الأنظمة الصوتية والمرئية" },
       href: "/services/audio-video",
       startAngle: 125,
       endAngle: 190,
-      color: "#a16207", // Bronze / Gold
-      activeGlow: "rgba(161, 98, 7, 0.65)",
-      bgGradient: "from-amber-600/35 via-yellow-600/20 to-transparent",
-      textColor: "text-amber-600 dark:text-amber-400",
+      color: "#9e6d21", // Bronze / Khaki
+      bgGradient: "from-[#9e6d21]/20 to-[#e0c59c]/10",
+      textColor: "text-[#9e6d21] dark:text-[#e0c59c]",
+      nodes: [
+        { id: "sound", angle: 133, icon: Volume2, title: { en: "Pro Sound Systems", ar: "الأنظمة الصوتية الاحترافية" }, href: "/services/audio-video", color: "#9e6d21", bgColor: "bg-[#9e6d21]", borderColor: "border-[#e0c59c]" },
+        { id: "videowall", angle: 149, icon: Tv, title: { en: "Video Walls & Displays", ar: "شاشات العرض والجدارية" }, href: "/services/audio-video", color: "#9e6d21", bgColor: "bg-[#9e6d21]", borderColor: "border-[#e0c59c]" },
+        { id: "conferencing", angle: 165, icon: Presentation, title: { en: "Smart Meeting Rooms", ar: "قاعات المؤتمرات الذكية" }, href: "/services/audio-video", color: "#9e6d21", bgColor: "bg-[#9e6d21]", borderColor: "border-[#e0c59c]" },
+        { id: "signage", angle: 181, icon: Radio, title: { en: "Digital Signage & PA", ar: "الإذاعة والشاشات الرقمية" }, href: "/services/audio-video", color: "#9e6d21", bgColor: "bg-[#9e6d21]", borderColor: "border-[#e0c59c]" },
+      ],
     },
     {
       id: "automation",
-      title: { en: "Automation", ar: "أنظمة التحكم الذكي" },
-      shortName: { en: "Automation", ar: "الأتمتة والتحكم" },
-      subtitle: { en: "Smart Buildings, IoT & Energy BMS", ar: "المباني الذكية وإدارة الطاقة والإنترنت" },
-      icon: Cpu,
+      title: { en: "SMART AUTOMATION", ar: "التحكم والأنظمة الذكية" },
       href: "/services/integration",
       startAngle: 190,
       endAngle: 265,
-      color: "#16a34a", // Emerald Green
-      activeGlow: "rgba(22, 163, 74, 0.65)",
-      bgGradient: "from-emerald-500/35 via-green-600/20 to-transparent",
+      color: "#16a34a", // Green
+      bgGradient: "from-emerald-500/20 to-green-500/10",
       textColor: "text-emerald-600 dark:text-emerald-400",
+      nodes: [
+        { id: "smarthome", angle: 200, icon: Home, title: { en: "Smart Home & BMS", ar: "المباني والمنازل الذكية" }, href: "/services/integration", color: "#16a34a", bgColor: "bg-emerald-600", borderColor: "border-emerald-400" },
+        { id: "lighting", angle: 218, icon: Lightbulb, title: { en: "Lighting & Energy Control", ar: "التحكم بالطاقة والإضاءة" }, href: "/services/integration", color: "#16a34a", bgColor: "bg-emerald-600", borderColor: "border-emerald-400" },
+        { id: "iot", angle: 236, icon: Cpu, title: { en: "IoT & Sensors Integration", ar: "إنترنت الأشياء والحساسات" }, href: "/services/integration", color: "#16a34a", bgColor: "bg-emerald-600", borderColor: "border-emerald-400" },
+        { id: "workflow", angle: 254, icon: Workflow, title: { en: "Integrated Control Layer", ar: "التكامل التشغيلي الموحد" }, href: "/services/integration", color: "#16a34a", bgColor: "bg-emerald-600", borderColor: "border-emerald-400" },
+      ],
     },
     {
       id: "network",
-      title: { en: "Network Infrastructure", ar: "البنية التحتية للشبكات" },
-      shortName: { en: "Network Infrastructure", ar: "الشبكات والبنية التحتية" },
-      subtitle: { en: "Data Centers, Fiber & Cyber SDN", ar: "غرف الخوادم، الألياف الضوئية والأمن السيبراني" },
-      icon: Network,
+      title: { en: "NETWORK INFRASTRUCTURE", ar: "البنية التحتية للشبكات" },
       href: "/services/network",
       startAngle: 265,
       endAngle: 335,
-      color: "#0284c7", // Electric Sky Blue
-      activeGlow: "rgba(2, 132, 199, 0.65)",
-      bgGradient: "from-sky-500/35 via-blue-600/20 to-transparent",
+      color: "#0284c7", // Sky blue
+      bgGradient: "from-sky-500/20 to-blue-500/10",
       textColor: "text-sky-600 dark:text-sky-400",
+      nodes: [
+        { id: "datacenter", angle: 275, icon: Server, title: { en: "Data Center Infrastructure", ar: "مراكز البيانات والخوادم" }, href: "/services/data-centers", color: "#0284c7", bgColor: "bg-sky-600", borderColor: "border-sky-400" },
+        { id: "cabling", angle: 293, icon: Cable, title: { en: "Fiber & Structured Cabling", ar: "كابلات الألياف الضوئية" }, href: "/services/network", color: "#0284c7", bgColor: "bg-sky-600", borderColor: "border-sky-400" },
+        { id: "routing", angle: 311, icon: Network, title: { en: "Enterprise Switching & SDN", ar: "شبكات التبديل المتقدمة" }, href: "/services/network", color: "#0284c7", bgColor: "bg-sky-600", borderColor: "border-sky-400" },
+        { id: "cloud", angle: 328, icon: Cloud, title: { en: "Cloud & Cyber Security", ar: "الحوسبة السحابية وحماية الشبكة" }, href: "/services/network", color: "#0284c7", bgColor: "bg-sky-600", borderColor: "border-sky-400" },
+      ],
     },
   ];
 
-  // Coordinate helper (0 = top)
+  // Utility to calculate coordinate on circle given radius & angle (0 = top)
   const getCoordinates = (angleDeg: number, radius: number, cx = 250, cy = 250) => {
     const angleRad = ((angleDeg - 90) * Math.PI) / 180;
     return {
@@ -102,14 +137,7 @@ export function InteractiveHeroWheel({ className = "" }: { className?: string })
   };
 
   // Generate SVG annular sector path
-  const describeArcSector = (
-    cx: number,
-    cy: number,
-    rInner: number,
-    rOuter: number,
-    startAngle: number,
-    endAngle: number
-  ) => {
+  const describeArcSector = (cx: number, cy: number, rInner: number, rOuter: number, startAngle: number, endAngle: number) => {
     const p1 = getCoordinates(startAngle, rInner, cx, cy);
     const p2 = getCoordinates(startAngle, rOuter, cx, cy);
     const p3 = getCoordinates(endAngle, rOuter, cx, cy);
@@ -133,190 +161,174 @@ export function InteractiveHeroWheel({ className = "" }: { className?: string })
     return `M ${p1.x} ${p1.y} A ${r} ${r} 0 0 ${sweep} ${p2.x} ${p2.y}`;
   };
 
-  const currentSector = sectors.find((s) => s.id === activeHover);
-
   return (
-    <div className={`relative mx-auto w-full max-w-[420px] sm:max-w-[460px] lg:max-w-[500px] aspect-square select-none flex flex-col items-center justify-center ${className}`}>
-      
-      {/* Dynamic Ambient Background Glow aura */}
-      <div
-        className="absolute inset-4 rounded-full blur-3xl opacity-80 transition-all duration-700 pointer-events-none"
-        style={{
-          background: currentSector
-            ? `radial-gradient(circle, ${currentSector.activeGlow} 0%, rgba(0,0,0,0) 75%)`
-            : "radial-gradient(circle, rgba(234,88,12,0.2) 0%, rgba(2,132,199,0.15) 50%, rgba(0,0,0,0) 75%)",
-          transform: activeHover ? "scale(1.25)" : "scale(1)",
-        }}
-      />
+    <TooltipProvider delayDuration={150}>
+      <div className="relative mx-auto w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[530px] aspect-square select-none flex items-center justify-center">
+        {/* Glow ambient background aura */}
+        <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-accent/20 via-orange-500/10 to-sky-500/20 blur-3xl opacity-60 pointer-events-none animate-pulse" />
 
-      {/* The SVG Diagram Base */}
-      <svg
-        viewBox="0 0 500 500"
-        className="w-full h-full drop-shadow-2xl overflow-visible pointer-events-auto"
-      >
-        <defs>
-          {/* Sector Text Paths (centered in the wide sector band) */}
+        {/* The SVG Diagram Base */}
+        <svg
+          viewBox="0 0 500 500"
+          className="w-full h-full drop-shadow-2xl overflow-visible"
+        >
+          <defs>
+            {/* Sector Text Paths */}
+            {sectors.map((s) => {
+              // Adjust text arc orientation based on quadrant
+              const isBottom = s.startAngle >= 90 && s.startAngle < 270;
+              const r = 142;
+              const pathD = isBottom
+                ? describeTextArc(250, 250, r, s.endAngle - 2, s.startAngle + 2, 0)
+                : describeTextArc(250, 250, r, s.startAngle + 2, s.endAngle - 2, 1);
+              return <path key={`textpath-${s.id}`} id={`sector-arc-${s.id}`} d={pathD} fill="none" />;
+            })}
+
+            {/* Gradient patterns */}
+            <linearGradient id="grad-security" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#f97316" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#c2410c" stopOpacity="0.95" />
+            </linearGradient>
+            <linearGradient id="grad-av" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#b38330" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#8c601b" stopOpacity="0.95" />
+            </linearGradient>
+            <linearGradient id="grad-automation" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#22c55e" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#15803d" stopOpacity="0.95" />
+            </linearGradient>
+            <linearGradient id="grad-network" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#0369a1" stopOpacity="0.95" />
+            </linearGradient>
+          </defs>
+
+          {/* Outer Ring guide track */}
+          <circle
+            cx="250"
+            cy="250"
+            r="205"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeDasharray="4 6"
+            className="text-border/60"
+          />
+
+          {/* Middle Sectors (The 4 category bands) */}
           {sectors.map((s) => {
-            const isBottom = s.startAngle >= 90 && s.startAngle < 270;
-            const r = 168;
-            const pathD = isBottom
-              ? describeTextArc(250, 250, r, s.endAngle - 3, s.startAngle + 3, 0)
-              : describeTextArc(250, 250, r, s.startAngle + 3, s.endAngle - 3, 1);
-            return <path key={`textpath-${s.id}`} id={`clean-sector-arc-${s.id}`} d={pathD} fill="none" />;
+            const isHovered = activeHover === s.id;
+            // Tailor font size & tracking so longer labels like NETWORK INFRASTRUCTURE fit completely
+            const textStyle =
+              s.id === "network"
+                ? "text-[9.5px] sm:text-[10px] tracking-normal font-bold"
+                : s.id === "security"
+                ? "text-[10.5px] sm:text-[11px] tracking-wider font-bold"
+                : "text-[11px] sm:text-[12px] tracking-widest font-bold";
+
+            return (
+              <g
+                key={s.id}
+                className="transition-all duration-300 cursor-pointer group"
+                onMouseEnter={() => setActiveHover(s.id)}
+                onMouseLeave={() => setActiveHover(null)}
+              >
+                <Link to={s.href as any}>
+                  <path
+                    d={describeArcSector(250, 250, 105, 178, s.startAngle + 1.5, s.endAngle - 1.5)}
+                    fill={`url(#grad-${s.id})`}
+                    className={`transition-all duration-300 ${
+                      isHovered ? "opacity-100 filter brightness-110 drop-shadow-lg" : "opacity-85 hover:opacity-100"
+                    }`}
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="1.5"
+                  />
+                  {/* Curved Text Label */}
+                  <text
+                    className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]`}
+                  >
+                    <textPath
+                      href={`#sector-arc-${s.id}`}
+                      startOffset="50%"
+                      textAnchor="middle"
+                    >
+                      {s.title[lang]}
+                    </textPath>
+                  </text>
+                </Link>
+              </g>
+            );
           })}
 
-          {/* High-Definition Contrast Gradients (Normal and Saturated Hover States) */}
-          <linearGradient id="clean-grad-security" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f97316" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#c2410c" stopOpacity="1" />
-          </linearGradient>
-          <linearGradient id="clean-grad-security-active" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ff7a18" stopOpacity="1" />
-            <stop offset="45%" stopColor="#ea580c" stopOpacity="1" />
-            <stop offset="100%" stopColor="#6c2209" stopOpacity="1" />
-          </linearGradient>
-
-          <linearGradient id="clean-grad-av" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#b45309" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#78350f" stopOpacity="1" />
-          </linearGradient>
-          <linearGradient id="clean-grad-av-active" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f59e0b" stopOpacity="1" />
-            <stop offset="45%" stopColor="#b45309" stopOpacity="1" />
-            <stop offset="100%" stopColor="#3d1602" stopOpacity="1" />
-          </linearGradient>
-
-          <linearGradient id="clean-grad-automation" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#16a34a" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#14532d" stopOpacity="1" />
-          </linearGradient>
-          <linearGradient id="clean-grad-automation-active" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#22c55e" stopOpacity="1" />
-            <stop offset="45%" stopColor="#16a34a" stopOpacity="1" />
-            <stop offset="100%" stopColor="#042311" stopOpacity="1" />
-          </linearGradient>
-
-          <linearGradient id="clean-grad-network" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#0284c7" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#0c4a6e" stopOpacity="1" />
-          </linearGradient>
-          <linearGradient id="clean-grad-network-active" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#38bdf8" stopOpacity="1" />
-            <stop offset="45%" stopColor="#0284c7" stopOpacity="1" />
-            <stop offset="100%" stopColor="#062539" stopOpacity="1" />
-          </linearGradient>
-        </defs>
-
-        {/* 4 Interactive Category Sector Arcs */}
-        {sectors.map((s) => {
-          const isHovered = activeHover === s.id;
-          const isDimmed = activeHover !== null && !isHovered;
-
-          // Pop-out geometry on hover
-          const rInner = isHovered ? 104 : 110;
-          const rOuter = isHovered ? 236 : 225;
-
-          const textStyle =
-            s.id === "network"
-              ? "text-[12.5px] sm:text-[13.5px] tracking-normal font-bold"
-              : s.id === "security"
-              ? "text-[13px] sm:text-[14px] tracking-wide font-bold"
-              : "text-[14px] sm:text-[15px] tracking-wider font-bold";
-
-          return (
-            <g
-              key={s.id}
-              className="cursor-pointer pointer-events-auto"
-              onMouseEnter={() => setActiveHover(s.id)}
-              onMouseLeave={() => setActiveHover(null)}
-              style={{
-                filter: isHovered
-                  ? `drop-shadow(0 0 20px ${s.color}) brightness(1.25) contrast(1.2)`
-                  : isDimmed
-                  ? "brightness(0.55) opacity(0.35)"
-                  : "none",
-                transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-            >
-              <Link to={s.href as any} className="outline-none">
-                {/* Sector Arc Wedge */}
-                <path
-                  d={describeArcSector(250, 250, rInner, rOuter, s.startAngle + 1.2, s.endAngle - 1.2)}
-                  fill={isHovered ? `url(#clean-grad-${s.id}-active)` : `url(#clean-grad-${s.id})`}
-                  stroke={isHovered ? "#ffffff" : "rgba(255,255,255,0.5)"}
-                  strokeWidth={isHovered ? "3.5" : "2"}
-                  className="transition-all duration-300 transform-gpu origin-center cursor-pointer"
-                />
-
-                {/* Curved Text Label */}
-                <text
-                  className={`${textStyle} fill-white select-none pointer-events-none transition-all duration-300 ${
-                    isHovered
-                      ? "drop-shadow-[0_2px_5px_rgba(0,0,0,0.95)] font-black"
-                      : "drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]"
-                  }`}
-                >
-                  <textPath
-                    href={`#clean-sector-arc-${s.id}`}
-                    startOffset="50%"
-                    textAnchor="middle"
-                  >
-                    {s.title[lang]}
-                  </textPath>
-                </text>
-              </Link>
-            </g>
-          );
-        })}
-
-        {/* Center Inner Circle Base */}
-        <circle
-          cx="250"
-          cy="250"
-          r="106"
-          className="fill-card stroke-border/80 drop-shadow-2xl transition-all duration-300"
-          strokeWidth={activeHover ? "4" : "3"}
-          style={{
-            stroke: currentSector ? currentSector.color : undefined,
-          }}
-        />
-      </svg>
-
-      {/* Central Core Logo (Interactive -> Home) */}
-      <Link
-        to="/"
-        className="absolute z-20 w-[190px] h-[190px] sm:w-[205px] sm:h-[205px] rounded-full bg-card border-2 border-border/80 shadow-2xl flex flex-col items-center justify-center p-5 sm:p-6 transition-all duration-500 group cursor-pointer overflow-hidden"
-        style={{
-          boxShadow: currentSector
-            ? `0 0 32px ${currentSector.activeGlow}, inset 0 0 18px ${currentSector.activeGlow}`
-            : undefined,
-          borderColor: currentSector ? currentSector.color : undefined,
-        }}
-        title={lang === "ar" ? "الصفحة الرئيسية — إنتجريتد تكنيكس" : "Home — Integrated Technics"}
-      >
-        <div className="relative w-full h-full flex flex-col items-center justify-center text-center">
-          <img
-            src="/ht-logo.svg"
-            alt="Integrated Technics"
-            className={`w-full h-auto max-h-[90px] sm:max-h-[98px] object-contain filter drop-shadow-md select-none transition-transform duration-500 ${
-              activeHover ? "scale-105" : "group-hover:scale-105"
-            }`}
-            draggable={false}
+          {/* Center Circle Base (behind logo) */}
+          <circle
+            cx="250"
+            cy="250"
+            r="102"
+            className="fill-card stroke-border/70 drop-shadow-xl transition-all"
+            strokeWidth="4"
           />
-          {currentSector && (
-            <div className="absolute -bottom-1 inset-x-0 text-center animate-in fade-in zoom-in-95 duration-200">
-              <span
-                className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full text-white shadow-lg"
-                style={{ backgroundColor: currentSector.color }}
+        </svg>
+
+        {/* Central Core: LOGO (Clickable -> Home) */}
+        <Link
+          to="/"
+          className="absolute z-20 w-[184px] h-[184px] sm:w-[200px] sm:h-[200px] rounded-full bg-white dark:bg-card border-[3px] border-border/80 shadow-2xl flex items-center justify-center p-6 sm:p-7 hover:scale-105 active:scale-95 transition-transform duration-300 group cursor-pointer"
+          title={lang === "ar" ? "الصفحة الرئيسية — إنتجريتد تكنيكس" : "Home — Integrated Technics"}
+        >
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img
+              src="/ht-logo.svg"
+              alt="Integrated Technics"
+              className="w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300 select-none"
+              draggable={false}
+            />
+          </div>
+        </Link>
+
+        {/* Outer Ring: Sub-Service Orbital Icon Buttons */}
+        {sectors.flatMap((sector) =>
+          sector.nodes.map((node) => {
+            // Coordinate in percent (0 to 100)
+            const coords = getCoordinates(node.angle, 205, 250, 250);
+            const leftPct = (coords.x / 500) * 100;
+            const topPct = (coords.y / 500) * 100;
+            const Icon = node.icon;
+
+            return (
+              <div
+                key={node.id}
+                className="absolute z-30 -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${leftPct}%`, top: `${topPct}%` }}
               >
-                <Sparkles className="h-2.5 w-2.5" />
-                <span>{currentSector.shortName[lang]}</span>
-                <ArrowUpRight className="h-2.5 w-2.5" />
-              </span>
-            </div>
-          )}
-        </div>
-      </Link>
-    </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      to={node.href as any}
+                      className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full flex items-center justify-center text-white shadow-lg border-2 ${node.borderColor} ${node.bgColor} hover:scale-125 hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-90`}
+                      aria-label={node.title[lang]}
+                    >
+                      <Icon className="h-4 w-4 sm:h-5 sm:w-5 drop-shadow" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    className="bg-card/95 text-foreground backdrop-blur-md border px-3 py-1.5 rounded-lg shadow-xl text-xs font-medium z-50 pointer-events-none"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: node.color }}
+                      />
+                      <span>{node.title[lang]}</span>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </TooltipProvider>
   );
 }

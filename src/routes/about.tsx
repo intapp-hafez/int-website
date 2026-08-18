@@ -43,7 +43,7 @@ import teamSamir from "@/assets/team-samir.jpg";
 import teamDina from "@/assets/team-dina.jpg";
 import logoImg from "@/assets/logo.png";
 import artboard39Logo from "@/assets/artboard-39.svg";
-import { InteractiveHeroWheel } from "@/components/site/InteractiveHeroWheel";
+import { AboutLogoWheel } from "@/components/site/AboutLogoWheel";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -242,7 +242,7 @@ function AboutPage() {
               <div className="absolute -bottom-20 -start-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
               
               <div className="relative z-10 w-full flex items-center justify-center">
-                <InteractiveHeroWheel />
+                <AboutLogoWheel />
               </div>
 
               <div className="relative z-10 text-center mt-3 pt-3 border-t border-border/70 w-full">
