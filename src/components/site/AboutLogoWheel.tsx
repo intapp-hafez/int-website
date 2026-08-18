@@ -32,13 +32,17 @@ const SECTOR_INFO = {
   },
 };
 
-// Exact outer boundary paths per sector from Artboard 39.svg (viewBox 583.45×583.45)
-// Only the OUTER ring path is used for the stroke highlight (inner ring excluded to avoid center bleed)
-const SECTOR_OUTER: Record<NonNullable<SectorKey>, string> = {
-  security: "M291.73,291.73,113.82,64.83A288.39,288.39,0,0,1,291.73,3.4c158.17,0,288.33,130.16,288.33,288.33A288.29,288.29,0,0,1,530.76,453Z",
-  av:       "M291.73,291.73,531,452.63a288.31,288.31,0,0,1-405.77,74.48Z",
-  automation:"M291.73,291.73,125.22,527.12A288.37,288.37,0,0,1,5.27,258.92Z",
-  network:  "M291.73,291.73,5.22,259.35A288.35,288.35,0,0,1,113.81,64.84Z",
+// Arc-ONLY paths (no lines to center) — traces just the outer curved edge of each sector
+// These are derived from the Artboard 39 outer ring paths but without the M→center lineto→close structure
+const SECTOR_ARC: Record<NonNullable<SectorKey>, string> = {
+  // Security orange: from ~upper-left edge clockwise (large arc, >180°) to lower-right edge
+  security: "M113.82,64.83 A288.39,288.39,0,1,1,530.76,453",
+  // AV bronze: from lower-right edge, short arc to bottom edge
+  av:       "M530.76,453 A288.31,288.31,0,0,1,125.22,527.12",
+  // Automation green: from bottom edge, arc to left-mid edge
+  automation:"M125.22,527.12 A288.37,288.37,0,0,1,5.22,259.35",
+  // Network blue: from left-mid edge, short arc back to upper-left edge
+  network:  "M5.22,259.35 A288.35,288.35,0,0,1,113.82,64.83",
 };
 
 // Both rings used only as invisible hit/click areas
@@ -100,11 +104,11 @@ export function AboutLogoWheel({ className = "" }: { className?: string }) {
         >
           {hovered && info && (
             <path
-              d={SECTOR_OUTER[hovered]}
+              d={SECTOR_ARC[hovered]}
               fill="none"
               stroke={info.color}
               strokeWidth="6"
-              strokeLinejoin="round"
+              strokeLinecap="round"
               strokeOpacity="0.9"
               style={{
                 filter: `drop-shadow(0 0 12px ${info.color}) drop-shadow(0 0 24px ${info.glow})`,
