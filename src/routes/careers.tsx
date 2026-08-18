@@ -364,22 +364,29 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
       setDone(`DEMO-${Date.now().toString(36).toUpperCase().slice(-6)}`);
       return;
     }
+    const extraInfo = `
+[Additional Info]
+Location: ${d.city}, ${d.country} | Nationality: ${d.nationality} | Gender: ${d.gender}
+Current: ${d.current_title} at ${d.current_company} | Exp: ${d.years_experience}y
+Education: ${d.highest_education} (${d.university})
+Salary: ${d.expected_salary} ${d.salary_currency} | Notice: ${d.notice_period_days}d | Start: ${d.earliest_start_date || "-"}
+Source: ${d.source}
+Portfolio: ${d.portfolio_url || "-"}
+Skills: ${(d.skills || "").split(",").map(s => s.trim()).filter(Boolean).join(", ")}
+Languages: ${(d.languages || "").split(",").map(s => s.trim()).filter(Boolean).join(", ")}
+
+[Cover Letter]
+${d.cover_letter}
+`.trim();
+
     const payload = {
       job_id: job?.id,
-      full_name: d.full_name, email: d.email, phone: d.phone,
-      nationality: d.nationality, country: d.country, city: d.city, gender: d.gender,
-      current_title: d.current_title, current_company: d.current_company,
-      years_experience: d.years_experience,
-      highest_education: d.highest_education, university: d.university,
-      expected_salary: d.expected_salary, salary_currency: d.salary_currency,
-      notice_period_days: d.notice_period_days,
-      earliest_start_date: d.earliest_start_date || null,
-      source: d.source,
-      resume_url: uploadedUrl, linkedin_url: d.linkedin_url || "", portfolio_url: d.portfolio_url || "",
-      skills: d.skills ? d.skills.split(",").map(s => s.trim()).filter(Boolean) : [],
-      languages: d.languages ? d.languages.split(",").map(s => s.trim()).filter(Boolean) : [],
-      cover_letter: d.cover_letter,
-      consent_processing: d.consent_processing,
+      full_name: d.full_name,
+      email: d.email,
+      phone: d.phone,
+      resume_url: uploadedUrl,
+      linkedin_url: d.linkedin_url || "",
+      cover_letter: extraInfo,
     };
     const { data, error } = await supabase.from("career_applications").insert(payload as any).select("ref").single();
     setSubmitting(false);

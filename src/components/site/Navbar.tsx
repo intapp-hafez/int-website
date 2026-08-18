@@ -141,9 +141,11 @@ export function Navbar() {
               <div className="px-3 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                 {lang === "ar" ? "الحساب" : "Account"}
               </div>
-              <Link to="/track-quote" onClick={() => setOpen(false)} className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2">
-                <Search className="h-4 w-4" /> {lang === "ar" ? "تتبع العرض" : "Track Quote"}
-              </Link>
+              {settings.headerIcons?.tracking !== false && (
+                <Link to="/track-quote" onClick={() => setOpen(false)} className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2">
+                  <Search className="h-4 w-4" /> {lang === "ar" ? "تتبع العرض" : "Track Quote"}
+                </Link>
+              )}
               {user ? (
                 <>
                   <div className="flex items-center gap-3 px-3 py-3 border-b border-border/50">

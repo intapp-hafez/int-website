@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useMemo, type FormEvent } from "react";
+import { useState, useMemo, useEffect, type FormEvent } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -9,53 +9,146 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Paperclip, X, Sparkles, Search } from "lucide-react";
-import { demoTickets, type Ticket, type TicketCategory } from "@/data/demo";
-import { useClientT, getDemoClientCompany } from "@/lib/client-i18n";
+import { Plus, Search, Loader2, LifeBuoy } from "lucide-react";
+import { useClientT } from "@/lib/client-i18n";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useI18n } from "@/lib/i18n";
+
+import { dispatchTicketNotificationEmails } from "@/lib/smtp-store";
 
 export const Route = createFileRoute("/dashboard/workspace/tickets/")({
+  head: () => ({ meta: [{ title: "Support Tickets — Client Workspace" }] }),
   component: ClientTickets,
 });
 
+export type SupportCategoryItem = {
+  value: string;
+  name_en: string;
+  name_ar: string;
+  default_sla_policy_id?: string | null;
+  responsible_emails?: string;
+};
+
+export type Ticket = {
+  id: string;
+  ticket_no?: string;
+  subject: string;
+  client: string;
+  priority: "low" | "medium" | "high" | "urgent";
+  status: "open" | "pending" | "resolved" | "closed";
+  updated: string;
+  category?: string;
+};
+
+const DEFAULT_CATEGORIES: SupportCategoryItem[] = [
+  { value: "cctv", name_en: "CCTV & Video Surveillance", name_ar: "أنظمة المراقبة والكاميرات CCTV" },
+  { value: "access_control", name_en: "Access Control & Attendance", name_ar: "التحكم في الأبواب وبصمة الحضور" },
+  { value: "fire_alarm", name_en: "Fire Alarm & Safety", name_ar: "إنذار الحريق وأنظمة السلامة" },
+  { value: "networking", name_en: "Network Infrastructure & VoIP", name_ar: "البنية التحتية للشبكات والسنترال" },
+  { value: "datacenter", name_en: "Data Center & UPS", name_ar: "غرف الخوادم وأنظمة الطاقة" },
+  { value: "sound_av", name_en: "Audio Visual & Public Address", name_ar: "الأنظمة الصوتية والمرئية" },
+  { value: "maintenance", name_en: "General Maintenance & SLA", name_ar: "الصيانة الدورية وعقود التشغيل" },
+];
+
 function ClientTickets() {
   const { t, isRtl } = useClientT();
+  const { lang } = useI18n();
+  const isAr = lang === "ar";
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const company = getDemoClientCompany();
-  const [tickets, setTickets] = useState<Ticket[]>(() => demoTickets.filter((tk) => tk.client === company));
+
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [categories, setCategories] = useState<SupportCategoryItem[]>(DEFAULT_CATEGORIES);
+  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [filterCategory, setFilterCategory] = useState<TicketCategory | "all">("all");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
   const [filterPriority, setFilterPriority] = useState<Ticket["priority"] | "all">("all");
   const [open, setOpen] = useState(false);
-  type Category = TicketCategory;
-  const [form, setForm] = useState<{ subject: string; priority: Ticket["priority"]; category: Category; message: string }>({ subject: "", priority: "medium", category: "general", message: "" });
-  const [files, setFiles] = useState<File[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
-  const categories: { value: Category; key: "catBilling" | "catTechnical" | "catAccount" | "catFeature" | "catGeneral" | "catOther" }[] = [
-    { value: "billing", key: "catBilling" },
-    { value: "technical", key: "catTechnical" },
-    { value: "account", key: "catAccount" },
-    { value: "feature", key: "catFeature" },
-    { value: "general", key: "catGeneral" },
-    { value: "other", key: "catOther" },
-  ];
+  const [form, setForm] = useState<{
+    subject: string;
+    priority: Ticket["priority"];
+    category: string;
+    message: string;
+  }>({
+    subject: "",
+    priority: "medium",
+    category: "cctv",
+    message: "",
+  });
 
-  const quickReplies: { key: "qrInvoice" | "qrLogin" | "qrBug" | "qrFeature" | "qrFollowup"; category: Category }[] = [
-    { key: "qrInvoice", category: "billing" },
-    { key: "qrLogin", category: "account" },
-    { key: "qrBug", category: "technical" },
-    { key: "qrFeature", category: "feature" },
-    { key: "qrFollowup", category: "general" },
-  ];
+  const loadCategories = async () => {
+    try {
+      const { data, error } = await (supabase as any)
+        .from("support_categories")
+        .select("value, name_en, name_ar, default_sla_policy_id, responsible_emails")
+        .eq("active", true)
+        .order("sort_order");
 
-  const onPickFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const list = Array.from(e.target.files ?? []);
-    if (list.length) setFiles((prev) => [...prev, ...list]);
-    e.target.value = "";
+      if (!error && data && data.length > 0) {
+        setCategories(data);
+        setForm((prev) => ({ ...prev, category: data[0].value }));
+      }
+    } catch (err) {
+      console.warn("[workspace-tickets] categories load error:", err);
+    }
   };
-  const removeFile = (idx: number) => setFiles((prev) => prev.filter((_, i) => i !== idx));
-  const applyQuick = (key: "qrInvoice" | "qrLogin" | "qrBug" | "qrFeature" | "qrFollowup") => {
-    setForm((f) => ({ ...f, message: (f.message ? f.message + "\n\n" : "") + t(key as any) }));
+
+  const loadTickets = async () => {
+    try {
+      if (!user) return;
+      const { data, error } = await (supabase as any)
+        .from("support_tickets")
+        .select("*")
+        .or(`created_by.eq.${user.id},client_id.eq.${user.id}`)
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        const mapped: Ticket[] = data.map((tk: any) => ({
+          id: tk.id,
+          ticket_no: tk.ticket_no || "TIC",
+          subject: tk.subject,
+          client: user.user_metadata?.full_name || user.email || "Client",
+          priority: tk.priority || "medium",
+          status: tk.status || "open",
+          updated: tk.updated_at ? new Date(tk.updated_at).toLocaleDateString(isAr ? "ar" : "en") : new Date().toLocaleDateString(isAr ? "ar" : "en"),
+          category: tk.category || "general",
+        }));
+        setTickets(mapped);
+      }
+    } catch (err) {
+      console.warn("[workspace-tickets] load error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    void loadCategories();
+    void loadTickets();
+
+    const ticketsChannel = (supabase as any)
+      .channel("workspace_tickets_realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "support_tickets" }, () => {
+        void loadTickets();
+      })
+      .subscribe();
+
+    const categoriesChannel = (supabase as any)
+      .channel("workspace_categories_realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "support_categories" }, () => {
+        void loadCategories();
+      })
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(ticketsChannel);
+      void supabase.removeChannel(categoriesChannel);
+    };
+  }, [user]);
 
   const priorityTone: Record<string, string> = {
     low: "bg-muted text-foreground",
@@ -64,205 +157,265 @@ function ClientTickets() {
     urgent: "bg-destructive/10 text-destructive",
   };
   const statusTone: Record<string, string> = {
-    open: "bg-emerald-100 text-emerald-900",
-    pending: "bg-amber-100 text-amber-900",
+    open: "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-400",
+    in_progress: "bg-blue-100 dark:bg-blue-950/40 text-blue-900 dark:text-blue-400",
+    pending: "bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-400",
+    waiting_client: "bg-purple-100 dark:bg-purple-950/40 text-purple-900 dark:text-purple-400",
     resolved: "bg-blue-500/10 text-blue-700",
     closed: "bg-muted text-foreground",
   };
 
-  const onCreate = (e: FormEvent) => {
+  const onCreate = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.subject.trim()) return;
-    const id = `T-${7100 + tickets.length}`;
-    setTickets([{ id, subject: form.subject, client: company, priority: form.priority, status: "open", updated: new Date().toISOString().slice(0, 10), category: form.category }, ...tickets]);
-    setForm({ subject: "", priority: "medium", category: "general", message: "" });
-    setFiles([]);
-    setOpen(false);
+    if (!form.subject.trim() || !form.message.trim()) return;
+
+    setSubmitting(true);
+    try {
+      const matchedCat = categories.find((c) => c.value === form.category);
+      const payload: any = {
+        subject: form.subject.trim(),
+        priority: form.priority,
+        category: form.category,
+        status: "open",
+        created_by: user?.id,
+        client_id: user?.id,
+        sla_policy_id: matchedCat?.default_sla_policy_id || null,
+      };
+
+      // 1. Insert into support_tickets
+      const { data: ticketData, error: ticketError } = await (supabase as any)
+        .from("support_tickets")
+        .insert(payload)
+        .select()
+        .single();
+
+      if (ticketError) throw ticketError;
+
+      // 2. Insert initial message
+      if (ticketData) {
+        await (supabase as any).from("support_ticket_messages").insert({
+          ticket_id: ticketData.id,
+          author_id: user?.id,
+          body: form.message.trim(),
+          is_internal: false,
+        });
+
+        // 3. Dispatch Email Alerts to Assigned Category Technicians/Engineers
+        await dispatchTicketNotificationEmails({
+          ticketId: ticketData.id,
+          ticketNo: ticketData.ticket_no || "TIC",
+          subject: form.subject.trim(),
+          categoryName: matchedCat ? (isAr ? matchedCat.name_ar : matchedCat.name_en) : form.category,
+          priority: form.priority,
+          clientName: user?.user_metadata?.full_name || user?.email || "Client",
+          clientEmail: user?.email || "",
+          message: form.message.trim(),
+          responsibleEmails: matchedCat?.responsible_emails || "",
+        });
+      }
+
+      toast.success(
+        isAr
+          ? "تم فتح تذكرة الدعم وإشعار الفريق الفني المختص عبر البريد الإلكتروني"
+          : "Support ticket opened & notified to designated technicians!"
+      );
+      setForm({
+        subject: "",
+        priority: "medium",
+        category: categories[0]?.value || "cctv",
+        message: "",
+      });
+      setOpen(false);
+      void loadTickets();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to create support ticket");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const getCategoryLabel = (val?: string) => {
+    if (!val) return "—";
+    const found = categories.find((c) => c.value === val);
+    if (found) return isAr ? found.name_ar || found.name_en : found.name_en;
+    return val;
   };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return tickets.filter((tk) => {
-      const cat = (tk.category ?? "general") as TicketCategory;
-      if (filterCategory !== "all" && cat !== filterCategory) return false;
+      if (filterCategory !== "all" && tk.category !== filterCategory) return false;
       if (filterPriority !== "all" && tk.priority !== filterPriority) return false;
-      if (q && !(tk.subject.toLowerCase().includes(q) || tk.id.toLowerCase().includes(q))) return false;
+      if (q && !(tk.subject.toLowerCase().includes(q) || (tk.ticket_no && tk.ticket_no.toLowerCase().includes(q)))) return false;
       return true;
     });
   }, [tickets, query, filterCategory, filterPriority]);
-  const filtersActive = filterCategory !== "all" || filterPriority !== "all" || query.trim().length > 0;
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
+    <Card className="rounded-2xl border shadow-xs" dir={isRtl ? "rtl" : "ltr"}>
+      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0 flex-wrap pb-4">
         <div>
-          <CardTitle className="font-display text-xl">{t("tickets")}</CardTitle>
-          <p className="text-xs text-muted-foreground mt-1">{t("ticketsTagline")}</p>
+          <CardTitle className="font-display text-xl flex items-center gap-2">
+            <LifeBuoy className="h-5 w-5 text-accent" />
+            <span>{isAr ? "تذاكر الدعم والصيانة" : "Support & Maintenance Tickets"}</span>
+          </CardTitle>
+          <p className="text-xs text-muted-foreground mt-1">
+            {isAr
+              ? "افتح وتابع تذاكر الصيانة للأنظمة الأمنية والشبكات ومتابعة المهندسين المسؤولين."
+              : "Open and track maintenance tickets for security systems, networks, and assignees."}
+          </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="h-4 w-4 me-1" /> {t("newTicket")}</Button>
+            <Button size="sm" className="rounded-xl">
+              <Plus className={`h-4 w-4 ${isRtl ? "ms-1" : "me-1"}`} />
+              <span>{isAr ? "فتح تذكرة جديدة" : "Open New Ticket"}</span>
+            </Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>{t("newTicket")}</DialogTitle></DialogHeader>
-            <form onSubmit={onCreate} className="space-y-3">
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>{isAr ? "فتح تذكرة دعم جديدة" : "Open New Support Ticket"}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={onCreate} className="space-y-4 py-2">
               <div className="space-y-1.5">
-                <Label htmlFor="subject">{t("subject")}</Label>
-                <Input id="subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} required />
+                <Label>{isAr ? "الموضوع / عنوان المشكلة *" : "Subject / Issue Summary *"}</Label>
+                <Input
+                  value={form.subject}
+                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                  placeholder={isAr ? "مثال: عطل في كاميرات البوابة الرئيسية" : "e.g. CCTV camera offline at Gate 1"}
+                  required
+                />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>{t("category")}</Label>
-                  <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as Category })}>
+                  <Label>{isAr ? "فئة النظام / الخدمة *" : "System Category *"}</Label>
+                  <Select value={form.category} onValueChange={(v: string) => setForm({ ...form, category: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {categories.map((c) => (
-                        <SelectItem key={c.value} value={c.value}>{t(c.key as any)}</SelectItem>
+                        <SelectItem key={c.value} value={c.value}>
+                          {isAr ? c.name_ar || c.name_en : c.name_en}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>{t("priority")}</Label>
-                  <Select value={form.priority} onValueChange={(v) => setForm({ ...form, priority: v as Ticket["priority"] })}>
+                  <Label>{isAr ? "درجة الأولوية" : "Priority Level"}</Label>
+                  <Select value={form.priority} onValueChange={(v: any) => setForm({ ...form, priority: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {(["low", "medium", "high", "urgent"] as const).map((p) => (
-                        <SelectItem key={p} value={p}>{t(p as any)}</SelectItem>
-                      ))}
+                      <SelectItem value="low">{isAr ? "منخفضة (Low)" : "Low"}</SelectItem>
+                      <SelectItem value="medium">{isAr ? "متوسطة (Medium)" : "Medium"}</SelectItem>
+                      <SelectItem value="high">{isAr ? "عالية (High)" : "High"}</SelectItem>
+                      <SelectItem value="urgent">{isAr ? "حرجة / طارئة (Urgent)" : "Urgent"}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5 text-primary" /> {t("quickReplies")}</Label>
-                <div className="flex flex-wrap gap-1.5">
-                  {quickReplies.map((q) => (
-                    <Button key={q.key} type="button" size="sm" variant="outline" className="h-7 text-xs" onClick={() => applyQuick(q.key)}>
-                      {t(("cat" + q.category.charAt(0).toUpperCase() + q.category.slice(1)) as any)}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="msg">{t("message")}</Label>
-                <Textarea id="msg" rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>{t("attachments")}</Label>
-                <label className="flex items-center justify-center gap-2 rounded-md border border-dashed border-input px-3 py-3 text-sm text-muted-foreground hover:bg-muted/40 cursor-pointer transition">
-                  <Paperclip className="h-4 w-4" />
-                  <span>{t("attachFiles")}</span>
-                  <input type="file" multiple className="hidden" onChange={onPickFiles} />
-                </label>
-                {files.length > 0 && (
-                  <ul className="space-y-1 pt-1">
-                    {files.map((f, i) => (
-                      <li key={i} className="flex items-center justify-between gap-2 rounded-md bg-muted/50 px-2 py-1 text-xs">
-                        <span className="truncate" dir={isRtl ? "rtl" : "ltr"}>{f.name} <span className="text-muted-foreground">({Math.round(f.size / 1024)} KB)</span></span>
-                        <button type="button" onClick={() => removeFile(i)} className="text-muted-foreground hover:text-destructive shrink-0" aria-label="remove">
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <Label>{isAr ? "تفاصيل المشكلة والموقع أو الأرقام التسلسلية للأجهزة *" : "Issue Details & Device Serial Numbers *"}</Label>
+                <Textarea
+                  rows={4}
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  placeholder={isAr ? "صف المشكلة بدقة واذكر موقع المبنى، الجهاز أو الأعطال الظاهرة..." : "Provide branch location, device models, serial numbers or observed error..."}
+                  required
+                />
               </div>
               <DialogFooter>
-                <Button type="submit">{t("submitTicket")}</Button>
+                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                  {isAr ? "إلغاء" : "Cancel"}
+                </Button>
+                <Button type="submit" disabled={submitting}>
+                  {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+                  <span>{isAr ? "إرسال التذكرة" : "Submit Ticket"}</span>
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </CardHeader>
-      <CardContent className="overflow-x-auto">
-        {tickets.length > 0 && (
-          <div className="flex flex-col sm:flex-row gap-2 sm:items-center mb-4">
-            <div className="relative flex-1 min-w-0">
-              <Search className={`absolute top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground ${isRtl ? "right-2.5" : "left-2.5"}`} />
-              <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("searchTickets")} className={isRtl ? "pr-8" : "pl-8"} />
-            </div>
-            <Select value={filterCategory} onValueChange={(v) => setFilterCategory(v as any)}>
-              <SelectTrigger className="sm:w-[180px]"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("allCategories")}</SelectItem>
-                {categories.map((c) => (
-                  <SelectItem key={c.value} value={c.value}>{t(c.key as any)}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={filterPriority} onValueChange={(v) => setFilterPriority(v as any)}>
-              <SelectTrigger className="sm:w-[160px]"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("allPriorities")}</SelectItem>
-                {(["low", "medium", "high", "urgent"] as const).map((p) => (
-                  <SelectItem key={p} value={p}>{t(p as any)}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {filtersActive && (
-              <Button type="button" variant="ghost" size="sm" onClick={() => { setQuery(""); setFilterCategory("all"); setFilterPriority("all"); }}>
-                <X className="h-4 w-4 me-1" /> {t("clearFilters")}
-              </Button>
-            )}
-          </div>
-        )}
-        {tickets.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-6 text-center">{t("noTickets")}</p>
-        ) : filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-6 text-center">{t("noResults")}</p>
-        ) : (
-          <>
-          {/* Mobile card grid */}
-          <div className="grid gap-3 sm:hidden">
-            {filtered.map((tk) => (
-              <button
-                key={tk.id}
-                onClick={() => navigate({ to: "/dashboard/workspace/tickets/$id", params: { id: tk.id } })}
-                className="text-start rounded-xl border bg-card p-4 shadow-sm hover:shadow-md active:scale-[0.99] transition"
-              >
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="font-mono text-[11px] text-muted-foreground">{tk.id}</span>
-                  <span className="text-[11px] text-muted-foreground">{tk.updated}</span>
-                </div>
-                <div className="font-medium text-sm mb-2 line-clamp-2">{tk.subject}</div>
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <Badge className={`${priorityTone[tk.priority]} border-0 capitalize text-[10px]`}>{t(tk.priority as any)}</Badge>
-                  <Badge className={`${statusTone[tk.status]} border-0 capitalize text-[10px]`}>{t(tk.status as any)}</Badge>
-                </div>
-              </button>
-            ))}
-          </div>
 
-          <Table className="hidden sm:table">
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("id")}</TableHead>
-                <TableHead>{t("subject")}</TableHead>
-                <TableHead>{t("category")}</TableHead>
-                <TableHead>{t("priority")}</TableHead>
-                <TableHead>{t("status")}</TableHead>
-                <TableHead className="text-end">{t("updated")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((tk) => {
-                const cat = (tk.category ?? "general") as TicketCategory;
-                const catKey = "cat" + cat.charAt(0).toUpperCase() + cat.slice(1);
-                return (
-                <TableRow key={tk.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate({ to: "/dashboard/workspace/tickets/$id", params: { id: tk.id } })}>
-                  <TableCell className="font-mono text-xs">{tk.id}</TableCell>
-                  <TableCell className="text-sm font-medium">{tk.subject}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{t(catKey as any)}</TableCell>
-                  <TableCell><Badge className={`${priorityTone[tk.priority]} border-0 capitalize`}>{t(tk.priority as any)}</Badge></TableCell>
-                  <TableCell><Badge className={`${statusTone[tk.status]} border-0 capitalize`}>{t(tk.status as any)}</Badge></TableCell>
-                  <TableCell className="text-end text-sm text-muted-foreground">{tk.updated}</TableCell>
+      <CardContent className="space-y-4">
+        {/* Search & Filter Bar */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Search className="h-4 w-4 absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder={isAr ? "بحث في تذاكر الدعم..." : "Search tickets..."}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="ps-9 h-9 text-xs rounded-xl"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Select value={filterCategory} onValueChange={(v: any) => setFilterCategory(v)}>
+              <SelectTrigger className="w-40 h-9 text-xs rounded-xl"><SelectValue placeholder="Category" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{isAr ? "كل الفئات" : "All Categories"}</SelectItem>
+                {categories.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>
+                    {isAr ? c.name_ar || c.name_en : c.name_en}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterPriority} onValueChange={(v: any) => setFilterPriority(v)}>
+              <SelectTrigger className="w-32 h-9 text-xs rounded-xl"><SelectValue placeholder="Priority" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{isAr ? "كل الأولويات" : "All Priorities"}</SelectItem>
+                <SelectItem value="low">{isAr ? "منخفضة" : "Low"}</SelectItem>
+                <SelectItem value="medium">{isAr ? "متوسطة" : "Medium"}</SelectItem>
+                <SelectItem value="high">{isAr ? "عالية" : "High"}</SelectItem>
+                <SelectItem value="urgent">{isAr ? "حرجة" : "Urgent"}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="p-8 text-center text-xs text-muted-foreground">
+            <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2 text-accent" />
+            <span>{isAr ? "جارٍ جلب تذاكر الدعم..." : "Loading your tickets..."}</span>
+          </div>
+        ) : filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-6 text-center">{isAr ? "لا توجد تذاكر مطابقة." : "No tickets found."}</p>
+        ) : (
+          <div className="rounded-xl border overflow-hidden">
+            <Table>
+              <TableHeader className="bg-muted/40">
+                <TableRow>
+                  <TableHead className="w-28">{isAr ? "رقم التذكرة" : "Ticket No"}</TableHead>
+                  <TableHead>{isAr ? "الموضوع" : "Subject"}</TableHead>
+                  <TableHead>{isAr ? "الفئة" : "Category"}</TableHead>
+                  <TableHead>{isAr ? "الأولوية" : "Priority"}</TableHead>
+                  <TableHead>{isAr ? "الحالة" : "Status"}</TableHead>
+                  <TableHead className="text-end">{isAr ? "آخر تحديث" : "Updated"}</TableHead>
                 </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-          </>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((tk) => (
+                  <TableRow
+                    key={tk.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => navigate({ to: "/dashboard/workspace/tickets/$id", params: { id: tk.id } })}
+                  >
+                    <TableCell className="font-mono text-xs font-bold text-accent">{tk.ticket_no || "TIC"}</TableCell>
+                    <TableCell className="text-xs sm:text-sm font-medium">{tk.subject}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground font-medium">
+                      <Badge variant="outline" className="text-[10px]">
+                        {getCategoryLabel(tk.category)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell><Badge className={`${priorityTone[tk.priority] || "bg-muted"} border-0 capitalize text-[10px]`}>{tk.priority}</Badge></TableCell>
+                    <TableCell><Badge className={`${statusTone[tk.status] || "bg-muted"} border-0 capitalize text-[10px]`}>{tk.status}</Badge></TableCell>
+                    <TableCell className="text-end text-xs text-muted-foreground font-mono">{tk.updated}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </CardContent>
     </Card>

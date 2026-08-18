@@ -1,116 +1,177 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Search, FileText, LifeBuoy, Send } from "lucide-react";
-import { demoRequests, demoQuotations, demoTickets } from "@/data/demo";
-import { useClientT, getDemoClientCompany } from "@/lib/client-i18n";
+import { Search, FileText, LifeBuoy, Send, Loader2 } from "lucide-react";
+import { useClientT } from "@/lib/client-i18n";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/dashboard/workspace/track")({
   component: TrackPage,
 });
 
 function TrackPage() {
-  const { t } = useClientT();
-  const company = getDemoClientCompany();
+  const { t, isRtl } = useClientT();
   const [q, setQ] = useState("");
+  const [searching, setSearching] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [result, setResult] = useState<any>(null);
 
-  const result = useMemo(() => {
-    const id = q.trim().toUpperCase();
-    if (!id) return null;
-    const req = demoRequests.find((r) => r.id.toUpperCase() === id);
-    if (req) return { type: "request" as const, data: req };
-    const order = demoQuotations.find((o) => o.id.toUpperCase() === id && o.client === company);
-    if (order) return { type: "order" as const, data: order };
-    const ticket = demoTickets.find((tk) => tk.id.toUpperCase() === id && tk.client === company);
-    if (ticket) return { type: "ticket" as const, data: ticket };
-    return { type: "none" as const };
-  }, [q, company]);
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = q.trim();
+    if (!query) return;
+
+    setSearching(true);
+    setSearched(true);
+    setResult(null);
+
+    try {
+      // 1. Try search in support_tickets by ticket_no or id
+      const { data: ticket } = await supabase
+        .from("support_tickets")
+        .select("*")
+        .or(`ticket_no.ilike.%${query}%,id.eq.${query}`)
+        .maybeSingle();
+
+      if (ticket) {
+        setResult({ type: "ticket", data: ticket });
+        return;
+      }
+
+      // 2. Try search in quotes by id
+      const { data: quote } = await supabase
+        .from("quotes")
+        .select("*")
+        .eq("id", query)
+        .maybeSingle();
+
+      if (quote) {
+        setResult({ type: "quote", data: quote });
+        return;
+      }
+
+      // 3. Try search in leads by id
+      const { data: lead } = await supabase
+        .from("leads")
+        .select("*")
+        .eq("id", query)
+        .maybeSingle();
+
+      if (lead) {
+        setResult({ type: "lead", data: lead });
+        return;
+      }
+
+      setResult({ type: "none" });
+    } catch (err) {
+      console.warn("[track] search error:", err);
+      setResult({ type: "none" });
+    } finally {
+      setSearching(false);
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6" dir={isRtl ? "rtl" : "ltr"}>
+      <Card className="rounded-2xl border shadow-xs">
         <CardHeader>
           <CardTitle className="font-display text-xl flex items-center gap-2">
-            <Search className="h-5 w-5 text-accent" /> {t("track")}
+            <Search className="h-5 w-5 text-accent" />
+            <span>{t("track", "تتبع الطلبات وعروض الأسعار")}</span>
           </CardTitle>
-          <p className="text-xs text-muted-foreground">{t("trackTagline")}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {t("trackTagline", "أدخل رقم الطلب أو التذكرة أو كود المتابعة لمعرفة الحالة الحالية")}
+          </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={(e) => { e.preventDefault(); setSearched(true); }} className="flex flex-col sm:flex-row gap-2 max-w-xl">
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("trackPlaceholder")} className="flex-1" />
-            <Button type="submit"><Search className="h-4 w-4 me-2" />{t("trackSearch")}</Button>
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 max-w-xl">
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t("trackPlaceholder", "e.g. TIC-1042 or Quote UUID...")}
+              className="flex-1 rounded-xl text-xs sm:text-sm"
+            />
+            <Button type="submit" disabled={searching} className="rounded-xl">
+              {searching ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : <Search className="h-4 w-4 me-2" />}
+              <span>{t("trackSearch", "بحث ومتابعة")}</span>
+            </Button>
           </form>
         </CardContent>
       </Card>
 
-      {searched && result && result.type === "none" && (
-        <Card><CardContent className="py-8 text-center text-sm text-muted-foreground">{t("trackNoMatch")}</CardContent></Card>
+      {searched && result?.type === "none" && (
+        <Card className="rounded-2xl border">
+          <CardContent className="py-8 text-center text-sm text-muted-foreground">
+            {t("trackNoMatch", "لم يتم العثور على سجل مطابق لرقم التتبع المدخل.")}
+          </CardContent>
+        </Card>
       )}
 
-      {searched && result && result.type === "request" && (
-        <Card>
+      {searched && result?.type === "ticket" && (
+        <Card className="rounded-2xl border shadow-xs">
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2"><Send className="h-4 w-4 text-accent" /> {t("trackTypeRequest")}</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2">
+              <LifeBuoy className="h-4 w-4 text-accent" />
+              <span>{t("trackTypeTicket", "تذكرة دعم فني")}</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="font-medium">{result.data.title}</div>
-                <div className="text-xs text-muted-foreground">{result.data.id} · {result.data.service} · {t("updated")} {result.data.updatedAt}</div>
+                <div className="font-bold text-sm text-foreground">{result.data.subject}</div>
+                <div className="text-xs text-muted-foreground font-mono mt-0.5">
+                  {result.data.ticket_no || result.data.id.slice(0, 8)} · {new Date(result.data.created_at).toLocaleDateString()}
+                </div>
               </div>
-              <Badge className="capitalize bg-accent/15 text-accent border-0">{t(result.data.status as any)}</Badge>
+              <Badge variant="outline" className="capitalize text-xs">
+                {result.data.status}
+              </Badge>
             </div>
-            <p className="text-sm text-muted-foreground">{result.data.description}</p>
-            <div>
-              <div className="text-xs text-muted-foreground mb-1">{t("progress")}: {result.data.progress}%</div>
-              <Progress value={result.data.progress} />
+            <div className="pt-2">
+              <Button asChild size="sm" variant="outline" className="rounded-xl text-xs">
+                <Link to="/dashboard/workspace/tickets/$id" params={{ id: result.data.id }}>
+                  {t("viewDetails", "عرض تفاصيل ومحادثة التذكرة")}
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {searched && result && result.type === "order" && (
-        <Card>
+      {searched && result?.type === "quote" && (
+        <Card className="rounded-2xl border shadow-xs">
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4 text-accent" /> {t("trackTypeOrder")}</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2">
+              <FileText className="h-4 w-4 text-accent" />
+              <span>{t("trackTypeOrder", "عرض سعر / طلب")}</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="font-medium">{result.data.service}</div>
-                <div className="text-xs text-muted-foreground">{result.data.id} · {result.data.date}</div>
+                <div className="font-bold text-sm text-foreground">{result.data.service_name || "Enterprise Quotation"}</div>
+                <div className="text-xs text-muted-foreground font-mono mt-0.5">
+                  #{result.data.id.slice(0, 8)} · {new Date(result.data.created_at).toLocaleDateString()}
+                </div>
               </div>
-              <Badge className="capitalize bg-blue-500/10 text-blue-700 border-0">{t(result.data.status as any)}</Badge>
+              <Badge variant="secondary" className="capitalize text-xs">
+                {result.data.status}
+              </Badge>
             </div>
-            <div className="text-sm">{t("amount")}: <span className="font-semibold">${result.data.amount.toLocaleString()} {result.data.currency}</span></div>
-            <Button asChild size="sm" variant="outline">
-              <Link to="/dashboard/workspace/orders/$id" params={{ id: result.data.id }}>{t("viewDetails")}</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {searched && result && result.type === "ticket" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2"><LifeBuoy className="h-4 w-4 text-accent" /> {t("trackTypeTicket")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="font-medium">{result.data.subject}</div>
-                <div className="text-xs text-muted-foreground">{result.data.id} · {t("updated")} {result.data.updated}</div>
-              </div>
-              <Badge className="capitalize bg-amber-100 text-amber-900 border-0">{t(result.data.status as any)}</Badge>
+            <div className="text-xs">
+              <span className="text-muted-foreground">{t("amount", "المبلغ")}: </span>
+              <span className="font-mono font-bold text-foreground">${Number(result.data.total || 0).toLocaleString()} {result.data.currency || "USD"}</span>
             </div>
-            <Button asChild size="sm" variant="outline">
-              <Link to="/dashboard/workspace/tickets/$id" params={{ id: result.data.id }}>{t("viewDetails")}</Link>
-            </Button>
+            <div className="pt-2">
+              <Button asChild size="sm" variant="outline" className="rounded-xl text-xs">
+                <Link to="/dashboard/workspace/orders/$id" params={{ id: result.data.id }}>
+                  {t("viewDetails", "عرض وتحميل عرض السعر")}
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}

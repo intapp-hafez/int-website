@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Copy, Layers, Pencil, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
-import { demoUsers } from "@/data/demo";
+import { supabase } from "@/integrations/supabase/client";
 import { useAdminT } from "@/lib/admin-i18n";
 import {
   ADMIN_PAGES,
@@ -118,7 +118,31 @@ export function PermissionPresets({ activeUserId }: { activeUserId?: string }) {
   };
 
   const total = ADMIN_PAGES.length * PERM_ACTIONS.length;
-  const eligible = demoUsers.filter((u) => u.role !== "admin");
+  const [eligible, setEligible] = useState<{ id: string; name: string; role: string; email?: string }[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("user_roles")
+          .select("id, user_id, role, display_name")
+          .neq("role", "admin");
+        if (data) {
+          const staffOnly = data.filter((r: any) => r.role !== "client" && r.role !== "client_user");
+          setEligible(
+            staffOnly.map((r: any, idx: number) => ({
+              id: r.user_id || r.id,
+              name: r.display_name?.trim() || `Staff Member #${idx + 1}`,
+              role: String(r.role || "user"),
+              email: `${r.role || "user"}@integratedtechnics.com`,
+            }))
+          );
+        }
+      } catch (err) {
+        console.warn("[PermissionPresets] Error loading users:", err);
+      }
+    })();
+  }, []);
 
   const toggleUser = (id: string) =>
     setTargetUsers((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));

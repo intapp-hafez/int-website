@@ -247,6 +247,7 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
   const [perms, setPerms] = useState<PermsMap>({});
   const [customPresets, setCustomPresets] = useState<PermPreset[]>([]);
   const [grants, setGrants] = useState<AccessGrant[]>([]);
+  const [userRolesMap, setUserRolesMap] = useState<Record<string, string>>({});
   const [, setTick] = useState(0);
 
   const refreshGrants = async () => {
@@ -274,6 +275,19 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     setGrants(mapped);
   };
 
+  const refreshRoles = async () => {
+    try {
+      const { data } = await supabase.from("user_roles").select("user_id, role");
+      if (data) {
+        const m: Record<string, string> = {};
+        for (const r of data as any[]) {
+          if (r.user_id) m[r.user_id] = r.role;
+        }
+        setUserRolesMap(m);
+      }
+    } catch {}
+  };
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
@@ -293,11 +307,15 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     } catch {}
     
     void refreshGrants();
+    void refreshRoles();
     
     const channel = supabase
       .channel("access_grants_changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "access_grants" }, () => {
         void refreshGrants();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_roles" }, () => {
+        void refreshRoles();
       })
       .subscribe();
       
@@ -333,8 +351,9 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       // Backfill any missing pages
       base = { ...defaultUserPerms(), ...existing };
     } else {
+      const liveRole = userRolesMap[userId];
       const matchedUser = demoUsers.find((u) => u.id === userId);
-      base = defaultPermsForRole(matchedUser?.role);
+      base = defaultPermsForRole(liveRole || matchedUser?.role);
     }
     // Layer active time-limited grants on top; expired ones simply vanish.
     const now = Date.now();
@@ -554,6 +573,10 @@ export function useCanAccess(pageKey: string) {
   return useMemo(() => {
     if (!user) return { view: false, add: false, edit: false, delete: false } as PagePerms;
     if (user.role === "admin") return allPerms();
+    if (user.id) {
+      const perms = getUserPerms(user.id);
+      if (perms && perms[pageKey]) return perms[pageKey];
+    }
     const matched = demoUsers.find((u) => u.email.toLowerCase() === user.email.toLowerCase());
     if (!matched) return noPerms();
     return getUserPerms(matched.id)[pageKey] ?? noPerms();

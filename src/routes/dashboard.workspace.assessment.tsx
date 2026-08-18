@@ -15,6 +15,7 @@ import { Sparkles, ArrowLeft, ArrowRight, FileText, CheckCircle2, RefreshCcw, Se
 import { toast } from "sonner";
 import { BUSINESS_BENEFITS } from "@/data/recommendation-seed";
 import type { Assessment, RecommendedSolution } from "@/lib/recommendation-types";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/dashboard/workspace/assessment")({
   head: () => ({ meta: [{ title: "Smart Assessment — Workspace" }, { name: "description", content: "Answer a few business questions and get tailored technology recommendations." }] }),
@@ -126,13 +127,52 @@ function AssessmentPage() {
     setConsultDone(false);
     setConsultOpen(true);
   }
-  function submitConsultation() {
+
+  async function submitConsultation() {
     const { name, email, preferred } = consultForm;
     if (!name.trim()) return toast.error(isAr ? "الاسم مطلوب" : "Name is required");
     if (!email.includes("@")) return toast.error(isAr ? "بريد إلكتروني غير صالح" : "Invalid email");
     if (!preferred) return toast.error(isAr ? "اختر وقتاً مقترحاً" : "Choose a preferred time");
-    saveAndReturn();
-    setConsultDone(true);
+
+    const saved = saveAndReturn();
+
+    try {
+      // 1. Insert into Supabase leads
+      const recoSummary = results.map((r: any) => r.solution?.name_en || r.name_en || "").filter(Boolean).join(", ");
+      await supabase.from("leads").insert({
+        full_name: name.trim(),
+        email: email.trim(),
+        company: consultForm.company || clientName || "Enterprise Client",
+        category: "Smart Solution Assessment Consultation",
+        message: `Client requested consultation following Smart Assessment (${chosenBT?.name_en || businessTypeKey}). Preferred Slot: ${new Date(preferred).toLocaleString()}. Top Recommendations: ${recoSummary}`,
+        status: "new",
+      });
+
+      // 2. Persist assessment to client_assessments
+      await supabase.from("client_assessments").insert({
+        business_type_key: businessTypeKey,
+        project_name: projectName || "Untitled Project",
+        client_name: clientName || name,
+        answers: answers as any,
+        results: results as any,
+        status: "consultation_requested",
+      });
+
+      // 3. Create Admin notification
+      await supabase.from("admin_notifications").insert({
+        type: "lead",
+        title: `New Assessment Consultation: ${name}`,
+        message: `Project: ${projectName || "General"} · ${consultForm.company || "Enterprise"} · Preferred: ${new Date(preferred).toLocaleDateString()}`,
+        href: "/dashboard/admin/leads",
+        read: false,
+      });
+
+      toast.success(isAr ? "تم إرسال طلب الاستشارة بنجاح" : "Consultation request dispatched to engineering team");
+    } catch (err: any) {
+      console.warn("[assessment] Supabase lead insertion warning:", err);
+    } finally {
+      setConsultDone(true);
+    }
   }
 
   function revisit(a: Assessment) {

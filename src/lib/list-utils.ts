@@ -27,5 +27,7 @@ export function paginate<T>(items: T[], page: number, pageSize: number) {
     page: safePage,
     start,
     end: Math.min(start + pageSize, items.length),
+    total: items.length,
+    totalPages: pageCount,
   };
 }

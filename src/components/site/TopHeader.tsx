@@ -42,12 +42,13 @@ export function TopHeader() {
           </a>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-3 ms-auto shrink-0">
-
-          <Link to="/track-quote" className="inline-flex items-center gap-1 hover:text-accent transition-colors min-h-[32px] px-1">
-            <Search className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">{lang === "ar" ? "تتبع العرض" : "Track Quote"}</span>
-          </Link>
-          <MiniCart />
+          {settings.headerIcons?.tracking !== false && (
+            <Link to="/track-quote" className="inline-flex items-center gap-1 hover:text-accent transition-colors min-h-[32px] px-1">
+              <Search className="h-3.5 w-3.5" />
+              <span className="hidden md:inline">{lang === "ar" ? "تتبع العرض" : "Track Quote"}</span>
+            </Link>
+          )}
+          {settings.headerIcons?.cart !== false && <MiniCart />}
           <div role="group" aria-label="Language switcher" className="inline-flex items-center rounded-md border border-primary-foreground/30 overflow-hidden">
             <Globe className="h-3.5 w-3.5 mx-1 opacity-80 hidden sm:inline" aria-hidden="true" />
             <button

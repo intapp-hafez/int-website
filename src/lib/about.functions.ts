@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createMiddleware } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { supabase } from "@/integrations/supabase/client";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Bilingual = z.object({ en: z.string().max(2000), ar: z.string().max(2000) });
@@ -56,7 +56,7 @@ export const saveAboutContent = createServerFn({ method: "POST" })
   .inputValidator((input) => SaveSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { userId } = context as { userId: string };
-    const { data: roleRow, error: roleErr } = await supabaseAdmin
+    const { data: roleRow, error: roleErr } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
@@ -69,7 +69,7 @@ export const saveAboutContent = createServerFn({ method: "POST" })
     if (!roleRow) {
       throw new Error("Admin role required to edit About content");
     }
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from("about_content")
       .upsert({
         id: "main",

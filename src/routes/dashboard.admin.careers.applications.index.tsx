@@ -74,10 +74,14 @@ function ApplicationsList() {
       try {
         const data = await listApplications();
         setApps((data as any) ?? []);
-      } catch { setApps([]); }
+      } catch (e: any) {
+        setApps([]);
+        toast.error(lang === "ar" ? `تعذر تحميل الطلبات: ${e?.message ?? ""}` : `Could not load applications: ${e?.message ?? ""}`);
+      }
       finally { setLoading(false); }
     })();
   }, [can.view]);
+
 
   const jobs = useMemo(() => {
     const map = new Map<string, string>();

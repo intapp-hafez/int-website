@@ -20,20 +20,23 @@ import {
   Save,
   ExternalLink,
   Pencil,
-  Table as TableIcon,
-  LayoutGrid,
   Calendar,
   Sparkles,
   Search,
   Eye,
   FileText,
+  ChevronDown,
 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { ViewToggle } from "@/components/admin/ViewToggle";
+import { useListSearch, validateListSearch } from "@/components/admin/useListSearch";
 
 export const Route = createFileRoute("/dashboard/admin/news")({
   head: () => ({ meta: [{ title: "News & Articles — Admin" }] }),
+  validateSearch: validateListSearch,
   component: NewsAdminPage,
 });
 
@@ -65,7 +68,8 @@ function NewsAdminPage() {
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [uploading, setUploading] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const { view } = useListSearch({ defaultView: "table" });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
@@ -115,6 +119,7 @@ function NewsAdminPage() {
       });
       toast.success("News article published successfully");
       setDraft(emptyDraft);
+      setIsAddOpen(false);
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to add post");
     } finally {
@@ -244,146 +249,168 @@ function NewsAdminPage() {
         </div>
       </div>
 
-      {/* Add New Post Accordion/Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-display text-lg flex items-center gap-2">
-            <Plus className="h-5 w-5 text-accent" /> Add New Post
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Title (English) *</Label>
-              <Input
-                value={draft.title_en}
-                onChange={(e) => setDraft({ ...draft, title_en: e.target.value })}
-                placeholder="e.g. Integrated Technics Expands Infrastructure Division"
-              />
+      {/* Add New Post Collapsible Card (Collapsed by default) */}
+      <Collapsible open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <Card className="transition-all">
+          <CardHeader
+            className="cursor-pointer select-none py-4 hover:bg-muted/30 transition-colors"
+            onClick={() => setIsAddOpen(!isAddOpen)}
+          >
+            <div className="flex items-center justify-between">
+              <CardTitle className="font-display text-lg flex items-center gap-2">
+                <Plus className="h-5 w-5 text-accent" /> Add New Post
+              </CardTitle>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsAddOpen(!isAddOpen);
+                }}
+              >
+                {isAddOpen ? "Hide Form" : "New Post Form"}
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAddOpen ? "rotate-180" : ""}`} />
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label>العنوان (عربي) *</Label>
-              <Input
-                dir="rtl"
-                value={draft.title_ar}
-                onChange={(e) => setDraft({ ...draft, title_ar: e.target.value })}
-                placeholder="مثال: إنترجريتد تكنيكس توسع قطاع البنية التحتية"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Category (EN)</Label>
-              <Input
-                value={draft.category_en}
-                onChange={(e) => setDraft({ ...draft, category_en: e.target.value })}
-                placeholder="Projects, Partnerships, Awards, Corporate..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>الفئة (عربي)</Label>
-              <Input
-                dir="rtl"
-                value={draft.category_ar}
-                onChange={(e) => setDraft({ ...draft, category_ar: e.target.value })}
-                placeholder="مشاريع، شراكات، جوائز، أخبار الشركة..."
-              />
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <Label>Slug (URL Identifier)</Label>
-              <Input
-                value={draft.slug}
-                onChange={(e) => setDraft({ ...draft, slug: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "-") })}
-                placeholder="auto-generated from title if empty"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Excerpt (EN)</Label>
-              <Textarea
-                rows={2}
-                value={draft.excerpt_en}
-                onChange={(e) => setDraft({ ...draft, excerpt_en: e.target.value })}
-                placeholder="Short summary for preview cards..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>مقتطف ملخص (عربي)</Label>
-              <Textarea
-                dir="rtl"
-                rows={2}
-                value={draft.excerpt_ar}
-                onChange={(e) => setDraft({ ...draft, excerpt_ar: e.target.value })}
-                placeholder="ملخص قصير يظهر في بطاقات المعاينة..."
-              />
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <Label>Body Content (English)</Label>
-              <RichTextEditor
-                dir="ltr"
-                value={draft.body_en}
-                onChange={(val) => setDraft({ ...draft, body_en: val })}
-                placeholder="Full article content in English..."
-              />
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <Label>المحتوى بالتفصيل (عربي)</Label>
-              <RichTextEditor
-                dir="rtl"
-                value={draft.body_ar}
-                onChange={(val) => setDraft({ ...draft, body_ar: val })}
-                placeholder="محتوى المقال أو الخبر بالتفصيل باللغة العربية..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Cover Image (Upload file or URL)</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  value={draft.image_url}
-                  onChange={(e) => setDraft({ ...draft, image_url: e.target.value })}
-                  placeholder="https://images.unsplash.com/..."
-                  className="flex-1"
-                />
-                <label className="cursor-pointer shrink-0">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => void handleUpload(e.target.files?.[0] || null, "draft")}
+          </CardHeader>
+          <CollapsibleContent>
+            <CardContent className="space-y-4 pt-0">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Title (English) *</Label>
+                  <Input
+                    value={draft.title_en}
+                    onChange={(e) => setDraft({ ...draft, title_en: e.target.value })}
+                    placeholder="e.g. Integrated Technics Expands Infrastructure Division"
                   />
-                  <Button type="button" variant="outline" size="sm" asChild disabled={uploading === "draft"}>
-                    <span>
-                      {uploading === "draft" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4 me-1.5" />}
-                      Upload
-                    </span>
-                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <Label>العنوان (عربي) *</Label>
+                  <Input
+                    dir="rtl"
+                    value={draft.title_ar}
+                    onChange={(e) => setDraft({ ...draft, title_ar: e.target.value })}
+                    placeholder="مثال: إنترجريتد تكنيكس توسع قطاع البنية التحتية"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Category (EN)</Label>
+                  <Input
+                    value={draft.category_en}
+                    onChange={(e) => setDraft({ ...draft, category_en: e.target.value })}
+                    placeholder="Projects, Partnerships, Awards, Corporate..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>الفئة (عربي)</Label>
+                  <Input
+                    dir="rtl"
+                    value={draft.category_ar}
+                    onChange={(e) => setDraft({ ...draft, category_ar: e.target.value })}
+                    placeholder="مشاريع، شراكات، جوائز، أخبار الشركة..."
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Slug (URL Identifier)</Label>
+                  <Input
+                    value={draft.slug}
+                    onChange={(e) => setDraft({ ...draft, slug: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "-") })}
+                    placeholder="auto-generated from title if empty"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Excerpt (EN)</Label>
+                  <Textarea
+                    rows={2}
+                    value={draft.excerpt_en}
+                    onChange={(e) => setDraft({ ...draft, excerpt_en: e.target.value })}
+                    placeholder="Short summary for preview cards..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>مقتطف ملخص (عربي)</Label>
+                  <Textarea
+                    dir="rtl"
+                    rows={2}
+                    value={draft.excerpt_ar}
+                    onChange={(e) => setDraft({ ...draft, excerpt_ar: e.target.value })}
+                    placeholder="ملخص قصير يظهر في بطاقات المعاينة..."
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Body Content (English)</Label>
+                  <RichTextEditor
+                    dir="ltr"
+                    value={draft.body_en}
+                    onChange={(val) => setDraft({ ...draft, body_en: val })}
+                    placeholder="Full article content in English..."
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label>المحتوى بالتفصيل (عربي)</Label>
+                  <RichTextEditor
+                    dir="rtl"
+                    value={draft.body_ar}
+                    onChange={(val) => setDraft({ ...draft, body_ar: val })}
+                    placeholder="محتوى المقال أو الخبر بالتفصيل باللغة العربية..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Cover Image (Upload file or URL)</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={draft.image_url}
+                      onChange={(e) => setDraft({ ...draft, image_url: e.target.value })}
+                      placeholder="https://images.unsplash.com/..."
+                      className="flex-1"
+                    />
+                    <label className="cursor-pointer shrink-0">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => void handleUpload(e.target.files?.[0] || null, "draft")}
+                      />
+                      <Button type="button" variant="outline" size="sm" asChild disabled={uploading === "draft"}>
+                        <span>
+                          {uploading === "draft" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4 me-1.5" />}
+                          Upload
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Published Date</Label>
+                  <Input
+                    type="date"
+                    value={draft.published_at.slice(0, 10)}
+                    onChange={(e) => setDraft({ ...draft, published_at: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6 pt-2">
+                <label className="inline-flex items-center gap-2 cursor-pointer">
+                  <Switch checked={draft.active} onCheckedChange={(v) => setDraft({ ...draft, active: v })} />
+                  <span className="text-sm font-medium">Active (Visible)</span>
+                </label>
+                <label className="inline-flex items-center gap-2 cursor-pointer">
+                  <Switch checked={draft.featured} onCheckedChange={(v) => setDraft({ ...draft, featured: v })} />
+                  <span className="text-sm font-medium">Featured (Hero Highlight)</span>
                 </label>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Published Date</Label>
-              <Input
-                type="date"
-                value={draft.published_at.slice(0, 10)}
-                onChange={(e) => setDraft({ ...draft, published_at: e.target.value })}
-              />
-            </div>
-          </div>
 
-          <div className="flex items-center gap-6 pt-2">
-            <label className="inline-flex items-center gap-2 cursor-pointer">
-              <Switch checked={draft.active} onCheckedChange={(v) => setDraft({ ...draft, active: v })} />
-              <span className="text-sm font-medium">Active (Visible)</span>
-            </label>
-            <label className="inline-flex items-center gap-2 cursor-pointer">
-              <Switch checked={draft.featured} onCheckedChange={(v) => setDraft({ ...draft, featured: v })} />
-              <span className="text-sm font-medium">Featured (Hero Highlight)</span>
-            </label>
-          </div>
-
-          <Button onClick={add} disabled={!_perms.add || saving || (!draft.title_en && !draft.title_ar)}>
-            {saving ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Plus className="h-4 w-4 me-2" />}
-            Publish News Post
-          </Button>
-        </CardContent>
-      </Card>
+              <Button onClick={add} disabled={!_perms.add || saving || (!draft.title_en && !draft.title_ar)}>
+                {saving ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Plus className="h-4 w-4 me-2" />}
+                Publish News Post
+              </Button>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Main Posts Management: Controls & Table/Card View */}
       <div className="space-y-4">
@@ -417,33 +444,12 @@ function NewsAdminPage() {
             )}
 
             {/* View Mode Toggle */}
-            <div className="flex items-center border rounded-lg p-0.5 bg-muted/40">
-              <Button
-                type="button"
-                variant={viewMode === "table" ? "secondary" : "ghost"}
-                size="sm"
-                className="h-8 px-2.5 text-xs gap-1.5"
-                onClick={() => setViewMode("table")}
-              >
-                <TableIcon className="h-3.5 w-3.5" />
-                Table View
-              </Button>
-              <Button
-                type="button"
-                variant={viewMode === "cards" ? "secondary" : "ghost"}
-                size="sm"
-                className="h-8 px-2.5 text-xs gap-1.5"
-                onClick={() => setViewMode("cards")}
-              >
-                <LayoutGrid className="h-3.5 w-3.5" />
-                Cards View
-              </Button>
-            </div>
+            <ViewToggle value={view} options={["table", "grid"]} />
           </div>
         </div>
 
-        {/* 1. TABLE VIEW */}
-        {viewMode === "table" && (
+        {/* 1. TABLE VIEW (DEFAULT) */}
+        {view === "table" && (
           <div className="border rounded-2xl overflow-hidden bg-card shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
@@ -579,8 +585,8 @@ function NewsAdminPage() {
           </div>
         )}
 
-        {/* 2. CARDS VIEW */}
-        {viewMode === "cards" && (
+        {/* 2. CARDS / GRID VIEW */}
+        {(view === "grid" || view === "list") && (
           <div className="grid md:grid-cols-2 gap-4">
             {filteredPosts.map((p) => (
               <Card key={p.id} className="overflow-hidden hover:border-accent/50 transition-colors">

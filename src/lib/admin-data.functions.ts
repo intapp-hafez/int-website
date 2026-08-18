@@ -1,13 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { resolveStatus } from "@/lib/career-workflow";
+import { supabase } from "@/integrations/supabase/client";
 
-// NOTE: Demo admin panel — these server functions intentionally bypass RLS
-// using the service-role client so the seeded data is visible without
-// requiring a real authenticated Supabase admin session.
+// NOTE: This project uses a pure SPA shim — server functions run directly in
+// the browser. We use the authenticated supabase client so that RLS policies
+// enforce access control (admin-role users can read protected tables).
 
 export const listOrders = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from("leads")
     .select("id,created_at,full_name,email,phone,company,status,message,items,product_name,lang")
     .eq("source", "cart_checkout")
@@ -19,8 +19,7 @@ export const listOrders = createServerFn({ method: "GET" }).handler(async () => 
 export const getOrder = createServerFn({ method: "GET" })
   .inputValidator((d: { id: string }) => d)
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin
+    const { data: row, error } = await supabase
       .from("leads").select("*").eq("id", data.id).maybeSingle();
     if (error) throw new Error(error.message);
     return row as any;
@@ -29,8 +28,7 @@ export const getOrder = createServerFn({ method: "GET" })
 export const updateOrderStatus = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string; status: string }) => d)
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from("leads").update({ status: data.status }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -41,8 +39,7 @@ export const listClientQuotes = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const email = String(data.email ?? "").trim().toLowerCase();
     if (!email) return [] as any[];
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await supabaseAdmin
+    const { data: rows, error } = await supabase
       .from("leads")
       .select("id,created_at,updated_at,full_name,email,company,status,product_name,product_slug,items,source,priority,lang")
       .ilike("email", email)
@@ -52,8 +49,7 @@ export const listClientQuotes = createServerFn({ method: "GET" })
   });
 
 export const listApplications = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from("career_applications")
     .select("id, ref, full_name, email, phone, status, created_at, job_id, years_experience, city, country, career_jobs(title_en)")
     .order("created_at", { ascending: false });
@@ -62,8 +58,7 @@ export const listApplications = createServerFn({ method: "GET" }).handler(async 
 });
 
 export const listApplicationsFull = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from("career_applications")
     .select("*, career_jobs(title_en,title_ar,location_en)")
     .order("created_at", { ascending: false });
@@ -74,12 +69,11 @@ export const listApplicationsFull = createServerFn({ method: "GET" }).handler(as
 export const getApplication = createServerFn({ method: "GET" })
   .inputValidator((d: { id: string }) => d)
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: app, error: e1 }, { data: events, error: e2 }] = await Promise.all([
-      supabaseAdmin.from("career_applications")
+      supabase.from("career_applications")
         .select("*, career_jobs(title_en,title_ar,location_en)")
         .eq("id", data.id).maybeSingle(),
-      supabaseAdmin.from("career_application_events")
+      supabase.from("career_application_events")
         .select("*").eq("application_id", data.id)
         .order("created_at", { ascending: false }),
     ]);
@@ -91,11 +85,10 @@ export const getApplication = createServerFn({ method: "GET" })
 export const updateApplicationStatus = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string; from: string | null; to: string; note?: string }) => d)
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from("career_applications").update({ status: data.to as any }).eq("id", data.id);
     if (error) throw new Error(error.message);
-    await supabaseAdmin.from("career_application_events").insert({
+    await supabase.from("career_application_events").insert({
       application_id: data.id,
       from_status: (data.from ?? null) as any,
       to_status: data.to as any,
@@ -107,8 +100,7 @@ export const updateApplicationStatus = createServerFn({ method: "POST" })
 export const updateApplicationNotes = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string; notes: string }) => d)
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from("career_applications").update({ internal_notes: data.notes }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -117,8 +109,7 @@ export const updateApplicationNotes = createServerFn({ method: "POST" })
 export const updateApplicationEvent = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string; note: string; created_at: string }) => d)
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("career_application_events")
+    const { error } = await supabase.from("career_application_events")
       .update({ note: data.note, created_at: data.created_at }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -130,8 +121,7 @@ export const listApplicationsReport = createServerFn({ method: "POST" })
     ids: Array.isArray(d?.ids) ? d.ids.filter((x) => typeof x === "string").slice(0, 500) : [],
   }))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin
+    let q = supabase
       .from("career_applications")
       .select("*, career_jobs(title_en,title_ar,location_en)")
       .order("created_at", { ascending: false });
@@ -141,7 +131,7 @@ export const listApplicationsReport = createServerFn({ method: "POST" })
     const ids = (apps ?? []).map((a: any) => a.id);
     let events: any[] = [];
     if (ids.length) {
-      const { data: ev, error: e2 } = await supabaseAdmin
+      const { data: ev, error: e2 } = await supabase
         .from("career_application_events")
         .select("*")
         .in("application_id", ids)
@@ -162,11 +152,10 @@ export const bulkUpdateApplicationStatus = createServerFn({ method: "POST" })
     return { ids, to, note: String(d?.note ?? "") };
   })
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: current, error: e0 } = await supabaseAdmin
+    const { data: current, error: e0 } = await supabase
       .from("career_applications").select("id,status").in("id", data.ids);
     if (e0) throw new Error(e0.message);
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from("career_applications").update({ status: data.to as any }).in("id", data.ids);
     if (error) throw new Error(error.message);
     const rows = (current ?? []).filter((r: any) => r.status !== data.to).map((r: any) => ({
@@ -175,7 +164,7 @@ export const bulkUpdateApplicationStatus = createServerFn({ method: "POST" })
       to_status: data.to as any,
       note: data.note,
     }));
-    if (rows.length) await supabaseAdmin.from("career_application_events").insert(rows);
+    if (rows.length) await supabase.from("career_application_events").insert(rows);
     return { ok: true, updated: rows.length };
   });
 
@@ -194,9 +183,8 @@ export const bulkUpdateApplicationsByRef = createServerFn({ method: "POST" })
     return { rows };
   })
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const refs = Array.from(new Set(data.rows.map((r) => r.ref)));
-    const { data: existing, error } = await supabaseAdmin
+    const { data: existing, error } = await supabase
       .from("career_applications").select("id,ref,status").in("ref", refs);
     if (error) throw new Error(error.message);
     const byRef = new Map((existing ?? []).map((r: any) => [String(r.ref).toUpperCase(), r]));
@@ -211,7 +199,7 @@ export const bulkUpdateApplicationsByRef = createServerFn({ method: "POST" })
       const status = resolveStatus(row.status);
       if (!status) { skipped.push({ ref: row.ref, reason: "invalid_status" }); continue; }
       if (app.status === status) { skipped.push({ ref: row.ref, reason: "unchanged" }); continue; }
-      const { error: e1 } = await supabaseAdmin
+      const { error: e1 } = await supabase
         .from("career_applications").update({ status: status as any }).eq("id", app.id);
       if (e1) { skipped.push({ ref: row.ref, reason: "update_failed" }); continue; }
       events.push({
@@ -223,6 +211,6 @@ export const bulkUpdateApplicationsByRef = createServerFn({ method: "POST" })
       updated.push({ ref: row.ref, from: app.status, to: status });
       app.status = status;
     }
-    if (events.length) await supabaseAdmin.from("career_application_events").insert(events);
+    if (events.length) await supabase.from("career_application_events").insert(events);
     return { updated, skipped };
   });

@@ -11,7 +11,7 @@ import { CheckCircle2, RotateCcw, Download, Upload, History, Trash2, Loader2 } f
 import { useAdminT } from "@/lib/admin-i18n";
 import { toast } from "sonner";
 import { useRef } from "react";
-import { ChevronDown, Menu as MenuIcon, Home, Info, Briefcase, Layers as LayersIcon, Phone } from "lucide-react";
+import { ChevronDown, Menu as MenuIcon, Home, Info, Briefcase, Layers as LayersIcon, Phone, ShoppingCart, Search } from "lucide-react";
 import { services as servicesData } from "@/data/site";
 import { useI18n } from "@/lib/i18n";
 import {
@@ -690,7 +690,80 @@ function SettingsPage() {
           </CardContent>
         </Card>
 
-        <VisibilityPreview visibility={form.visibility} lang={lang} />
+        {/* Header & Navigation Icons Toggle Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-display text-lg">Header & Navigation Icons</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Control the visibility of the Shopping Cart and Quote Tracking icons in the website top header and navigation menu.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-3 pt-2">
+              <label
+                htmlFor="icon_cart"
+                className="flex items-center justify-between gap-3 rounded-md border p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0">
+                    <ShoppingCart className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium">Cart & Quotation Bag</div>
+                    <div className="text-xs text-muted-foreground">Show or hide the shopping cart / quotation basket in the header.</div>
+                  </div>
+                </div>
+                <Switch
+                  id="icon_cart"
+                  checked={form.headerIcons?.cart !== false}
+                  onCheckedChange={(v) =>
+                    setForm({
+                      ...form,
+                      headerIcons: {
+                        ...(form.headerIcons || { cart: true, tracking: true }),
+                        cart: v,
+                      },
+                    })
+                  }
+                />
+              </label>
+
+              <label
+                htmlFor="icon_tracking"
+                className="flex items-center justify-between gap-3 rounded-md border p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0">
+                    <Search className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium">Quote Tracking Icon</div>
+                    <div className="text-xs text-muted-foreground">Show or hide the quote status tracking search link in the header & mobile menu.</div>
+                  </div>
+                </div>
+                <Switch
+                  id="icon_tracking"
+                  checked={form.headerIcons?.tracking !== false}
+                  onCheckedChange={(v) =>
+                    setForm({
+                      ...form,
+                      headerIcons: {
+                        ...(form.headerIcons || { cart: true, tracking: true }),
+                        tracking: v,
+                      },
+                    })
+                  }
+                />
+              </label>
+            </div>
+          </CardContent>
+        </Card>
+
+        <VisibilityPreview
+          visibility={form.visibility}
+          headerIcons={form.headerIcons}
+          lang={lang}
+        />
 
         <Card>
           <CardHeader>
@@ -891,8 +964,18 @@ function Field({ label, id, value, onChange, type = "text", hint, dir }: { label
   );
 }
 
-function VisibilityPreview({ visibility, lang }: { visibility: SiteSettings["visibility"]; lang: "en" | "ar" }) {
+function VisibilityPreview({
+  visibility,
+  headerIcons,
+  lang,
+}: {
+  visibility: SiteSettings["visibility"];
+  headerIcons?: SiteSettings["headerIcons"];
+  lang: "en" | "ar";
+}) {
   const show = (k: keyof SiteSettings["visibility"]) => visibility[k] !== false;
+  const showCart = headerIcons?.cart !== false;
+  const showTracking = headerIcons?.tracking !== false;
   const dir = lang === "ar" ? "rtl" : "ltr";
   const L = (en: string, ar: string) => (lang === "ar" ? ar : en);
 
@@ -941,6 +1024,31 @@ function VisibilityPreview({ visibility, lang }: { visibility: SiteSettings["vis
         <div>
           <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Desktop header</div>
           <div className="rounded-lg border bg-background overflow-hidden" dir={dir}>
+            {/* Top Bar Preview */}
+            <div className="bg-primary text-primary-foreground text-[10px] px-4 py-1.5 flex items-center justify-between">
+              <div className="flex items-center gap-3 opacity-80">
+                <span>info@integratedtechnics.com</span>
+                <span>+20 100 741 9344</span>
+              </div>
+              <div className="flex items-center gap-3">
+                {showTracking && (
+                  <span className="inline-flex items-center gap-1 opacity-90">
+                    <Search className="h-3 w-3" />
+                    <span>{L("Track Quote", "تتبع العرض")}</span>
+                  </span>
+                )}
+                {showCart && (
+                  <span className="inline-flex items-center gap-1 opacity-90">
+                    <ShoppingCart className="h-3 w-3" />
+                    <span>{L("Cart (0)", "السلة (0)")}</span>
+                  </span>
+                )}
+                <span className="font-semibold uppercase text-[9px] bg-accent text-accent-foreground px-1.5 py-0.5 rounded">
+                  {lang.toUpperCase()}
+                </span>
+              </div>
+            </div>
+
             <div className="h-12 px-4 flex items-center justify-between gap-4 border-b bg-background">
               <div className="font-display font-bold text-sm">
                 Integrated<span className="text-accent">Technics</span>

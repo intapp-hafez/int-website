@@ -8,8 +8,11 @@ export function createServerFn() {
     middleware: () => builder, 
     handler: (h: any) => {
       return async (input: any) => {
-        // Run handler directly in the browser
-        return await h({ data: validatorFn(input) });
+        // TanStack Start server functions are called as fn({ data: ... }).
+        // Unwrap the .data property before running the validator so the
+        // handler always receives { data: validatedPayload } — not double-wrapped.
+        const raw = input && typeof input === "object" && "data" in input ? input.data : input;
+        return await h({ data: validatorFn(raw) });
       }
     }
   };

@@ -179,13 +179,13 @@ export function InteractiveHeroWheel() {
         >
           <defs>
             {/* Sector Text Paths */}
-            {sectors.map((s, idx) => {
+            {sectors.map((s) => {
               // Adjust text arc orientation based on quadrant
               const isBottom = s.startAngle >= 90 && s.startAngle < 270;
               const r = 142;
               const pathD = isBottom
-                ? describeTextArc(250, 250, r, s.endAngle - 6, s.startAngle + 6, 0)
-                : describeTextArc(250, 250, r, s.startAngle + 6, s.endAngle - 6, 1);
+                ? describeTextArc(250, 250, r, s.endAngle - 2, s.startAngle + 2, 0)
+                : describeTextArc(250, 250, r, s.startAngle + 2, s.endAngle - 2, 1);
               return <path key={`textpath-${s.id}`} id={`sector-arc-${s.id}`} d={pathD} fill="none" />;
             })}
 
@@ -223,6 +223,14 @@ export function InteractiveHeroWheel() {
           {/* Middle Sectors (The 4 category bands) */}
           {sectors.map((s) => {
             const isHovered = activeHover === s.id;
+            // Tailor font size & tracking so longer labels like NETWORK INFRASTRUCTURE fit completely
+            const textStyle =
+              s.id === "network"
+                ? "text-[9.5px] sm:text-[10px] tracking-normal font-bold"
+                : s.id === "security"
+                ? "text-[10.5px] sm:text-[11px] tracking-wider font-bold"
+                : "text-[11px] sm:text-[12px] tracking-widest font-bold";
+
             return (
               <g
                 key={s.id}
@@ -242,7 +250,7 @@ export function InteractiveHeroWheel() {
                   />
                   {/* Curved Text Label */}
                   <text
-                    className="text-[11px] sm:text-[12px] font-bold tracking-widest fill-white select-none pointer-events-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
+                    className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]`}
                   >
                     <textPath
                       href={`#sector-arc-${s.id}`}

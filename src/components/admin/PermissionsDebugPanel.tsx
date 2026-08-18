@@ -51,7 +51,7 @@ export function PermissionsDebugPanel() {
       return;
     }
     createRequest({
-      userId: matched?.id ?? user.email,
+      userId: user.id || matched?.id || user.email,
       userName: user.name || user.email,
       userEmail: user.email,
       pageKey,

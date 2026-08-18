@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
 
 export type SubmitLeadInput = {
   full_name: string;
@@ -106,8 +107,7 @@ export const submitCartLead = createServerFn({ method: "POST" })
       }
     }
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin
+    const { data: row, error } = await supabase
       .from("leads")
       .insert({
         source: data.source,

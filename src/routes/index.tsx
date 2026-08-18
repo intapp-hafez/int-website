@@ -16,11 +16,12 @@ import { useServices, getServiceIcon } from "@/lib/services-store";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { CarouselDots } from "@/components/ui/carousel-dots";
 import Autoplay from "embla-carousel-autoplay";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
 import { FeaturedProducts } from "@/components/site/FeaturedProducts";
 import { LatestNews } from "@/components/site/LatestNews";
 import { InteractiveHeroWheel } from "@/components/site/InteractiveHeroWheel";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -37,13 +38,42 @@ const whyIcons = [Shield, Award, Clock, Users];
 function TestimonialsSection() {
   const { lang } = useI18n();
   const { settings } = useSettings();
-  
-  if (!settings.testimonials || settings.testimonials.length === 0) return null;
+  const [dbReviews, setDbReviews] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadApprovedReviews = async () => {
+      try {
+        const { data } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("approved", true)
+          .order("created_at", { ascending: false });
+
+        if (data && data.length > 0) {
+          setDbReviews(data);
+        }
+      } catch (err) {
+        console.warn("[homepage-reviews] fetch error:", err);
+      }
+    };
+    void loadApprovedReviews();
+  }, []);
+
+  const items = dbReviews.length > 0
+    ? dbReviews.map((r) => ({
+        quote: { en: r.text, ar: r.text },
+        author: { en: r.author, ar: r.author },
+        role: { en: r.company, ar: r.company },
+        rating: r.rating || 5,
+      }))
+    : settings.testimonials || [];
+
+  if (!items || items.length === 0) return null;
 
   return (
     <Section eyebrow="Testimonials" title={lang === "ar" ? "ماذا يقول عملاؤنا" : "What Our Clients Say"} center className="bg-muted/30">
-      <div className={`grid gap-6 ${settings.testimonials.length % 2 === 0 ? "sm:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"}`}>
-        {settings.testimonials.map((t, i) => {
+      <div className={`grid gap-6 ${items.length % 2 === 0 ? "sm:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"}`}>
+        {items.map((t, i) => {
           const quote = t.quote?.[lang] || t.quote?.en || t.quote?.ar || "";
           const author = t.author?.[lang] || t.author?.en || t.author?.ar || "";
           const role = t.role?.[lang] || t.role?.en || t.role?.ar || "";

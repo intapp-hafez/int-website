@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const HEX8_RE = /^[0-9a-f]{8}$/i;
@@ -36,9 +37,7 @@ export const trackQuote = createServerFn({ method: "POST" })
     return { id, email: email || undefined };
   })
   .handler(async ({ data }): Promise<TrackedQuote> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    let query = supabaseAdmin
+    let query = supabase
       .from("leads")
       .select("id,status,created_at,updated_at,full_name,email,phone,company,message,product_name,product_slug,items,lang,priority");
 
@@ -62,7 +61,7 @@ export const trackQuote = createServerFn({ method: "POST" })
       throw new Error("Email does not match this quote");
     }
 
-    const { data: notes } = await supabaseAdmin
+    const { data: notes } = await supabase
       .from("lead_notes" as any)
       .select("id,body,created_at")
       .eq("lead_id", lead.id)

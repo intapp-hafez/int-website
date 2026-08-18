@@ -151,7 +151,12 @@ export type ClientTKey = keyof typeof dict.en;
 
 export function useClientT() {
   const { lang, dir } = useI18n();
-  const t = (k: ClientTKey) => (dict[lang as "en" | "ar"] ?? dict.en)[k] ?? dict.en[k];
+  const t = (k: ClientTKey | string, fallback?: string): string => {
+    if (k in dict.en) {
+      return (dict[lang as "en" | "ar"] as any)?.[k] ?? (dict.en as any)[k] ?? fallback ?? k;
+    }
+    return lang === "ar" ? (fallback ?? k) : k;
+  };
   return { t, lang, dir, isRtl: dir === "rtl" };
 }
 

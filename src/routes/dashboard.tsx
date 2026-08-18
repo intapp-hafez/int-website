@@ -3,9 +3,8 @@ import { useEffect, useState } from "react";
 import { useAuth, type Role } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, Star, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2 } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, Star, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2, Tag } from "lucide-react";
 import { useCanAccess, usePermissions, resolveAdminPage } from "@/lib/permissions-store";
-import { demoUsers } from "@/data/demo";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export const Route = createFileRoute("/dashboard")({
@@ -42,6 +41,7 @@ const adminGroups: NavGroup[] = [
     en: "Helpdesk", ar: "مكتب الدعم", icon: LifeBuoy, adminOnly: true,
     items: [
       { to: "/dashboard/admin/helpdesk/tickets", en: "Tickets", ar: "التذاكر", icon: LifeBuoy, role: "admin", pageKey: "helpdesk_tickets", adminOnly: true },
+      { to: "/dashboard/admin/helpdesk/categories", en: "Categories", ar: "فئات التذاكر والمسؤولين", icon: Tag, role: "admin", pageKey: "helpdesk_categories", adminOnly: true },
       { to: "/dashboard/admin/reviews", en: "Reviews", ar: "المراجعات", icon: Star, role: "admin", pageKey: "reviews", adminOnly: true },
     ],
   },
@@ -106,6 +106,8 @@ const adminGroups: NavGroup[] = [
   },
 ];
 
+const isClientRole = (role?: string) => !role || ["client", "client_user", "user"].includes(role.toLowerCase());
+
 function DashboardLayout() {
   const { user, ready, signOut } = useAuth();
   const { lang } = useI18n();
@@ -133,23 +135,25 @@ function DashboardLayout() {
     );
   }
 
+  const isClient = isClientRole(user.role);
+
   // Role gate for /dashboard/admin/*
   const isAdminPath = pathname.startsWith("/dashboard/admin");
-  const denied = isAdminPath && user.role === "client";
+  const denied = isAdminPath && isClient;
 
   // Extra hard gate: helpdesk is admin-only regardless of granted page permissions.
-  const isHelpdeskPath = pathname.startsWith("/dashboard/admin/helpdesk") || pathname.startsWith("/dashboard/workspace/helpdesk");
+  const isHelpdeskPath = pathname.startsWith("/dashboard/admin/helpdesk");
   const helpdeskDenied = isHelpdeskPath && user.role !== "admin";
 
   const permDenied = isAdminPath && !denied && user.role !== "admin" && adminPage !== null && !perms[action];
 
   const roleLabel = lang === "ar"
     ? (user.role === "admin" ? "مدير" : user.role === "manager" ? "مشرف" : user.role === "agent" ? "موظف" : user.role === "seo" ? "مسؤول SEO" : user.role === "technician" ? "فني تقني" : "عميل")
-    : (user.role === "seo" ? "SEO Specialist" : user.role);
+    : (user.role === "seo" ? "SEO Specialist" : isClient ? "Client" : user.role);
 
   return (
-    <div className={`${isAdminPath ? "w-full px-6" : "container mx-auto px-4"} py-8 grid lg:grid-cols-[260px_1fr] gap-6 overflow-x-clip ${user.role === "client" ? "pb-28 lg:pb-8" : ""}`}>
-      <aside className={`bg-card border rounded-xl p-4 h-fit lg:sticky lg:top-28 ${user.role === "client" ? "hidden lg:block" : ""}`}>
+    <div className={`${isAdminPath ? "w-full px-6" : "container mx-auto px-4"} py-8 grid lg:grid-cols-[260px_1fr] gap-6 overflow-x-clip ${isClient ? "pb-28 lg:pb-8" : ""}`}>
+      <aside className={`bg-card border rounded-xl p-4 h-fit lg:sticky lg:top-28 ${isClient ? "block" : ""}`}>
         <div className="flex items-center gap-2 mb-4 pb-4 border-b">
           <div className="h-9 w-9 rounded-md bg-accent/10 text-accent flex items-center justify-center">
             {user.role === "admin" ? <ShieldCheck className="h-4 w-4" /> : <User className="h-4 w-4" />}
@@ -160,10 +164,11 @@ function DashboardLayout() {
           </div>
         </div>
         <nav className="flex flex-col gap-0.5">
-          {user.role === "client" && workspaceItems.map((l) => (
-            <NavLinkItem key={l.to} item={l} lang={lang} />
-          ))}
-          {user.role !== "client" && (
+          {isClient ? (
+            workspaceItems.map((l) => (
+              <NavLinkItem key={l.to} item={l} lang={lang} />
+            ))
+          ) : (
             <>
               <NavLinkItem item={adminTopItem} lang={lang} />
               {adminGroups.map((g) => (
@@ -205,11 +210,13 @@ function Unauthorized({ reason = "role" }: { reason?: "role" | "perm" }) {
 
 function NavLinkItem({ item, lang }: { item: NavItem; lang: "en" | "ar" | string }) {
   const { user } = useAuth();
-  const perms = useCanAccess(item.pageKey ?? "overview");
-  // adminOnly items are strictly for the admin role, even if a page permission was granted.
+  const isClient = isClientRole(user?.role);
+  if (item.clientOnly && !isClient) return null;
   if (item.adminOnly && user?.role !== "admin") return null;
-  // Hide admin nav items the user can't view (admins always pass via useCanAccess)
-  if (item.pageKey && !perms.view) return null;
+  if (!isClient && item.pageKey) {
+    const perms = useCanAccess(item.pageKey ?? "overview");
+    if (!perms.view) return null;
+  }
   const Icon = item.icon;
   const label = lang === "ar" ? item.ar : item.en;
   return (

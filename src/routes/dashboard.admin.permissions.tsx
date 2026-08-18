@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,14 +15,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ShieldCheck, Save, ShieldOff, RotateCcw } from "lucide-react";
+import { ShieldCheck, Save, ShieldOff, RotateCcw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { demoUsers } from "@/data/demo";
 import { useAdminT } from "@/lib/admin-i18n";
 import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
 import { PermissionPresets } from "@/components/admin/PermissionPresets";
 import { ADMIN_PAGES, PERM_ACTIONS, usePermissions } from "@/lib/permissions-store";
 import { AccessRequestQueue } from "@/components/admin/AccessRequestQueue";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/dashboard/admin/permissions")({
   head: () => ({ meta: [{ title: "Permissions — Admin" }] }),
@@ -35,6 +35,9 @@ const ROLE_BADGE_STYLE: Record<string, string> = {
   agent: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800",
   seo: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
   technician: "bg-cyan-100 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800",
+  moderator: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800",
+  helpdesk_manager: "bg-teal-100 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200 dark:border-teal-800",
+  client_user: "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800",
 };
 
 const ROLE_DISPLAY: Record<string, { en: string; ar: string }> = {
@@ -43,14 +46,56 @@ const ROLE_DISPLAY: Record<string, { en: string; ar: string }> = {
   agent: { en: "Agent", ar: "موظف" },
   seo: { en: "SEO Specialist", ar: "مسؤول SEO" },
   technician: { en: "Technician", ar: "فني تقني" },
+  moderator: { en: "Moderator", ar: "مشرف" },
+  helpdesk_manager: { en: "Helpdesk Manager", ar: "مدير الدعم الفني" },
+  client_user: { en: "Client User", ar: "مستخدم عميل" },
+};
+
+type LiveUser = {
+  id: string;        // user_id from user_roles
+  rowId: string;     // user_roles.id (row pk)
+  name: string;
+  role: string;
 };
 
 function PermissionsPage() {
   const { lang } = useAdminT();
   const { getUserPerms, setAllForUser, resetUser } = usePermissions();
-  const nonAdminUsers = demoUsers.filter((u) => u.role !== "admin");
-  const [selectedId, setSelectedId] = useState<string>(nonAdminUsers[0]?.id ?? demoUsers[0]?.id ?? "");
-  const user = demoUsers.find((u) => u.id === selectedId);
+
+  const [users, setUsers] = useState<LiveUser[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [selectedId, setSelectedId] = useState<string>("");
+
+  // Load real users from user_roles
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("user_roles")
+          .select("id, user_id, role, display_name")
+          .order("created_at", { ascending: true });
+        if (error) throw error;
+        // Filter out client roles — clients use the client workspace portal and do not have admin panel permissions
+        const staffRoles = (data ?? []).filter((r: any) => r.role !== "client" && r.role !== "client_user");
+        const mapped: LiveUser[] = staffRoles.map((r: any, idx: number) => ({
+          id: r.user_id,
+          rowId: r.id,
+          name: r.display_name?.trim() || `Staff Member #${idx + 1}`,
+          role: String(r.role || "user"),
+        }));
+        setUsers(mapped);
+        // Auto-select first non-admin, or first overall
+        const first = mapped.find((u) => u.role !== "admin") ?? mapped[0];
+        if (first) setSelectedId(first.id);
+      } catch (e: any) {
+        toast.error(e?.message || "Could not load users");
+      } finally {
+        setLoadingUsers(false);
+      }
+    })();
+  }, []);
+
+  const user = users.find((u) => u.id === selectedId);
   const isAdmin = user?.role === "admin";
 
   const grantedCount = user
@@ -104,22 +149,33 @@ function PermissionsPage() {
             <CardTitle className="font-display text-base">
               {lang === "ar" ? "المستخدم" : "User"}
             </CardTitle>
-            <Select value={selectedId} onValueChange={setSelectedId}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder={lang === "ar" ? "اختر مستخدمًا" : "Select a user"} />
-              </SelectTrigger>
-              <SelectContent>
-                {demoUsers.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>
-                    <span className="font-medium">{u.name}</span>
-                    <span className="text-muted-foreground"> · {u.email}</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+
+            {loadingUsers ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {lang === "ar" ? "جاري التحميل..." : "Loading..."}
+              </div>
+            ) : (
+              <Select value={selectedId} onValueChange={setSelectedId}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder={lang === "ar" ? "اختر مستخدمًا" : "Select a user"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                      <span className="font-medium">{u.name}</span>
+                      <span className="text-muted-foreground ms-1">
+                        · {ROLE_DISPLAY[u.role]?.[lang as "en" | "ar"] ?? u.role}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
             {user && (
               <Badge variant="outline" className={ROLE_BADGE_STYLE[user.role] ?? ""}>
-                {lang === "ar" ? ROLE_DISPLAY[user.role]?.ar ?? user.role : ROLE_DISPLAY[user.role]?.en ?? user.role}
+                {ROLE_DISPLAY[user.role]?.[lang as "en" | "ar"] ?? user.role}
               </Badge>
             )}
             {!isAdmin && user && (
@@ -180,13 +236,13 @@ function PermissionsPage() {
 
       {user ? (
         <PermissionsMatrix userId={user.id} isAdmin={isAdmin} />
-      ) : (
+      ) : !loadingUsers ? (
         <Card>
           <CardContent className="p-10 text-center text-sm text-muted-foreground">
             {lang === "ar" ? "اختر مستخدمًا للبدء." : "Select a user to begin."}
           </CardContent>
         </Card>
-      )}
+      ) : null}
     </div>
   );
 }

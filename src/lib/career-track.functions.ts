@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { CareerStatus } from "@/lib/career-workflow";
+import { supabase } from "@/integrations/supabase/client";
 
 export type TrackedApplication = {
   ref: string;
@@ -31,8 +32,7 @@ export const trackApplication = createServerFn({ method: "POST" })
     return { ref, email: email || undefined };
   })
   .handler(async ({ data }): Promise<TrackedApplication> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: app, error } = await supabaseAdmin
+    const { data: app, error } = await supabase
       .from("career_applications")
       .select("id,ref,status,created_at,updated_at,full_name,email,career_jobs(title_en,title_ar,location_en)")
       .ilike("ref", data.ref)
@@ -42,7 +42,7 @@ export const trackApplication = createServerFn({ method: "POST" })
     if (data.email && String((app as any).email).trim().toLowerCase() !== data.email) {
       throw new Error("Email does not match this application");
     }
-    const { data: events } = await supabaseAdmin
+    const { data: events } = await supabase
       .from("career_application_events")
       .select("id,to_status,from_status,note,created_at")
       .eq("application_id", (app as any).id)
@@ -62,6 +62,7 @@ export const trackApplication = createServerFn({ method: "POST" })
     };
   });
 
+
 /** Sends the bilingual receipt email for a submitted application. */
 export const sendApplicationConfirmation = createServerFn({ method: "POST" })
   .inputValidator((input: { ref: string; origin: string }) => {
@@ -70,9 +71,8 @@ export const sendApplicationConfirmation = createServerFn({ method: "POST" })
     return { ref, origin: String(input?.origin ?? "").slice(0, 200) };
   })
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { renderConfirmationEmail, deliverEmail } = await import("@/lib/career-email.server");
-    const { data: app } = await supabaseAdmin
+    const { data: app } = await supabase
       .from("career_applications")
       .select("ref,status,full_name,email,career_jobs(title_en,title_ar)")
       .ilike("ref", data.ref)
@@ -100,9 +100,8 @@ export const sendApplicationSms = createServerFn({ method: "POST" })
     return { ref, origin: String(input?.origin ?? "").slice(0, 200) };
   })
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { renderApplicationSms, deliverSms } = await import("@/lib/career-sms.server");
-    const { data: app } = await supabaseAdmin
+    const { data: app } = await supabase
       .from("career_applications")
       .select("ref,status,full_name,phone,career_jobs(title_en,title_ar)")
       .ilike("ref", data.ref)

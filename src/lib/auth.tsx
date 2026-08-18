@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { supabase } from "@/integrations/supabase/client";
 
 export type Role = "admin" | "manager" | "agent" | "seo" | "technician" | "client";
-export type AuthUser = { id: string; email: string; role: Role; name?: string };
+export type AuthUser = { id: string; email: string; role: Role; name?: string; user_metadata?: Record<string, any> };
 
 type Ctx = {
   user: AuthUser | null;
@@ -27,7 +27,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
 
       if (!error && data?.role) {
-        return data.role as Role;
+        const r = String(data.role).toLowerCase();
+        if (["client", "client_user", "user"].includes(r)) {
+          return "client";
+        }
+        return r as Role;
       }
     } catch (err) {
       console.warn("[auth] failed to query user_roles", err);

@@ -134,6 +134,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 import { IndustriesProvider } from "@/lib/industries-store";
 import { ServicesProvider } from "@/lib/services-store";
 import { FaqsProvider } from "@/lib/faqs-store";
+import { SmtpProvider } from "@/lib/smtp-store";
+import { SecurityProvider } from "@/lib/security-store";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
@@ -148,6 +150,8 @@ function RootComponent() {
           <IndustriesProvider>
           <ServicesProvider>
           <FaqsProvider>
+          <SmtpProvider>
+          <SecurityProvider>
           <PermissionsProvider>
           <AccessRequestsProvider>
           <SlidesProvider>
@@ -181,6 +185,8 @@ function RootComponent() {
           </SlidesProvider>
           </AccessRequestsProvider>
           </PermissionsProvider>
+          </SecurityProvider>
+          </SmtpProvider>
           </FaqsProvider>
           </ServicesProvider>
           </IndustriesProvider>

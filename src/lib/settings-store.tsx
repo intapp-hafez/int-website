@@ -42,6 +42,11 @@ export type ContactHeaderConfig = {
   subtitle: Bilingual;
 };
 
+export type HeaderIconsConfig = {
+  cart: boolean;
+  tracking: boolean;
+};
+
 export type SiteSettings = {
   email: string;
   salesEmail: string;
@@ -63,6 +68,7 @@ export type SiteSettings = {
   };
   invoiceWatermark: InvoiceWatermark;
   visibility: PageVisibility;
+  headerIcons: HeaderIconsConfig;
   sticky: StickyConfig;
   stats: HomepageStat[];
   testimonials: Testimonial[];
@@ -194,6 +200,10 @@ export const defaultSettings: SiteSettings = {
     partners: true,
     contact: true,
   },
+  headerIcons: {
+    cart: true,
+    tracking: true,
+  },
   sticky: {
     side: "end",
     mobileCollapse: true,
@@ -275,6 +285,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
               }))
             : defaultSettings.testimonials,
           visibility: { ...defaultSettings.visibility, ...(parsed.visibility ?? {}) },
+          headerIcons: {
+            cart: parsed.headerIcons?.cart !== undefined ? Boolean(parsed.headerIcons.cart) : defaultSettings.headerIcons.cart,
+            tracking: parsed.headerIcons?.tracking !== undefined ? Boolean(parsed.headerIcons.tracking) : defaultSettings.headerIcons.tracking,
+          },
           sticky: {
             ...defaultSettings.sticky,
             ...(parsed.sticky ?? {}),
@@ -342,6 +356,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       stats: (patch as any).stats ?? settings.stats,
       testimonials: (patch as any).testimonials ?? settings.testimonials,
       visibility: { ...settings.visibility, ...((patch as any).visibility ?? {}) },
+      headerIcons: { ...settings.headerIcons, ...((patch as any).headerIcons ?? {}) },
       sticky: {
         ...settings.sticky,
         ...((patch as any).sticky ?? {}),

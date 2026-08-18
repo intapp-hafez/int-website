@@ -80,6 +80,183 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          approved: boolean
+          author: string
+          company: string
+          created_at: string
+          id: string
+          rating: number
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean
+          author?: string
+          company?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          text?: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean
+          author?: string
+          company?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quotes: {
+        Row: {
+          company: string | null
+          created_at: string
+          currency: string
+          email: string | null
+          full_name: string | null
+          id: string
+          items: Json
+          notes: string | null
+          phone: string | null
+          service_name: string | null
+          status: string
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          currency?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          phone?: string | null
+          service_name?: string | null
+          status?: string
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          currency?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          phone?: string | null
+          service_name?: string | null
+          status?: string
+          total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      client_assessments: {
+        Row: {
+          answers: Json
+          business_type_key: string
+          client_id: string | null
+          client_name: string
+          created_at: string
+          id: string
+          project_name: string
+          results: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answers?: Json
+          business_type_key?: string
+          client_id?: string | null
+          client_name?: string
+          created_at?: string
+          id?: string
+          project_name?: string
+          results?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answers?: Json
+          business_type_key?: string
+          client_id?: string | null
+          client_name?: string
+          created_at?: string
+          id?: string
+          project_name?: string
+          results?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          canonical_url: string | null
+          created_at: string
+          desc_ar: string
+          desc_en: string
+          id: number
+          image: string
+          industry: string
+          meta_description_ar: string | null
+          meta_description_en: string | null
+          meta_keywords: string | null
+          meta_title_ar: string | null
+          meta_title_en: string | null
+          og_image: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          canonical_url?: string | null
+          created_at?: string
+          desc_ar?: string
+          desc_en?: string
+          id?: number
+          image?: string
+          industry?: string
+          meta_description_ar?: string | null
+          meta_description_en?: string | null
+          meta_keywords?: string | null
+          meta_title_ar?: string | null
+          meta_title_en?: string | null
+          og_image?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Update: {
+          canonical_url?: string | null
+          created_at?: string
+          desc_ar?: string
+          desc_en?: string
+          id?: number
+          image?: string
+          industry?: string
+          meta_description_ar?: string | null
+          meta_description_en?: string | null
+          meta_keywords?: string | null
+          meta_title_ar?: string | null
+          meta_title_en?: string | null
+          og_image?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       career_application_events: {
         Row: {
           actor_id: string | null
