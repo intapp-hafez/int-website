@@ -207,7 +207,7 @@ function QuoteDetailPage() {
             <div className="inline-flex items-center gap-2 text-sm bg-muted/30 p-2.5 rounded-xl border">
               <Package className="h-4 w-4 text-accent" />
               <span className="text-muted-foreground">{isAr ? "المنتج المطلوب:" : "Requested Product:"}</span>
-              <Link to="/shop/$slug" params={{ slug: lead.product_slug }} className="font-semibold hover:text-accent">
+              <Link to="/products/$slug" params={{ slug: lead.product_slug }} className="font-semibold hover:text-accent">
                 {lead.product_name}
               </Link>
               <span className="text-xs text-muted-foreground font-mono">/{lead.product_slug}</span>

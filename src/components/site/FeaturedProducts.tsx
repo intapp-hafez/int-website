@@ -25,7 +25,7 @@ export function FeaturedProducts() {
   if (items.length === 0) return null;
 
   return (
-    <Section eyebrow={lang === "ar" ? "متجرنا" : "Shop"} title={lang === "ar" ? "منتجات مميزة" : "Featured Products"} sub={lang === "ar" ? "أبرز منتجاتنا المختارة" : "Our most popular integrated solutions"} center>
+    <Section eyebrow={lang === "ar" ? "متجرنا" : "Products"} title={lang === "ar" ? "منتجات مميزة" : "Featured Products"} sub={lang === "ar" ? "أبرز منتجاتنا المختارة" : "Our most popular integrated solutions"} center>
       <Carousel
         ref={containerRef}
         opts={{ loop: items.length > 4, align: "start", direction: isRtl ? "rtl" : "ltr" }}
@@ -44,7 +44,7 @@ export function FeaturedProducts() {
                 className="ps-2 basis-full md:basis-1/2 lg:basis-1/4"
                 aria-label={`${name} (${idx + 1} ${lang === "ar" ? "من" : "of"} ${items.length})`}
               >
-                <Link to="/shop/$slug" params={{ slug: p.slug }} className="group rounded-2xl overflow-hidden border bg-card glow-on-hover block h-full">
+                <Link to="/products/$slug" params={{ slug: p.slug }} className="group rounded-2xl overflow-hidden border bg-card glow-on-hover block h-full">
                   <div className="aspect-square bg-muted overflow-hidden">
                     {p.image_url ? (
                       <img src={p.image_url} alt={name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -55,7 +55,6 @@ export function FeaturedProducts() {
                   <div className="p-4">
                     {cat && <div className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1">{cat}</div>}
                     <h3 className="text-sm font-semibold line-clamp-2 mb-1">{name}</h3>
-                    {p.price != null && <div className="text-sm font-medium">{p.price} {p.currency}</div>}
                   </div>
                 </Link>
               </CarouselItem>
@@ -72,7 +71,7 @@ export function FeaturedProducts() {
         />
       </Carousel>
       <div className="text-center mt-8">
-        <Button asChild variant="outline"><Link to="/shop">{lang === "ar" ? "زر المتجر" : "Visit shop"} <ArrowRight className="h-4 w-4 ms-2 rtl:rotate-180" /></Link></Button>
+        <Button asChild variant="outline"><Link to="/products">{lang === "ar" ? "زر المتجر" : "Visit shop"} <ArrowRight className="h-4 w-4 ms-2 rtl:rotate-180" /></Link></Button>
       </div>
     </Section>
   );

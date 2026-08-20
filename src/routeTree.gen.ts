@@ -12,12 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CareersRouteImport } from './routes/careers'
-import { Route as CartRouteImport } from './routes/cart'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as IndustriesRouteImport } from './routes/industries'
-import { Route as PartnersRouteImport } from './routes/partners'
 import { Route as PoliciesRouteImport } from './routes/policies'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProjectsRouteImport } from './routes/projects'
@@ -34,9 +32,11 @@ import { Route as DashboardAdminRouteImport } from './routes/dashboard.admin'
 import { Route as DashboardWorkspaceRouteImport } from './routes/dashboard.workspace'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
+import { Route as PartnersIndexRouteImport } from './routes/partners.index'
+import { Route as PartnersIdRouteImport } from './routes/partners_.$id'
+import { Route as ProductsIndexRouteImport } from './routes/products.index'
+import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
-import { Route as ShopIndexRouteImport } from './routes/shop.index'
-import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard.admin.index'
 import { Route as DashboardAdminAboutRouteImport } from './routes/dashboard.admin.about'
 import { Route as DashboardAdminCareersRouteImport } from './routes/dashboard.admin.careers'
@@ -52,6 +52,7 @@ import { Route as DashboardAdminOrdersRouteImport } from './routes/dashboard.adm
 import { Route as DashboardAdminPartnersRouteImport } from './routes/dashboard.admin.partners'
 import { Route as DashboardAdminPermissionsRouteImport } from './routes/dashboard.admin.permissions'
 import { Route as DashboardAdminPoliciesRouteImport } from './routes/dashboard.admin.policies'
+import { Route as DashboardAdminProductCategoriesRouteImport } from './routes/dashboard.admin.product-categories'
 import { Route as DashboardAdminProductsRouteImport } from './routes/dashboard.admin.products'
 import { Route as DashboardAdminProjectsRouteImport } from './routes/dashboard.admin.projects'
 import { Route as DashboardAdminQuotationsRouteImport } from './routes/dashboard.admin.quotations'
@@ -93,6 +94,7 @@ import { Route as DashboardAdminLocationsIndexRouteImport } from './routes/dashb
 import { Route as DashboardAdminNationalitiesIndexRouteImport } from './routes/dashboard.admin.nationalities.index'
 import { Route as DashboardAdminOrdersIndexRouteImport } from './routes/dashboard.admin.orders.index'
 import { Route as DashboardAdminOrdersIdRouteImport } from './routes/dashboard.admin.orders.$id'
+import { Route as DashboardAdminProductCategoriesIndexRouteImport } from './routes/dashboard.admin.product-categories.index'
 import { Route as DashboardAdminProductsIndexRouteImport } from './routes/dashboard.admin.products.index'
 import { Route as DashboardAdminProjectsIndexRouteImport } from './routes/dashboard.admin.projects.index'
 import { Route as DashboardAdminProjectsIdRouteImport } from './routes/dashboard.admin.projects.$id'
@@ -132,11 +134,6 @@ const CareersRoute = CareersRouteImport.update({
   path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CartRoute = CartRouteImport.update({
-  id: '/cart',
-  path: '/cart',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -155,11 +152,6 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const IndustriesRoute = IndustriesRouteImport.update({
   id: '/industries',
   path: '/industries',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartnersRoute = PartnersRouteImport.update({
-  id: '/partners',
-  path: '/partners',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PoliciesRoute = PoliciesRouteImport.update({
@@ -242,20 +234,30 @@ const NewsSlugRoute = NewsSlugRouteImport.update({
   path: '/news/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnersIndexRoute = PartnersIndexRouteImport.update({
+  id: '/partners/',
+  path: '/partners/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnersIdRoute = PartnersIdRouteImport.update({
+  id: '/partners_/$id',
+  path: '/partners/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsIndexRoute = ProductsIndexRouteImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsSlugRoute = ProductsSlugRouteImport.update({
+  id: '/products/$slug',
+  path: '/products/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesSlugRoute = ServicesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ServicesRoute,
-} as any)
-const ShopIndexRoute = ShopIndexRouteImport.update({
-  id: '/shop/',
-  path: '/shop/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopSlugRoute = ShopSlugRouteImport.update({
-  id: '/shop/$slug',
-  path: '/shop/$slug',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
   id: '/',
@@ -335,6 +337,12 @@ const DashboardAdminPoliciesRoute = DashboardAdminPoliciesRouteImport.update({
   path: '/policies',
   getParentRoute: () => DashboardAdminRoute,
 } as any)
+const DashboardAdminProductCategoriesRoute =
+  DashboardAdminProductCategoriesRouteImport.update({
+    id: '/product-categories',
+    path: '/product-categories',
+    getParentRoute: () => DashboardAdminRoute,
+  } as any)
 const DashboardAdminProductsRoute = DashboardAdminProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -562,6 +570,12 @@ const DashboardAdminOrdersIdRoute = DashboardAdminOrdersIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DashboardAdminOrdersRoute,
 } as any)
+const DashboardAdminProductCategoriesIndexRoute =
+  DashboardAdminProductCategoriesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminProductCategoriesRoute,
+  } as any)
 const DashboardAdminProductsIndexRoute =
   DashboardAdminProductsIndexRouteImport.update({
     id: '/',
@@ -703,12 +717,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/careers': typeof CareersRoute
-  '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
-  '/partners': typeof PartnersRoute
   '/policies': typeof PoliciesRoute
   '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
@@ -723,11 +735,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin': typeof DashboardAdminRouteWithChildren
   '/dashboard/workspace': typeof DashboardWorkspaceRouteWithChildren
   '/news/$slug': typeof NewsSlugRoute
+  '/partners/$id': typeof PartnersIdRoute
+  '/products/$slug': typeof ProductsSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
-  '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/news/': typeof NewsIndexRoute
-  '/shop/': typeof ShopIndexRoute
+  '/partners/': typeof PartnersIndexRoute
+  '/products/': typeof ProductsIndexRoute
   '/dashboard/admin/about': typeof DashboardAdminAboutRoute
   '/dashboard/admin/careers': typeof DashboardAdminCareersRouteWithChildren
   '/dashboard/admin/chatbot': typeof DashboardAdminChatbotRoute
@@ -742,6 +756,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/partners': typeof DashboardAdminPartnersRoute
   '/dashboard/admin/permissions': typeof DashboardAdminPermissionsRoute
   '/dashboard/admin/policies': typeof DashboardAdminPoliciesRoute
+  '/dashboard/admin/product-categories': typeof DashboardAdminProductCategoriesRouteWithChildren
   '/dashboard/admin/products': typeof DashboardAdminProductsRouteWithChildren
   '/dashboard/admin/projects': typeof DashboardAdminProjectsRouteWithChildren
   '/dashboard/admin/quotations': typeof DashboardAdminQuotationsRouteWithChildren
@@ -791,6 +806,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/locations/': typeof DashboardAdminLocationsIndexRoute
   '/dashboard/admin/nationalities/': typeof DashboardAdminNationalitiesIndexRoute
   '/dashboard/admin/orders/': typeof DashboardAdminOrdersIndexRoute
+  '/dashboard/admin/product-categories/': typeof DashboardAdminProductCategoriesIndexRoute
   '/dashboard/admin/products/': typeof DashboardAdminProductsIndexRoute
   '/dashboard/admin/projects/': typeof DashboardAdminProjectsIndexRoute
   '/dashboard/admin/quotations/': typeof DashboardAdminQuotationsIndexRoute
@@ -812,11 +828,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/careers': typeof CareersRoute
-  '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
-  '/partners': typeof PartnersRoute
   '/policies': typeof PoliciesRoute
   '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
@@ -829,11 +843,13 @@ export interface FileRoutesByTo {
   '/track-application': typeof TrackApplicationRoute
   '/track-quote': typeof TrackQuoteRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/partners/$id': typeof PartnersIdRoute
+  '/products/$slug': typeof ProductsSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
-  '/shop/$slug': typeof ShopSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/news': typeof NewsIndexRoute
-  '/shop': typeof ShopIndexRoute
+  '/partners': typeof PartnersIndexRoute
+  '/products': typeof ProductsIndexRoute
   '/dashboard/admin/about': typeof DashboardAdminAboutRoute
   '/dashboard/admin/chatbot': typeof DashboardAdminChatbotRoute
   '/dashboard/admin/faqs': typeof DashboardAdminFaqsRoute
@@ -884,6 +900,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/locations': typeof DashboardAdminLocationsIndexRoute
   '/dashboard/admin/nationalities': typeof DashboardAdminNationalitiesIndexRoute
   '/dashboard/admin/orders': typeof DashboardAdminOrdersIndexRoute
+  '/dashboard/admin/product-categories': typeof DashboardAdminProductCategoriesIndexRoute
   '/dashboard/admin/products': typeof DashboardAdminProductsIndexRoute
   '/dashboard/admin/projects': typeof DashboardAdminProjectsIndexRoute
   '/dashboard/admin/quotations': typeof DashboardAdminQuotationsIndexRoute
@@ -906,12 +923,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/careers': typeof CareersRoute
-  '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
-  '/partners': typeof PartnersRoute
   '/policies': typeof PoliciesRoute
   '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
@@ -926,11 +941,13 @@ export interface FileRoutesById {
   '/dashboard/admin': typeof DashboardAdminRouteWithChildren
   '/dashboard/workspace': typeof DashboardWorkspaceRouteWithChildren
   '/news/$slug': typeof NewsSlugRoute
+  '/partners_/$id': typeof PartnersIdRoute
+  '/products/$slug': typeof ProductsSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
-  '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/news/': typeof NewsIndexRoute
-  '/shop/': typeof ShopIndexRoute
+  '/partners/': typeof PartnersIndexRoute
+  '/products/': typeof ProductsIndexRoute
   '/dashboard/admin/about': typeof DashboardAdminAboutRoute
   '/dashboard/admin/careers': typeof DashboardAdminCareersRouteWithChildren
   '/dashboard/admin/chatbot': typeof DashboardAdminChatbotRoute
@@ -945,6 +962,7 @@ export interface FileRoutesById {
   '/dashboard/admin/partners': typeof DashboardAdminPartnersRoute
   '/dashboard/admin/permissions': typeof DashboardAdminPermissionsRoute
   '/dashboard/admin/policies': typeof DashboardAdminPoliciesRoute
+  '/dashboard/admin/product-categories': typeof DashboardAdminProductCategoriesRouteWithChildren
   '/dashboard/admin/products': typeof DashboardAdminProductsRouteWithChildren
   '/dashboard/admin/projects': typeof DashboardAdminProjectsRouteWithChildren
   '/dashboard/admin/quotations': typeof DashboardAdminQuotationsRouteWithChildren
@@ -994,6 +1012,7 @@ export interface FileRoutesById {
   '/dashboard/admin/locations/': typeof DashboardAdminLocationsIndexRoute
   '/dashboard/admin/nationalities/': typeof DashboardAdminNationalitiesIndexRoute
   '/dashboard/admin/orders/': typeof DashboardAdminOrdersIndexRoute
+  '/dashboard/admin/product-categories/': typeof DashboardAdminProductCategoriesIndexRoute
   '/dashboard/admin/products/': typeof DashboardAdminProductsIndexRoute
   '/dashboard/admin/projects/': typeof DashboardAdminProjectsIndexRoute
   '/dashboard/admin/quotations/': typeof DashboardAdminQuotationsIndexRoute
@@ -1017,12 +1036,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/careers'
-    | '/cart'
     | '/contact'
     | '/dashboard'
     | '/forgot-password'
     | '/industries'
-    | '/partners'
     | '/policies'
     | '/privacy'
     | '/projects'
@@ -1037,11 +1054,13 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/workspace'
     | '/news/$slug'
+    | '/partners/$id'
+    | '/products/$slug'
     | '/services/$slug'
-    | '/shop/$slug'
     | '/dashboard/'
     | '/news/'
-    | '/shop/'
+    | '/partners/'
+    | '/products/'
     | '/dashboard/admin/about'
     | '/dashboard/admin/careers'
     | '/dashboard/admin/chatbot'
@@ -1056,6 +1075,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/partners'
     | '/dashboard/admin/permissions'
     | '/dashboard/admin/policies'
+    | '/dashboard/admin/product-categories'
     | '/dashboard/admin/products'
     | '/dashboard/admin/projects'
     | '/dashboard/admin/quotations'
@@ -1105,6 +1125,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/locations/'
     | '/dashboard/admin/nationalities/'
     | '/dashboard/admin/orders/'
+    | '/dashboard/admin/product-categories/'
     | '/dashboard/admin/products/'
     | '/dashboard/admin/projects/'
     | '/dashboard/admin/quotations/'
@@ -1126,11 +1147,9 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/careers'
-    | '/cart'
     | '/contact'
     | '/forgot-password'
     | '/industries'
-    | '/partners'
     | '/policies'
     | '/privacy'
     | '/projects'
@@ -1143,11 +1162,13 @@ export interface FileRouteTypes {
     | '/track-application'
     | '/track-quote'
     | '/news/$slug'
+    | '/partners/$id'
+    | '/products/$slug'
     | '/services/$slug'
-    | '/shop/$slug'
     | '/dashboard'
     | '/news'
-    | '/shop'
+    | '/partners'
+    | '/products'
     | '/dashboard/admin/about'
     | '/dashboard/admin/chatbot'
     | '/dashboard/admin/faqs'
@@ -1198,6 +1219,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/locations'
     | '/dashboard/admin/nationalities'
     | '/dashboard/admin/orders'
+    | '/dashboard/admin/product-categories'
     | '/dashboard/admin/products'
     | '/dashboard/admin/projects'
     | '/dashboard/admin/quotations'
@@ -1219,12 +1241,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/careers'
-    | '/cart'
     | '/contact'
     | '/dashboard'
     | '/forgot-password'
     | '/industries'
-    | '/partners'
     | '/policies'
     | '/privacy'
     | '/projects'
@@ -1239,11 +1259,13 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/workspace'
     | '/news/$slug'
+    | '/partners_/$id'
+    | '/products/$slug'
     | '/services/$slug'
-    | '/shop/$slug'
     | '/dashboard/'
     | '/news/'
-    | '/shop/'
+    | '/partners/'
+    | '/products/'
     | '/dashboard/admin/about'
     | '/dashboard/admin/careers'
     | '/dashboard/admin/chatbot'
@@ -1258,6 +1280,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/partners'
     | '/dashboard/admin/permissions'
     | '/dashboard/admin/policies'
+    | '/dashboard/admin/product-categories'
     | '/dashboard/admin/products'
     | '/dashboard/admin/projects'
     | '/dashboard/admin/quotations'
@@ -1307,6 +1330,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/locations/'
     | '/dashboard/admin/nationalities/'
     | '/dashboard/admin/orders/'
+    | '/dashboard/admin/product-categories/'
     | '/dashboard/admin/products/'
     | '/dashboard/admin/projects/'
     | '/dashboard/admin/quotations/'
@@ -1329,12 +1353,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   CareersRoute: typeof CareersRoute
-  CartRoute: typeof CartRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   IndustriesRoute: typeof IndustriesRoute
-  PartnersRoute: typeof PartnersRoute
   PoliciesRoute: typeof PoliciesRoute
   PrivacyRoute: typeof PrivacyRoute
   ProjectsRoute: typeof ProjectsRoute
@@ -1347,9 +1369,11 @@ export interface RootRouteChildren {
   TrackApplicationRoute: typeof TrackApplicationRoute
   TrackQuoteRoute: typeof TrackQuoteRoute
   NewsSlugRoute: typeof NewsSlugRoute
-  ShopSlugRoute: typeof ShopSlugRoute
+  PartnersIdRoute: typeof PartnersIdRoute
+  ProductsSlugRoute: typeof ProductsSlugRoute
   NewsIndexRoute: typeof NewsIndexRoute
-  ShopIndexRoute: typeof ShopIndexRoute
+  PartnersIndexRoute: typeof PartnersIndexRoute
+  ProductsIndexRoute: typeof ProductsIndexRoute
   ApiPublicHooksSeoBotDailyRoute: typeof ApiPublicHooksSeoBotDailyRoute
 }
 
@@ -1374,13 +1398,6 @@ declare module '@tanstack/react-router' {
       path: '/careers'
       fullPath: '/careers'
       preLoaderRoute: typeof CareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -1409,13 +1426,6 @@ declare module '@tanstack/react-router' {
       path: '/industries'
       fullPath: '/industries'
       preLoaderRoute: typeof IndustriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/partners': {
-      id: '/partners'
-      path: '/partners'
-      fullPath: '/partners'
-      preLoaderRoute: typeof PartnersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/policies': {
@@ -1530,26 +1540,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partners/': {
+      id: '/partners/'
+      path: '/partners'
+      fullPath: '/partners/'
+      preLoaderRoute: typeof PartnersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partners_/$id': {
+      id: '/partners_/$id'
+      path: '/partners/$id'
+      fullPath: '/partners/$id'
+      preLoaderRoute: typeof PartnersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products/': {
+      id: '/products/'
+      path: '/products'
+      fullPath: '/products/'
+      preLoaderRoute: typeof ProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products/$slug': {
+      id: '/products/$slug'
+      path: '/products/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof ProductsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services/$slug': {
       id: '/services/$slug'
       path: '/$slug'
       fullPath: '/services/$slug'
       preLoaderRoute: typeof ServicesSlugRouteImport
       parentRoute: typeof ServicesRoute
-    }
-    '/shop/': {
-      id: '/shop/'
-      path: '/shop'
-      fullPath: '/shop/'
-      preLoaderRoute: typeof ShopIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop/$slug': {
-      id: '/shop/$slug'
-      path: '/shop/$slug'
-      fullPath: '/shop/$slug'
-      preLoaderRoute: typeof ShopSlugRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/dashboard/admin/': {
       id: '/dashboard/admin/'
@@ -1654,6 +1678,13 @@ declare module '@tanstack/react-router' {
       path: '/policies'
       fullPath: '/dashboard/admin/policies'
       preLoaderRoute: typeof DashboardAdminPoliciesRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/product-categories': {
+      id: '/dashboard/admin/product-categories'
+      path: '/product-categories'
+      fullPath: '/dashboard/admin/product-categories'
+      preLoaderRoute: typeof DashboardAdminProductCategoriesRouteImport
       parentRoute: typeof DashboardAdminRoute
     }
     '/dashboard/admin/products': {
@@ -1942,6 +1973,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin/orders/$id'
       preLoaderRoute: typeof DashboardAdminOrdersIdRouteImport
       parentRoute: typeof DashboardAdminOrdersRoute
+    }
+    '/dashboard/admin/product-categories/': {
+      id: '/dashboard/admin/product-categories/'
+      path: '/'
+      fullPath: '/dashboard/admin/product-categories/'
+      preLoaderRoute: typeof DashboardAdminProductCategoriesIndexRouteImport
+      parentRoute: typeof DashboardAdminProductCategoriesRoute
     }
     '/dashboard/admin/products/': {
       id: '/dashboard/admin/products/'
@@ -2238,6 +2276,21 @@ const DashboardAdminOrdersRouteChildren: DashboardAdminOrdersRouteChildren = {
 const DashboardAdminOrdersRouteWithChildren =
   DashboardAdminOrdersRoute._addFileChildren(DashboardAdminOrdersRouteChildren)
 
+interface DashboardAdminProductCategoriesRouteChildren {
+  DashboardAdminProductCategoriesIndexRoute: typeof DashboardAdminProductCategoriesIndexRoute
+}
+
+const DashboardAdminProductCategoriesRouteChildren: DashboardAdminProductCategoriesRouteChildren =
+  {
+    DashboardAdminProductCategoriesIndexRoute:
+      DashboardAdminProductCategoriesIndexRoute,
+  }
+
+const DashboardAdminProductCategoriesRouteWithChildren =
+  DashboardAdminProductCategoriesRoute._addFileChildren(
+    DashboardAdminProductCategoriesRouteChildren,
+  )
+
 interface DashboardAdminProductsRouteChildren {
   DashboardAdminProductsIndexRoute: typeof DashboardAdminProductsIndexRoute
 }
@@ -2345,6 +2398,7 @@ interface DashboardAdminRouteChildren {
   DashboardAdminPartnersRoute: typeof DashboardAdminPartnersRoute
   DashboardAdminPermissionsRoute: typeof DashboardAdminPermissionsRoute
   DashboardAdminPoliciesRoute: typeof DashboardAdminPoliciesRoute
+  DashboardAdminProductCategoriesRoute: typeof DashboardAdminProductCategoriesRouteWithChildren
   DashboardAdminProductsRoute: typeof DashboardAdminProductsRouteWithChildren
   DashboardAdminProjectsRoute: typeof DashboardAdminProjectsRouteWithChildren
   DashboardAdminQuotationsRoute: typeof DashboardAdminQuotationsRouteWithChildren
@@ -2380,6 +2434,8 @@ const DashboardAdminRouteChildren: DashboardAdminRouteChildren = {
   DashboardAdminPartnersRoute: DashboardAdminPartnersRoute,
   DashboardAdminPermissionsRoute: DashboardAdminPermissionsRoute,
   DashboardAdminPoliciesRoute: DashboardAdminPoliciesRoute,
+  DashboardAdminProductCategoriesRoute:
+    DashboardAdminProductCategoriesRouteWithChildren,
   DashboardAdminProductsRoute: DashboardAdminProductsRouteWithChildren,
   DashboardAdminProjectsRoute: DashboardAdminProjectsRouteWithChildren,
   DashboardAdminQuotationsRoute: DashboardAdminQuotationsRouteWithChildren,
@@ -2491,12 +2547,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   CareersRoute: CareersRoute,
-  CartRoute: CartRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   IndustriesRoute: IndustriesRoute,
-  PartnersRoute: PartnersRoute,
   PoliciesRoute: PoliciesRoute,
   PrivacyRoute: PrivacyRoute,
   ProjectsRoute: ProjectsRoute,
@@ -2509,9 +2563,11 @@ const rootRouteChildren: RootRouteChildren = {
   TrackApplicationRoute: TrackApplicationRoute,
   TrackQuoteRoute: TrackQuoteRoute,
   NewsSlugRoute: NewsSlugRoute,
-  ShopSlugRoute: ShopSlugRoute,
+  PartnersIdRoute: PartnersIdRoute,
+  ProductsSlugRoute: ProductsSlugRoute,
   NewsIndexRoute: NewsIndexRoute,
-  ShopIndexRoute: ShopIndexRoute,
+  PartnersIndexRoute: PartnersIndexRoute,
+  ProductsIndexRoute: ProductsIndexRoute,
   ApiPublicHooksSeoBotDailyRoute: ApiPublicHooksSeoBotDailyRoute,
 }
 export const routeTree = rootRouteImport

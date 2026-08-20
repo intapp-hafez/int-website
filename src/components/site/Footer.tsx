@@ -36,7 +36,7 @@ export function Footer() {
             ))}
           </div>
         </div>
-        {show("about") || show("services") || show("projects") || show("industries") || show("shop") ? (
+        {show("about") || show("services") || show("projects") || show("industries") || show("products") ? (
           <div>
             <h4 className="font-display text-sm uppercase tracking-wider mb-4 opacity-90">{t("footer.quick")}</h4>
             <ul className="space-y-1 lg:space-y-2 text-sm opacity-95">
@@ -44,7 +44,7 @@ export function Footer() {
               {show("services") && <li><Link to="/services" className="footer-link">{t("nav.services")}</Link></li>}
               {show("projects") && <li><Link to="/projects" className="footer-link">{t("nav.projects")}</Link></li>}
               {show("industries") && <li><Link to="/industries" className="footer-link">{t("nav.industries")}</Link></li>}
-              {show("shop") && <li><Link to="/shop" className="footer-link">{t("nav.shop")}</Link></li>}
+              {show("products") && <li><Link to="/products" className="footer-link">{t("nav.products")}</Link></li>}
             </ul>
           </div>
         ) : null}

@@ -33,7 +33,6 @@ import {
 } from "@/lib/about-store";
 import { useSettings } from "@/lib/settings-store";
 import { trackCta } from "@/lib/cta-tracking";
-import { FaqSection } from "@/components/site/FaqSection";
 
 import teamKarim from "@/assets/team-karim.jpg";
 import teamLayla from "@/assets/team-layla.jpg";
@@ -528,11 +527,7 @@ function AboutPage() {
           })}
         </div>
       </Section>
-
-      {/* 9. DYNAMIC FAQS SECTION WITH PAGINATION AFTER 15 */}
-      <FaqSection className="border-t bg-muted/10" pageSize={15} />
-
-      {/* 10. BOTTOM MASTER CALL-TO-ACTION */}
+      {/* 9. BOTTOM MASTER CALL-TO-ACTION */}
       <section aria-label={isAr ? "دعوة للتواصل" : "Call to action"} className="py-16 md:py-20">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="relative overflow-hidden rounded-3xl border gradient-hero text-primary-foreground p-8 md:p-14 shadow-2xl">

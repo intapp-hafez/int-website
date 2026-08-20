@@ -1,18 +1,17 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { Section } from "@/components/site/Section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ShoppingBag, Loader2, ShoppingCart, Minus, Plus } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import type { Product } from "@/lib/products";
-import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/shop/$slug")({
+export const Route = createFileRoute("/products/$slug")({
   loader: async ({ params }) => {
     const { data } = await supabase.from("products").select("*").eq("slug", params.slug).eq("active", true).maybeSingle();
     if (!data) throw notFound();
@@ -44,8 +43,6 @@ export const Route = createFileRoute("/shop/$slug")({
         { name: "twitter:title", content: titleEn },
         { name: "twitter:description", content: descEn },
         { property: "og:locale:alternate", content: "ar_AR" },
-        { property: "product:price:amount", content: p.price != null ? String(p.price) : "" },
-        { property: "product:price:currency", content: p.currency || "USD" },
       ],
       links: [
         { rel: "canonical", href: path },
@@ -58,15 +55,8 @@ export const Route = createFileRoute("/shop/$slug")({
           name: p.name_en,
           alternateName: p.name_ar,
           description: p.description_en,
-          sku: p.sku || undefined,
           image: img ? [img, ...(p.gallery || [])] : undefined,
           category: p.category_en || undefined,
-          offers: p.price != null ? {
-            "@type": "Offer",
-            price: p.price,
-            priceCurrency: p.currency || "USD",
-            availability: p.stock_status === "in_stock" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-          } : undefined,
         }),
       }],
     };
@@ -77,27 +67,17 @@ export const Route = createFileRoute("/shop/$slug")({
 function ProductPage() {
   const { product: p } = Route.useLoaderData();
   const { lang } = useI18n();
-  const { add } = useCart();
-  const navigate = useNavigate();
   const [active, setActive] = useState<string>(p.image_url || "");
-  const [qty, setQty] = useState(1);
   const isAr = lang === "ar";
-  const inStock = p.stock_status === "in_stock";
 
   const name = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en;
   const desc = (lang === "ar" ? p.description_ar : p.description_en) || p.description_en;
   const cat = (lang === "ar" ? p.category_ar : p.category_en) || p.category_en;
   const all = [p.image_url, ...(p.gallery || [])].filter(Boolean);
 
-  const handleAdd = (buyNow = false) => {
-    add(p, qty);
-    toast.success(isAr ? "تمت إضافة المنتج إلى السلة" : "Added to cart");
-    if (buyNow) navigate({ to: "/cart" });
-  };
-
   return (
     <Section>
-      <Button asChild variant="outline" size="sm" className="mb-4"><Link to="/shop"><ArrowLeft className="h-4 w-4 me-2" /> {lang === "ar" ? "العودة" : "Back"}</Link></Button>
+      <Button asChild variant="outline" size="sm" className="mb-4"><Link to="/products"><ArrowLeft className="h-4 w-4 me-2" /> {lang === "ar" ? "العودة" : "Back"}</Link></Button>
       <div className="grid lg:grid-cols-2 gap-8">
         <div>
           <div className="aspect-square rounded-2xl overflow-hidden border bg-muted">
@@ -116,27 +96,7 @@ function ProductPage() {
         <div>
           {cat && <div className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">{cat}</div>}
           <h1 className="text-3xl font-bold mb-3">{name}</h1>
-          {p.price != null && <div className="text-2xl font-semibold mb-4">{p.price} {p.currency}</div>}
-          {p.sku && <div className="text-xs text-muted-foreground mb-4">SKU: {p.sku}</div>}
           <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap mb-6">{desc}</p>
-
-          <div className="rounded-2xl border bg-card p-4 mb-6">
-            <div className="flex items-center gap-3 flex-wrap">
-              <div className="inline-flex items-center border rounded-md">
-                <button onClick={() => setQty(q => Math.max(1, q - 1))} className="h-10 w-10 inline-flex items-center justify-center hover:bg-muted" aria-label="-"><Minus className="h-4 w-4" /></button>
-                <input type="number" min={1} value={qty} onChange={e => setQty(Math.max(1, Number(e.target.value) || 1))} className="w-14 h-10 text-center bg-transparent outline-none" />
-                <button onClick={() => setQty(q => q + 1)} className="h-10 w-10 inline-flex items-center justify-center hover:bg-muted" aria-label="+"><Plus className="h-4 w-4" /></button>
-              </div>
-              <Button size="lg" onClick={() => handleAdd(false)} disabled={!inStock}>
-                <ShoppingCart className="h-4 w-4 me-2" />
-                {isAr ? "أضف إلى السلة" : "Add to cart"}
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => handleAdd(true)} disabled={!inStock}>
-                {isAr ? "اشترِ الآن" : "Buy now"}
-              </Button>
-            </div>
-            {!inStock && <div className="text-xs text-destructive mt-2">{isAr ? "غير متوفر حاليًا" : "Currently out of stock"}</div>}
-          </div>
 
           <QuoteForm product={p} />
         </div>

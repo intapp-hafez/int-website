@@ -295,7 +295,6 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
       icon_name: s.iconName,
       published: s.published !== false,
       sort_order: s.sortOrder ?? 0,
-      features: s.features || [],
       meta_title_en: s.seo?.metaTitle?.en,
       meta_title_ar: s.seo?.metaTitle?.ar,
       meta_description_en: s.seo?.metaDescription?.en,
@@ -307,10 +306,11 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
 
     try {
       const { error } = await db.from("services").upsert(payload, { onConflict: "slug" });
-      if (error) console.warn("[services] DB upsert warning:", error.message);
-      else await refresh();
+      if (error) throw new Error(error.message);
+      await refresh();
     } catch (err) {
       console.warn("[services] DB upsert exception:", err);
+      throw err;
     }
   };
 

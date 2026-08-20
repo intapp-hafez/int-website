@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, Shield, Users, Award, Clock, Star, Quote } from "lucide-react";
+import { ArrowRight, CheckCircle2, Shield, Users, Award, Clock, Star, Quote, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SmartLogo } from "@/components/ui/smart-logo";
 import { Section } from "@/components/site/Section";
 import { StatCounter } from "@/components/site/Stat";
 import { useI18n } from "@/lib/i18n";
@@ -207,25 +208,29 @@ function PartnersSlider() {
           {firstRowRepeated.map((p, idx) => {
             const displayName = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en || p.name_ar;
             const bgImage = partnerBgs[idx % partnerBgs.length];
-            const inner = (
-              <div className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex flex-col items-center justify-center p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
-                <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110 opacity-75" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
-                
-                <div className="relative z-10 flex flex-row items-center justify-start mt-auto w-full gap-3 pb-2 transition-transform duration-500 group-hover/item:-translate-y-1">
-                  <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 bg-white rounded-xl border-2 border-white flex items-center justify-center p-1.5 shadow-md">
-                    <SmartLogo src={p.logo} alt={displayName} name={displayName} />
+            return (
+              <Link key={`${p.id}-${idx}`} to="/partners/$id" params={{ id: p.id }} className="block">
+                <div className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex flex-col items-center justify-center p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-pointer group/item">
+                  <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110 opacity-75" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
+                  
+                  {/* View Details Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-500 bg-black/20 backdrop-blur-[2px] z-20">
+                    <span className="text-white font-medium bg-white/20 px-4 py-2 rounded-full backdrop-blur-md border border-white/30 text-xs sm:text-sm shadow-xl flex items-center gap-2 transition-transform duration-300 translate-y-4 group-hover/item:translate-y-0">
+                      {lang === 'ar' ? 'عرض التفاصيل' : 'View Details'}
+                    </span>
                   </div>
-                  <div className="text-sm font-display font-bold text-white drop-shadow-md text-start line-clamp-2">
-                    {displayName}
+                  
+                  <div className="relative z-10 flex flex-row items-center justify-start mt-auto w-full gap-3 pb-2 transition-transform duration-500 group-hover/item:-translate-y-1">
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 bg-white rounded-xl border-2 border-white flex items-center justify-center p-1.5 shadow-md">
+                      <SmartLogo src={p.logo} alt={displayName} name={displayName} />
+                    </div>
+                    <div className="text-sm font-display font-bold text-white drop-shadow-md text-start line-clamp-2">
+                      {displayName}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-            return (
-              <div key={`${p.id}-${idx}`}>
-                {p.href ? <a href={p.href} target="_blank" rel="noreferrer">{inner}</a> : inner}
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -235,60 +240,33 @@ function PartnersSlider() {
           {secondRowRepeated.map((p, idx) => {
             const displayName = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en || p.name_ar;
             const bgImage = partnerBgs[(idx + 3) % partnerBgs.length]; // Offset so rows look slightly different
-            const inner = (
-              <div className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex flex-col items-center justify-center p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-default group/item">
-                <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110 opacity-75" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
-                
-                <div className="relative z-10 flex flex-row items-center justify-start mt-auto w-full gap-3 pb-2 transition-transform duration-500 group-hover/item:-translate-y-1">
-                  <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 bg-white rounded-xl border-2 border-white flex items-center justify-center p-1.5 shadow-md">
-                    <SmartLogo src={p.logo} alt={displayName} name={displayName} />
+            return (
+              <Link key={`${p.id}-${idx}`} to="/partners/$id" params={{ id: p.id }} className="block">
+                <div className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex flex-col items-center justify-center p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-pointer group/item">
+                  <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110 opacity-75" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
+                  
+                  {/* View Details Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-500 bg-black/20 backdrop-blur-[2px] z-20">
+                    <span className="text-white font-medium bg-white/20 px-4 py-2 rounded-full backdrop-blur-md border border-white/30 text-xs sm:text-sm shadow-xl flex items-center gap-2 transition-transform duration-300 translate-y-4 group-hover/item:translate-y-0">
+                      {lang === 'ar' ? 'عرض التفاصيل' : 'View Details'}
+                    </span>
                   </div>
-                  <div className="text-sm font-display font-bold text-white drop-shadow-md text-start line-clamp-2">
-                    {displayName}
+                  
+                  <div className="relative z-10 flex flex-row items-center justify-start mt-auto w-full gap-3 pb-2 transition-transform duration-500 group-hover/item:-translate-y-1">
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 bg-white rounded-xl border-2 border-white flex items-center justify-center p-1.5 shadow-md">
+                      <SmartLogo src={p.logo} alt={displayName} name={displayName} />
+                    </div>
+                    <div className="text-sm font-display font-bold text-white drop-shadow-md text-start line-clamp-2">
+                      {displayName}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-            return (
-              <div key={`${p.id}-${idx}`}>
-                {p.href ? <a href={p.href} target="_blank" rel="noreferrer">{inner}</a> : inner}
-              </div>
+              </Link>
             );
           })}
         </div>
       </div>
-    </div>
-  );
-}
-
-function SmartLogo({ src, alt, name, align = "center" }: { src: string; alt: string; name: string; align?: "center" | "start" }) {
-  const [loaded, setLoaded] = useState(false);
-  const [failed, setFailed] = useState(false);
-  return (
-    <div className={`relative flex items-center h-10 w-full ${align === "start" ? "justify-start" : "justify-center"}`}>
-      {!loaded && !failed && <Skeleton className="absolute inset-0 h-full w-full" />}
-      {failed ? (
-        <div className={`h-10 w-10 rounded-md bg-accent/10 text-accent font-bold grid place-items-center text-sm ${align === "start" ? "mr-auto rtl:ml-auto rtl:mr-0" : ""}`}>
-          {name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-        </div>
-      ) : (
-        <img
-          src={src}
-          alt={alt}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          onLoad={() => setLoaded(true)}
-          onError={(e) => {
-            const img = e.currentTarget;
-            const domain = (src.match(/https?:\/\/logo\.clearbit\.com\/(.+)$/)?.[1]) || "";
-            const fallback = domain ? `https://www.google.com/s2/favicons?sz=128&domain=${domain}` : "";
-            if (fallback && img.src !== fallback) { img.src = fallback; return; }
-            setFailed(true);
-          }}
-          className={`max-h-10 max-w-[80%] object-contain transition-opacity duration-300 drop-shadow-sm ${loaded ? "opacity-100" : "opacity-0"} ${align === "start" ? "mr-auto rtl:ml-auto rtl:mr-0" : ""}`}
-        />
-      )}
     </div>
   );
 }

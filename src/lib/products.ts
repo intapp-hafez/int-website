@@ -1,18 +1,17 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
 export type Product = {
   id: string;
   slug: string;
-  sku: string;
   name_en: string;
   name_ar: string;
   description_en: string;
   description_ar: string;
   category_en: string;
   category_ar: string;
-  price: number | null;
-  currency: string;
   image_url: string;
   gallery: string[];
-  stock_status: string;
   featured: boolean;
   active: boolean;
   sort_order: number;
@@ -28,13 +27,11 @@ export type Product = {
 };
 
 export const emptyProduct: Omit<Product, "id"> = {
-  slug: "", sku: "",
+  slug: "",
   name_en: "", name_ar: "",
   description_en: "", description_ar: "",
   category_en: "", category_ar: "",
-  price: null, currency: "USD",
   image_url: "", gallery: [],
-  stock_status: "in_stock",
   featured: false, active: true, sort_order: 0,
   meta_title_en: "", meta_title_ar: "",
   meta_description_en: "", meta_description_ar: "",
@@ -62,8 +59,23 @@ export function assertBilingualPairs(pairs: Array<{ en: string; ar: string; labe
   if (missing.length) throw new Error("Required bilingual fields missing: " + missing.join(", "));
 }
 
-export const STOCK_OPTIONS = [
-  { value: "in_stock", en: "In stock", ar: "متوفر" },
-  { value: "out_of_stock", en: "Out of stock", ar: "غير متوفر" },
-  { value: "preorder", en: "Pre-order", ar: "طلب مسبق" },
-] as const;
+export type ProductCategory = {
+  id: string;
+  name_en: string;
+  name_ar: string;
+};
+
+export function useProductCategories() {
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.from("product_categories" as any).select("*").order("name_en")
+      .then(({ data }) => {
+        if (data) setCategories(data as any as ProductCategory[]);
+        setLoading(false);
+      });
+  }, []);
+
+  return { categories, loading };
+}

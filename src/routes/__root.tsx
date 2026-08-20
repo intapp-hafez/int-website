@@ -21,7 +21,6 @@ import { NewsProvider } from "@/lib/news-store";
 import { PartnersProvider } from "@/lib/partners-store";
 import { RecommendationsProvider } from "@/lib/recommendations-store";
 import { NotificationsProvider } from "@/lib/notifications-store";
-import { CartProvider } from "@/lib/cart";
 import { useSettings, type PageKey } from "@/lib/settings-store";
 import { useI18n } from "@/lib/i18n";
 import { Section } from "@/components/site/Section";
@@ -159,7 +158,6 @@ function RootComponent() {
           <RecommendationsProvider>
           <AuthProvider>
           <NotificationsProvider>
-          <CartProvider>
           <NewsProvider>
             <Navbar />
             <main className="min-h-screen pt-[104px] md:pt-[100px] pb-20 lg:pb-0">
@@ -177,7 +175,6 @@ function RootComponent() {
             <SeoHead />
             <Toaster />
           </NewsProvider>
-          </CartProvider>
           </NotificationsProvider>
           </AuthProvider>
           </RecommendationsProvider>
@@ -212,7 +209,7 @@ const PATH_PAGE_MAP: { test: (p: string) => boolean; key: PageKey }[] = [
   { test: (p) => p === "/", key: "home" },
   { test: (p) => p === "/about" || p.startsWith("/about/"), key: "about" },
   { test: (p) => p === "/services" || p.startsWith("/services/"), key: "services" },
-  { test: (p) => p === "/shop" || p.startsWith("/shop/"), key: "shop" },
+  { test: (p) => p === "/products" || p.startsWith("/products/"), key: "products" },
   { test: (p) => p === "/projects" || p.startsWith("/projects/"), key: "projects" },
   { test: (p) => p === "/industries" || p.startsWith("/industries/"), key: "industries" },
   { test: (p) => p === "/careers" || p.startsWith("/careers/"), key: "careers" },

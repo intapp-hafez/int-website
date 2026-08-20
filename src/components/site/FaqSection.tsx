@@ -16,7 +16,7 @@ import { Link } from "@tanstack/react-router";
 
 export function FaqSection({
   className = "",
-  pageSize = 15,
+  pageSize = 10,
 }: {
   className?: string;
   pageSize?: number;

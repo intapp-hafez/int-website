@@ -4,14 +4,13 @@ import { Section } from "@/components/site/Section";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Search, ShoppingBag, ShoppingCart } from "lucide-react";
+import { Loader2, Search, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import type { Product } from "@/lib/products";
-import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/shop/")({
+export const Route = createFileRoute("/products/")({
   head: () => ({
     meta: [
       { title: "Shop — Integrated Technics" },
@@ -30,7 +29,6 @@ function ShopPage() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("all");
   const [featuredOnly, setFeaturedOnly] = useState(false);
-  const [maxPrice, setMaxPrice] = useState<string>("");
 
   useEffect(() => {
     (async () => {
@@ -51,7 +49,6 @@ function ShopPage() {
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
-    const max = maxPrice ? Number(maxPrice) : Infinity;
     return products.filter(p => {
       if (featuredOnly && !p.featured) return false;
       if (cat !== "all") {
@@ -60,40 +57,39 @@ function ShopPage() {
       }
       if (term) {
         const n = (lang === "ar" ? p.name_ar : p.name_en) || "";
-        if (!n.toLowerCase().includes(term) && !p.sku.toLowerCase().includes(term)) return false;
+        if (!n.toLowerCase().includes(term)) return false;
       }
-      if (p.price != null && p.price > max) return false;
       return true;
     });
-  }, [products, q, cat, featuredOnly, maxPrice, lang]);
+  }, [products, q, cat, featuredOnly, lang]);
 
   return (
-    <Section eyebrow="Shop" title={lang === "ar" ? "المتجر" : "Shop"} sub={lang === "ar" ? "تصفح منتجاتنا المتكاملة" : "Browse our integrated products"}>
-      <div className="grid lg:grid-cols-[260px_1fr] gap-6">
-        <aside className="space-y-4 lg:sticky lg:top-28 h-fit">
-          <div>
-            <label className="text-xs font-medium text-muted-foreground">{lang === "ar" ? "بحث" : "Search"}</label>
-            <div className="relative mt-1">
-              <Search className="h-4 w-4 absolute start-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input className="ps-8" value={q} onChange={ev => setQ(ev.target.value)} placeholder={lang === "ar" ? "ابحث…" : "Search…"} />
-            </div>
+    <Section eyebrow="Products" title={lang === "ar" ? "المنتجات" : "Products"} sub={lang === "ar" ? "تصفح منتجاتنا المتكاملة" : "Browse our integrated products"}>
+      <div className="space-y-8">
+        {/* Category Tabs */}
+        {!loading && categories.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 justify-center">
+            <button
+              onClick={() => setCat("all")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                cat === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              {lang === "ar" ? "الكل" : "All"}
+            </button>
+            {categories.map(c => (
+              <button
+                key={c}
+                onClick={() => setCat(c)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  cat === c ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
           </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground">{lang === "ar" ? "الفئة" : "Category"}</label>
-            <Select value={cat} onValueChange={setCat}>
-              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{lang === "ar" ? "الكل" : "All"}</SelectItem>
-                {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground">{lang === "ar" ? "السعر الأقصى" : "Max price"}</label>
-            <Input type="number" min={0} value={maxPrice} onChange={ev => setMaxPrice(ev.target.value)} className="mt-1" />
-          </div>
-          <label className="flex items-center gap-2 text-sm"><Switch checked={featuredOnly} onCheckedChange={setFeaturedOnly} /> {lang === "ar" ? "المميزة فقط" : "Featured only"}</label>
-        </aside>
+        )}
 
         <div>
           {loading ? <div className="text-center py-12 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div> :
@@ -115,29 +111,11 @@ function ShopPage() {
 
 export function ProductCard({ p }: { p: Product }) {
   const { lang } = useI18n();
-  const { add } = useCart();
-  const isAr = lang === "ar";
   const name = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en;
   const cat = (lang === "ar" ? p.category_ar : p.category_en) || p.category_en;
-  const inStock = p.stock_status === "in_stock";
-  const onAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    add(p, 1);
-    toast.success(isAr ? "تمت إضافة المنتج إلى السلة" : "Added to cart");
-  };
+
   return (
-    <Link to="/shop/$slug" params={{ slug: p.slug }} className="group rounded-2xl overflow-hidden border bg-card glow-on-hover block relative">
-      <button
-        type="button"
-        onClick={onAdd}
-        disabled={!inStock}
-        aria-label={isAr ? "أضف إلى السلة" : "Add to cart"}
-        title={isAr ? "أضف إلى السلة" : "Add to cart"}
-        className="absolute top-2 end-2 z-10 h-9 w-9 inline-flex items-center justify-center rounded-full bg-background/90 backdrop-blur border shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <ShoppingCart className="h-4 w-4" />
-      </button>
+    <Link to="/products/$slug" params={{ slug: p.slug }} className="group rounded-2xl overflow-hidden border bg-card glow-on-hover block relative">
       <div className="aspect-square bg-muted overflow-hidden">
         {p.image_url ? (
           <img src={p.image_url} alt={name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -148,7 +126,6 @@ export function ProductCard({ p }: { p: Product }) {
       <div className="p-4">
         {cat && <div className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1">{cat}</div>}
         <h3 className="text-sm font-semibold line-clamp-2 mb-1">{name}</h3>
-        {p.price != null && <div className="text-sm font-medium">{p.price} {p.currency}</div>}
       </div>
     </Link>
   );

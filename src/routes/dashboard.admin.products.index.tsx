@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Plus, Pencil, Trash2, Loader2, Star, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { type Product, emptyProduct, slugify, assertBilingualPairs, STOCK_OPTIONS } from "@/lib/products";
+import { type Product, emptyProduct, slugify, assertBilingualPairs, useProductCategories } from "@/lib/products";
 import { ProductImagesManager } from "@/components/admin/ProductImagesManager";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
@@ -28,6 +28,7 @@ function ProductsAdmin() {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [filterFeatured, setFilterFeatured] = useState(false);
+  const { categories } = useProductCategories();
 
   const load = async () => {
     setLoading(true);
@@ -51,7 +52,7 @@ function ProductsAdmin() {
     return items.filter(p => {
       if (filterFeatured && !p.featured) return false;
       if (!q) return true;
-      return [p.name_en, p.name_ar, p.sku, p.category_en, p.category_ar, p.slug].some(v => (v || "").toLowerCase().includes(q));
+      return [p.name_en, p.name_ar, p.category_en, p.category_ar, p.slug].some(v => (v || "").toLowerCase().includes(q));
     });
   }, [items, search, filterFeatured]);
 
@@ -74,7 +75,6 @@ function ProductsAdmin() {
       ...editing,
       slug,
       gallery: editing.gallery || [],
-      price: editing.price === null || (editing.price as any) === "" ? null : Number(editing.price),
     };
     let error;
     if ("id" in editing && editing.id) {
@@ -142,7 +142,7 @@ function ProductsAdmin() {
                   </div>
                   <div className="text-xs text-muted-foreground mt-0.5" dir="rtl">{p.name_ar}</div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {[p.category_en, p.sku, p.price != null ? `${p.price} ${p.currency}` : null].filter(Boolean).join(" • ")}
+                    {[p.category_en].filter(Boolean).join(" • ")}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -165,22 +165,20 @@ function ProductsAdmin() {
               <div className="grid sm:grid-cols-2 gap-3">
                 <div><Label>Name (EN) *</Label><Input value={e.name_en} onChange={ev => setEditing({ ...e, name_en: ev.target.value, slug: e.slug || slugify(ev.target.value) })} /></div>
                 <div><Label>Name (AR) *</Label><Input dir="rtl" value={e.name_ar} onChange={ev => setEditing({ ...e, name_ar: ev.target.value })} /></div>
-                <div><Label>Category (EN) *</Label><Input value={e.category_en} onChange={ev => setEditing({ ...e, category_en: ev.target.value })} /></div>
-                <div><Label>Category (AR) *</Label><Input dir="rtl" value={e.category_ar} onChange={ev => setEditing({ ...e, category_ar: ev.target.value })} /></div>
-                <div><Label>SKU</Label><Input value={e.sku} onChange={ev => setEditing({ ...e, sku: ev.target.value })} /></div>
-                <div><Label>Slug</Label><Input value={e.slug} onChange={ev => setEditing({ ...e, slug: slugify(ev.target.value) })} /></div>
-              </div>
-
-              <div className="grid sm:grid-cols-3 gap-3">
-                <div><Label>Price</Label><Input type="number" step="0.01" value={e.price ?? ""} onChange={ev => setEditing({ ...e, price: ev.target.value ? Number(ev.target.value) : null })} /></div>
-                <div><Label>Currency</Label><Input maxLength={4} value={e.currency} onChange={ev => setEditing({ ...e, currency: ev.target.value.toUpperCase() })} /></div>
                 <div>
-                  <Label>Stock</Label>
-                  <Select value={e.stock_status} onValueChange={(v) => setEditing({ ...e, stock_status: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{STOCK_OPTIONS.map(s => <SelectItem key={s.value} value={s.value}>{s.en}</SelectItem>)}</SelectContent>
+                  <Label>Category (EN) *</Label>
+                  <Select value={e.category_en} onValueChange={v => {
+                    const cat = categories.find(c => c.name_en === v);
+                    setEditing({ ...e, category_en: v, category_ar: cat ? cat.name_ar : e.category_ar });
+                  }}>
+                    <SelectTrigger><SelectValue placeholder="Select category..." /></SelectTrigger>
+                    <SelectContent>
+                      {categories.map(c => <SelectItem key={c.id} value={c.name_en}>{c.name_en}</SelectItem>)}
+                    </SelectContent>
                   </Select>
                 </div>
+                <div><Label>Category (AR) *</Label><Input dir="rtl" readOnly value={e.category_ar} placeholder="Auto-filled" onChange={ev => setEditing({ ...e, category_ar: ev.target.value })} /></div>
+                <div><Label>Slug</Label><Input value={e.slug} onChange={ev => setEditing({ ...e, slug: slugify(ev.target.value) })} /></div>
               </div>
 
               <div className="space-y-1.5">

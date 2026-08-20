@@ -1,10 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { partnerDescriptions } from "@/data/partner-descriptions";
 
 export type PartnerRow = {
   id: string;
   name_en: string;
   name_ar: string;
+  description_en?: string;
+  description_ar?: string;
   logo: string;
   href: string;
   active: boolean;
@@ -153,7 +156,11 @@ export const defaultPartnersData: PartnerRow[] = [
     sort_order: 13,
     featured: false,
   },
-];
+].map(p => ({
+  ...p,
+  description_en: partnerDescriptions[p.name_en]?.en || "",
+  description_ar: partnerDescriptions[p.name_en]?.ar || ""
+}));
 
 type Ctx = {
   partners: PartnerRow[];
@@ -207,27 +214,35 @@ export function PartnersProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const upsert: Ctx["upsert"] = async (p) => {
-    const isNew = !p.id || p.id.startsWith("default-");
+    const isNewDbRow = !p.id || p.id.startsWith("default-") || p.id.startsWith("local-");
     const payload = {
       name_en: p.name_en ?? "",
       name_ar: p.name_ar ?? "",
+      description_en: p.description_en ?? "",
+      description_ar: p.description_ar ?? "",
       logo: p.logo ?? "https://cdn.simpleicons.org/cisco/005073",
       href: p.href ?? "",
       active: p.active ?? true,
       sort_order: p.sort_order ?? partners.length,
       featured: p.featured ?? false,
-      ...(!isNew ? { id: p.id } : {}),
+      ...(!isNewDbRow ? { id: p.id } : {}),
     };
+
+    const isNewToList = !p.id;
+    const tempId = p.id || `local-${Date.now()}`;
+
+    setPartners((prev) => {
+      if (isNewToList) {
+        return [...prev, { ...payload, id: tempId } as PartnerRow];
+      }
+      return prev.map((item) => (item.id === p.id ? { ...item, ...payload } : item));
+    });
 
     try {
       const { data, error } = await db.from("partners").upsert(payload).select().single();
       if (error) {
         console.error("[partners] save error", error);
-        const updated = isNew
-          ? [...partners, { ...payload, id: `local-${Date.now()}` }]
-          : partners.map((item) => (item.id === p.id ? { ...item, ...payload } : item));
-        setPartners(updated);
-        return { ...payload, id: p.id || `local-${Date.now()}` } as PartnerRow;
+        return { ...payload, id: tempId } as PartnerRow;
       }
       await refresh();
       return data as PartnerRow;

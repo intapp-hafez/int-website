@@ -125,7 +125,7 @@ function QuoteLeadsPage() {
                 {l.product_slug && (
                   <div className="inline-flex items-center gap-2 text-sm">
                     <Package className="h-3.5 w-3.5 text-muted-foreground" />
-                    <Link to="/shop/$slug" params={{ slug: l.product_slug }} className="font-medium hover:text-accent">{l.product_name}</Link>
+                    <Link to="/products/$slug" params={{ slug: l.product_slug }} className="font-medium hover:text-accent">{l.product_name}</Link>
                     <span className="text-xs text-muted-foreground">/{l.product_slug}</span>
                   </div>
                 )}

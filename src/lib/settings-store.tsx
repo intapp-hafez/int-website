@@ -9,7 +9,7 @@ export type PageKey =
   | "home"
   | "about"
   | "services"
-  | "shop"
+  | "products"
   | "projects"
   | "industries"
   | "careers"
@@ -43,7 +43,6 @@ export type ContactHeaderConfig = {
 };
 
 export type HeaderIconsConfig = {
-  cart: boolean;
   tracking: boolean;
 };
 
@@ -192,7 +191,7 @@ export const defaultSettings: SiteSettings = {
     home: true,
     about: true,
     services: true,
-    shop: true,
+    products: true,
     projects: true,
     industries: true,
     careers: true,
@@ -201,7 +200,6 @@ export const defaultSettings: SiteSettings = {
     contact: true,
   },
   headerIcons: {
-    cart: true,
     tracking: true,
   },
   sticky: {
@@ -286,7 +284,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
             : defaultSettings.testimonials,
           visibility: { ...defaultSettings.visibility, ...(parsed.visibility ?? {}) },
           headerIcons: {
-            cart: parsed.headerIcons?.cart !== undefined ? Boolean(parsed.headerIcons.cart) : defaultSettings.headerIcons.cart,
             tracking: parsed.headerIcons?.tracking !== undefined ? Boolean(parsed.headerIcons.tracking) : defaultSettings.headerIcons.tracking,
           },
           sticky: {

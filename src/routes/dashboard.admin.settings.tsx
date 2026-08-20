@@ -669,7 +669,7 @@ function SettingsPage() {
                 ["home", "Home"],
                 ["about", "About"],
                 ["services", "Services"],
-                ["shop", "Shop"],
+                ["products", "Products"],
                 ["projects", "Projects"],
                 ["industries", "Industries"],
                 ["careers", "Careers"],
@@ -700,34 +700,6 @@ function SettingsPage() {
               Control the visibility of the Shopping Cart and Quote Tracking icons in the website top header and navigation menu.
             </p>
             <div className="grid sm:grid-cols-2 gap-3 pt-2">
-              <label
-                htmlFor="icon_cart"
-                className="flex items-center justify-between gap-3 rounded-md border p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0">
-                    <ShoppingCart className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium">Cart & Quotation Bag</div>
-                    <div className="text-xs text-muted-foreground">Show or hide the shopping cart / quotation basket in the header.</div>
-                  </div>
-                </div>
-                <Switch
-                  id="icon_cart"
-                  checked={form.headerIcons?.cart !== false}
-                  onCheckedChange={(v) =>
-                    setForm({
-                      ...form,
-                      headerIcons: {
-                        ...(form.headerIcons || { cart: true, tracking: true }),
-                        cart: v,
-                      },
-                    })
-                  }
-                />
-              </label>
-
               <label
                 htmlFor="icon_tracking"
                 className="flex items-center justify-between gap-3 rounded-md border p-4 cursor-pointer hover:bg-muted/50 transition-colors"
@@ -974,7 +946,7 @@ function VisibilityPreview({
   lang: "en" | "ar";
 }) {
   const show = (k: keyof SiteSettings["visibility"]) => visibility[k] !== false;
-  const showCart = headerIcons?.cart !== false;
+
   const showTracking = headerIcons?.tracking !== false;
   const dir = lang === "ar" ? "rtl" : "ltr";
   const L = (en: string, ar: string) => (lang === "ar" ? ar : en);
@@ -983,7 +955,7 @@ function VisibilityPreview({
     show("home") && { label: L("Home", "الرئيسية") },
     show("about") && { label: L("About", "من نحن") },
     show("services") && { label: L("Services", "الخدمات"), mega: true },
-    show("shop") && { label: L("Shop", "المتجر") },
+    show("products") && { label: L("Products", "المنتجات") },
     show("projects") && { label: L("Projects", "المشاريع") },
   ].filter(Boolean) as { label: string; mega?: boolean }[];
 
@@ -992,7 +964,7 @@ function VisibilityPreview({
     show("services") && L("Services", "الخدمات"),
     show("projects") && L("Projects", "المشاريع"),
     show("industries") && L("Industries", "القطاعات"),
-    show("shop") && L("Shop", "المتجر"),
+    show("products") && L("Products", "المنتجات"),
   ].filter(Boolean) as string[];
 
   const footerCompany = [
@@ -1037,12 +1009,7 @@ function VisibilityPreview({
                     <span>{L("Track Quote", "تتبع العرض")}</span>
                   </span>
                 )}
-                {showCart && (
-                  <span className="inline-flex items-center gap-1 opacity-90">
-                    <ShoppingCart className="h-3 w-3" />
-                    <span>{L("Cart (0)", "السلة (0)")}</span>
-                  </span>
-                )}
+
                 <span className="font-semibold uppercase text-[9px] bg-accent text-accent-foreground px-1.5 py-0.5 rounded">
                   {lang.toUpperCase()}
                 </span>

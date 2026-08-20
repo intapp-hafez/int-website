@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useSettings } from "@/lib/settings-store";
-import { MiniCart } from "./MiniCart";
+
 import { trackCta } from "@/lib/cta-tracking";
 import { RequestProposalDialog } from "./RequestProposalDialog";
 import { cn } from "@/lib/utils";
@@ -48,7 +48,7 @@ export function TopHeader() {
               <span className="hidden md:inline">{lang === "ar" ? "تتبع العرض" : "Track Quote"}</span>
             </Link>
           )}
-          {settings.headerIcons?.cart !== false && <MiniCart />}
+
           <div role="group" aria-label="Language switcher" className="inline-flex items-center rounded-md border border-primary-foreground/30 overflow-hidden">
             <Globe className="h-3.5 w-3.5 mx-1 opacity-80 hidden sm:inline" aria-hidden="true" />
             <button

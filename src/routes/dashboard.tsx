@@ -51,6 +51,7 @@ const adminGroups: NavGroup[] = [
       { to: "/dashboard/admin/projects", en: "Projects", ar: "المشاريع", icon: ShieldCheck, role: "admin", pageKey: "projects" },
       { to: "/dashboard/admin/services", en: "Services", ar: "الخدمات", icon: Briefcase, role: "admin", pageKey: "services" },
       { to: "/dashboard/admin/products", en: "Products", ar: "المنتجات", icon: ShoppingBag, role: "admin", pageKey: "products" },
+      { to: "/dashboard/admin/product-categories", en: "Product Categories", ar: "فئات المنتجات", icon: Tag, role: "admin", pageKey: "products" },
       { to: "/dashboard/admin/reports", en: "Reports", ar: "التقارير", icon: BarChart3, role: "admin", pageKey: "reports" },
     ],
   },

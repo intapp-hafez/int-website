@@ -13,7 +13,7 @@ import logo from "@/assets/logo.png";
 const allLinks: { to: string; key: any; page: string }[] = [
   { to: "/", key: "nav.home", page: "home" },
   { to: "/about", key: "nav.about", page: "about" },
-  { to: "/shop", key: "nav.shop", page: "shop" },
+  { to: "/products", key: "nav.products", page: "Products" },
   { to: "/projects", key: "nav.projects", page: "projects" },
 ];
 

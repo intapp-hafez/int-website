@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Section } from "@/components/site/Section";
 import { useI18n } from "@/lib/i18n";
 import { usePartners } from "@/lib/partners-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Star } from "lucide-react";
 
-export const Route = createFileRoute("/partners")({
+export const Route = createFileRoute("/partners/")({
   head: () => ({ meta: [{ title: "Partners — Integrated Technics" }, { name: "description", content: "Authorized partner of the world's leading technology vendors." }] }),
   component: PartnersPage,
 });
@@ -41,7 +41,7 @@ function PartnersPage() {
             : list.map((p) => {
                 const name = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en || p.name_ar;
                 const inner = (
-                  <div className="relative aspect-[3/2] rounded-xl border bg-card flex flex-col items-center justify-center gap-2 p-4 hover:border-accent transition-colors group">
+                  <div className="relative aspect-[3/2] rounded-xl border bg-card flex flex-col items-center justify-center gap-2 p-4 hover:border-accent transition-colors group overflow-hidden">
                     {p.featured && (
                       <span className="absolute top-2 end-2 inline-flex items-center gap-1 text-[10px] font-semibold bg-accent/10 text-accent px-1.5 py-0.5 rounded">
                         <Star className="h-3 w-3 fill-current" />
@@ -49,11 +49,20 @@ function PartnersPage() {
                     )}
                     <img src={p.logo} alt={name} loading="lazy" referrerPolicy="no-referrer" className="max-h-10 max-w-[80%] object-contain grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition" />
                     <div className={`text-xs font-medium text-muted-foreground group-hover:text-accent text-center ${isAr ? "font-arabic" : ""}`} dir={isAr ? "rtl" : "ltr"}>{name}</div>
+                    
+                    {/* View Details Overlay for grid items */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-background/80 backdrop-blur-[2px]">
+                      <span className="text-foreground font-medium bg-background px-3 py-1.5 rounded-full border shadow-sm text-xs flex items-center gap-1 transition-transform duration-300 translate-y-2 group-hover:translate-y-0">
+                        {isAr ? 'عرض التفاصيل' : 'View Details'}
+                      </span>
+                    </div>
                   </div>
                 );
-                return p.href ? (
-                  <a key={p.id} href={p.href} target="_blank" rel="noreferrer" dir="ltr">{inner}</a>
-                ) : <div key={p.id}>{inner}</div>;
+                return (
+                  <Link key={p.id} to="/partners/$id" params={{ id: p.id }} dir="ltr" className="block">
+                    {inner}
+                  </Link>
+                );
               })}
         </div>
       </Section>
