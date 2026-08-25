@@ -42,8 +42,7 @@ function TrackPage() {
       }
 
       // 2. Try search in quotes by id
-      const { data: quote } = await supabase
-        .from("quotes")
+      const { data: quote } = await (supabase as any).from("quotes")
         .select("*")
         .eq("id", query)
         .maybeSingle();

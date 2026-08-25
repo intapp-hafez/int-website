@@ -74,8 +74,7 @@ function QuotationsPage() {
   const loadQuotes = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("quotes")
+      const { data, error } = await (supabase as any).from("quotes")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -144,7 +143,7 @@ function QuotationsPage() {
     if (!can.edit) return;
     setItems((prev) => prev.map((q) => (q.id === id ? { ...q, status } : q)));
     try {
-      const { error } = await supabase.from("quotes").update({ status }).eq("id", id);
+      const { error } = await (supabase as any).from("quotes").update({ status }).eq("id", id);
       if (error) throw error;
       toast.success(isAr ? "تم تحديث حالة عرض السعر" : "Quotation status updated");
     } catch (err: any) {
@@ -212,7 +211,7 @@ function QuotationsPage() {
     setSelected([]);
 
     try {
-      const { error } = await supabase.from("quotes").delete().in("id", toDelete);
+      const { error } = await (supabase as any).from("quotes").delete().in("id", toDelete);
       if (error) throw error;
       toast.success(isAr ? "تم حذف العروض المحددة" : "Selected quotations deleted");
     } catch (err: any) {
@@ -230,7 +229,7 @@ function QuotationsPage() {
     setSelected([]);
 
     try {
-      const { error } = await supabase.from("quotes").update({ status }).in("id", toUpdate);
+      const { error } = await (supabase as any).from("quotes").update({ status }).in("id", toUpdate);
       if (error) throw error;
       toast.success(isAr ? "تم تحديث حالة العروض" : "Quotations status updated");
     } catch (err: any) {

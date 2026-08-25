@@ -61,8 +61,7 @@ function AdminOverview() {
         const conversionRate = leadsTotal ? Math.round((leadsWon / leadsTotal) * 100) : 0;
 
         // 2. Quotes & Revenue
-        const { data: quotesData } = await supabase
-          .from("quotes")
+        const { data: quotesData } = await (supabase as any).from("quotes")
           .select("id, total, status");
 
         const quotes = quotesData || [];

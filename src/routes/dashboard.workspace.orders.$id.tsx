@@ -35,7 +35,7 @@ function ClientOrderDetail() {
     ensureInvoiceFonts();
     const loadQuote = async () => {
       try {
-        const { data } = await supabase.from("quotes").select("*").eq("id", id).maybeSingle();
+        const { data } = await (supabase as any).from("quotes").select("*").eq("id", id).maybeSingle();
         if (data) {
           setQuote(data);
         }

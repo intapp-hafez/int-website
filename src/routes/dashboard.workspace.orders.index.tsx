@@ -36,8 +36,7 @@ function ClientOrders() {
   const loadOrders = async () => {
     try {
       if (!user) return;
-      const { data, error } = await supabase
-        .from("quotes")
+      const { data, error } = await (supabase as any).from("quotes")
         .select("*")
         .or(`email.eq.${user.email},full_name.eq.${user.user_metadata?.full_name || ""}`)
         .order("created_at", { ascending: false });

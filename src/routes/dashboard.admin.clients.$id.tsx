@@ -72,7 +72,7 @@ function ClientDetail() {
 
       // 3. Try finding in quotes
       const { data: quoteMatch } = (!userRole && !lead)
-        ? await supabase.from("quotes").select("*").eq("id", id).maybeSingle()
+        ? await (supabase as any).from("quotes").select("*").eq("id", id).maybeSingle()
         : { data: null };
 
       let clientInfo: ClientData | null = null;
