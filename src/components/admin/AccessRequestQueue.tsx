@@ -160,35 +160,9 @@ export function AccessRequestQueue() {
             </div>
           ))
         )}
-
-        {grants.length > 0 && (
-          <div className="pt-4 mt-2 border-t space-y-2">
-            <div className="text-sm font-medium">{ar ? "الصلاحيات المؤقتة النشطة" : "Active grants"}</div>
-            {grants.map((g) => (
-              <div key={g.id} className="flex items-center justify-between gap-3 text-xs border rounded-lg px-3 py-2 flex-wrap">
-                <div className="min-w-0">
-                  <span className="font-medium">{label(g.pageKey)}</span>{" "}
-                  <span className="font-mono text-muted-foreground">{g.userId}</span>
-                  <div className="mt-1 flex flex-wrap items-center gap-1">
-                    {g.actions.map((a) => (
-                      <Badge key={a} variant="outline" className="font-mono text-[10px]">{a}</Badge>
-                    ))}
-                    <span className="text-muted-foreground ms-1 inline-flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {g.expiresAt
-                        ? `${ar ? "ينتهي" : "expires"} ${new Date(g.expiresAt).toLocaleString(ar ? "ar-EG" : "en-GB")}`
-                        : ar ? "دائم" : "permanent"}
-                    </span>
-                  </div>
-                </div>
-                <Button size="sm" variant="outline" onClick={() => { void revokeGrant(g.id); toast.success(ar ? "تم سحب الصلاحية" : "Grant revoked"); }}>
-                  <ShieldOff className="h-4 w-4 me-1" />{ar ? "سحب" : "Revoke"}
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
       </CardContent>
-    </Card>
+      </Card>
+      <ActiveGrantsTable />
+    </div>
   );
 }
