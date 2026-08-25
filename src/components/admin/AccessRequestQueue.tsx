@@ -80,6 +80,7 @@ export function AccessRequestQueue() {
   };
 
   return (
+    <div className="space-y-4">
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 flex-wrap">
         <CardTitle className="font-display text-base inline-flex items-center gap-2">
