@@ -9,194 +9,119 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as CareersRouteImport } from './routes/careers'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as IndustriesRouteImport } from './routes/industries'
-import { Route as PoliciesRouteImport } from './routes/policies'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as ProjectsRouteImport } from './routes/projects'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as ServicesRouteImport } from './routes/services'
-import { Route as SigninRouteImport } from './routes/signin'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as TrackApplicationRouteImport } from './routes/track-application'
 import { Route as TrackQuoteRouteImport } from './routes/track-quote'
-import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
-import { Route as DashboardAdminRouteImport } from './routes/dashboard.admin'
-import { Route as DashboardWorkspaceRouteImport } from './routes/dashboard.workspace'
-import { Route as NewsIndexRouteImport } from './routes/news.index'
-import { Route as NewsSlugRouteImport } from './routes/news.$slug'
-import { Route as PartnersIndexRouteImport } from './routes/partners.index'
-import { Route as PartnersIdRouteImport } from './routes/partners_.$id'
+import { Route as TrackApplicationRouteImport } from './routes/track-application'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SigninRouteImport } from './routes/signin'
+import { Route as ServicesRouteImport } from './routes/services'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PoliciesRouteImport } from './routes/policies'
+import { Route as IndustriesRouteImport } from './routes/industries'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
-import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
+import { Route as PartnersIndexRouteImport } from './routes/partners.index'
+import { Route as NewsIndexRouteImport } from './routes/news.index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
-import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard.admin.index'
-import { Route as DashboardAdminAboutRouteImport } from './routes/dashboard.admin.about'
-import { Route as DashboardAdminCareersRouteImport } from './routes/dashboard.admin.careers'
-import { Route as DashboardAdminChatbotRouteImport } from './routes/dashboard.admin.chatbot'
-import { Route as DashboardAdminClientsRouteImport } from './routes/dashboard.admin.clients'
-import { Route as DashboardAdminFaqsRouteImport } from './routes/dashboard.admin.faqs'
-import { Route as DashboardAdminHelpdeskRouteImport } from './routes/dashboard.admin.helpdesk'
-import { Route as DashboardAdminIndustriesRouteImport } from './routes/dashboard.admin.industries'
-import { Route as DashboardAdminLeadsRouteImport } from './routes/dashboard.admin.leads'
-import { Route as DashboardAdminNewsRouteImport } from './routes/dashboard.admin.news'
-import { Route as DashboardAdminNotificationsRouteImport } from './routes/dashboard.admin.notifications'
-import { Route as DashboardAdminOrdersRouteImport } from './routes/dashboard.admin.orders'
-import { Route as DashboardAdminPartnersRouteImport } from './routes/dashboard.admin.partners'
-import { Route as DashboardAdminPermissionsRouteImport } from './routes/dashboard.admin.permissions'
-import { Route as DashboardAdminPoliciesRouteImport } from './routes/dashboard.admin.policies'
-import { Route as DashboardAdminProductCategoriesRouteImport } from './routes/dashboard.admin.product-categories'
-import { Route as DashboardAdminProductsRouteImport } from './routes/dashboard.admin.products'
-import { Route as DashboardAdminProjectsRouteImport } from './routes/dashboard.admin.projects'
-import { Route as DashboardAdminQuotationsRouteImport } from './routes/dashboard.admin.quotations'
-import { Route as DashboardAdminRecommendationsRouteImport } from './routes/dashboard.admin.recommendations'
-import { Route as DashboardAdminReportsRouteImport } from './routes/dashboard.admin.reports'
-import { Route as DashboardAdminReviewsRouteImport } from './routes/dashboard.admin.reviews'
-import { Route as DashboardAdminSecurityRouteImport } from './routes/dashboard.admin.security'
-import { Route as DashboardAdminSeoRouteImport } from './routes/dashboard.admin.seo'
-import { Route as DashboardAdminServicesRouteImport } from './routes/dashboard.admin.services'
-import { Route as DashboardAdminSettingsRouteImport } from './routes/dashboard.admin.settings'
-import { Route as DashboardAdminSlidersRouteImport } from './routes/dashboard.admin.sliders'
-import { Route as DashboardAdminSmtpRouteImport } from './routes/dashboard.admin.smtp'
-import { Route as DashboardAdminTermsRouteImport } from './routes/dashboard.admin.terms'
-import { Route as DashboardAdminTicketsRouteImport } from './routes/dashboard.admin.tickets'
-import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard.admin.users'
+import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
+import { Route as PartnersIdRouteImport } from './routes/partners_.$id'
+import { Route as NewsSlugRouteImport } from './routes/news.$slug'
+import { Route as DashboardWorkspaceRouteImport } from './routes/dashboard.workspace'
+import { Route as DashboardAdminRouteImport } from './routes/dashboard.admin'
 import { Route as DashboardWorkspaceIndexRouteImport } from './routes/dashboard.workspace.index'
-import { Route as DashboardWorkspaceAssessmentRouteImport } from './routes/dashboard.workspace.assessment'
-import { Route as DashboardWorkspaceNewRouteImport } from './routes/dashboard.workspace.new'
-import { Route as DashboardWorkspaceOrdersRouteImport } from './routes/dashboard.workspace.orders'
-import { Route as DashboardWorkspaceProfileRouteImport } from './routes/dashboard.workspace.profile'
-import { Route as DashboardWorkspaceTicketsRouteImport } from './routes/dashboard.workspace.tickets'
+import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard.admin.index'
 import { Route as DashboardWorkspaceTrackRouteImport } from './routes/dashboard.workspace.track'
-import { Route as ApiPublicHooksSeoBotDailyRouteImport } from './routes/api/public/hooks/seo-bot-daily'
-import { Route as DashboardAdminCareersIndexRouteImport } from './routes/dashboard.admin.careers.index'
-import { Route as DashboardAdminCareersAnalyticsRouteImport } from './routes/dashboard.admin.careers.analytics'
-import { Route as DashboardAdminClientsIndexRouteImport } from './routes/dashboard.admin.clients.index'
-import { Route as DashboardAdminClientsIdRouteImport } from './routes/dashboard.admin.clients.$id'
-import { Route as DashboardAdminHelpdeskBranchesRouteImport } from './routes/dashboard.admin.helpdesk.branches'
-import { Route as DashboardAdminHelpdeskCategoriesRouteImport } from './routes/dashboard.admin.helpdesk.categories'
-import { Route as DashboardAdminHelpdeskDevicesRouteImport } from './routes/dashboard.admin.helpdesk.devices'
-import { Route as DashboardAdminHelpdeskInvoiceRecipientsRouteImport } from './routes/dashboard.admin.helpdesk.invoice-recipients'
-import { Route as DashboardAdminHelpdeskPerformanceRouteImport } from './routes/dashboard.admin.helpdesk.performance'
-import { Route as DashboardAdminHelpdeskSlaRouteImport } from './routes/dashboard.admin.helpdesk.sla'
-import { Route as DashboardAdminHelpdeskTicketsRouteImport } from './routes/dashboard.admin.helpdesk.tickets'
-import { Route as DashboardAdminLeadsIndexRouteImport } from './routes/dashboard.admin.leads.index'
-import { Route as DashboardAdminLeadsIdRouteImport } from './routes/dashboard.admin.leads.$id'
-import { Route as DashboardAdminLeadsQuotesRouteImport } from './routes/dashboard.admin.leads.quotes'
-import { Route as DashboardAdminLocationsIndexRouteImport } from './routes/dashboard.admin.locations.index'
-import { Route as DashboardAdminNationalitiesIndexRouteImport } from './routes/dashboard.admin.nationalities.index'
-import { Route as DashboardAdminOrdersIndexRouteImport } from './routes/dashboard.admin.orders.index'
-import { Route as DashboardAdminOrdersIdRouteImport } from './routes/dashboard.admin.orders.$id'
-import { Route as DashboardAdminProductCategoriesIndexRouteImport } from './routes/dashboard.admin.product-categories.index'
-import { Route as DashboardAdminProductsIndexRouteImport } from './routes/dashboard.admin.products.index'
-import { Route as DashboardAdminProjectsIndexRouteImport } from './routes/dashboard.admin.projects.index'
-import { Route as DashboardAdminProjectsIdRouteImport } from './routes/dashboard.admin.projects.$id'
-import { Route as DashboardAdminProjectsNewRouteImport } from './routes/dashboard.admin.projects.new'
-import { Route as DashboardAdminQuotationsIndexRouteImport } from './routes/dashboard.admin.quotations.index'
-import { Route as DashboardAdminQuotationsIdRouteImport } from './routes/dashboard.admin.quotations.$id'
-import { Route as DashboardAdminTicketsIndexRouteImport } from './routes/dashboard.admin.tickets.index'
-import { Route as DashboardAdminTicketsIdRouteImport } from './routes/dashboard.admin.tickets.$id'
-import { Route as DashboardAdminUsersIndexRouteImport } from './routes/dashboard.admin.users.index'
-import { Route as DashboardAdminUsersIdRouteImport } from './routes/dashboard.admin.users.$id'
-import { Route as DashboardWorkspaceOrdersIndexRouteImport } from './routes/dashboard.workspace.orders.index'
-import { Route as DashboardWorkspaceOrdersIdRouteImport } from './routes/dashboard.workspace.orders.$id'
+import { Route as DashboardWorkspaceTicketsRouteImport } from './routes/dashboard.workspace.tickets'
+import { Route as DashboardWorkspaceProfileRouteImport } from './routes/dashboard.workspace.profile'
+import { Route as DashboardWorkspaceOrdersRouteImport } from './routes/dashboard.workspace.orders'
+import { Route as DashboardWorkspaceNewRouteImport } from './routes/dashboard.workspace.new'
+import { Route as DashboardWorkspaceAssessmentRouteImport } from './routes/dashboard.workspace.assessment'
+import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard.admin.users'
+import { Route as DashboardAdminTicketsRouteImport } from './routes/dashboard.admin.tickets'
+import { Route as DashboardAdminTermsRouteImport } from './routes/dashboard.admin.terms'
+import { Route as DashboardAdminSmtpRouteImport } from './routes/dashboard.admin.smtp'
+import { Route as DashboardAdminSlidersRouteImport } from './routes/dashboard.admin.sliders'
+import { Route as DashboardAdminSettingsRouteImport } from './routes/dashboard.admin.settings'
+import { Route as DashboardAdminServicesRouteImport } from './routes/dashboard.admin.services'
+import { Route as DashboardAdminSeoRouteImport } from './routes/dashboard.admin.seo'
+import { Route as DashboardAdminSecurityRouteImport } from './routes/dashboard.admin.security'
+import { Route as DashboardAdminReviewsRouteImport } from './routes/dashboard.admin.reviews'
+import { Route as DashboardAdminReportsRouteImport } from './routes/dashboard.admin.reports'
+import { Route as DashboardAdminRecommendationsRouteImport } from './routes/dashboard.admin.recommendations'
+import { Route as DashboardAdminQuotationsRouteImport } from './routes/dashboard.admin.quotations'
+import { Route as DashboardAdminProjectsRouteImport } from './routes/dashboard.admin.projects'
+import { Route as DashboardAdminProductsRouteImport } from './routes/dashboard.admin.products'
+import { Route as DashboardAdminProductCategoriesRouteImport } from './routes/dashboard.admin.product-categories'
+import { Route as DashboardAdminPoliciesRouteImport } from './routes/dashboard.admin.policies'
+import { Route as DashboardAdminPermissionsRouteImport } from './routes/dashboard.admin.permissions'
+import { Route as DashboardAdminPartnersRouteImport } from './routes/dashboard.admin.partners'
+import { Route as DashboardAdminOrdersRouteImport } from './routes/dashboard.admin.orders'
+import { Route as DashboardAdminNotificationsRouteImport } from './routes/dashboard.admin.notifications'
+import { Route as DashboardAdminNewsRouteImport } from './routes/dashboard.admin.news'
+import { Route as DashboardAdminLeadsRouteImport } from './routes/dashboard.admin.leads'
+import { Route as DashboardAdminIndustriesRouteImport } from './routes/dashboard.admin.industries'
+import { Route as DashboardAdminHelpdeskRouteImport } from './routes/dashboard.admin.helpdesk'
+import { Route as DashboardAdminFaqsRouteImport } from './routes/dashboard.admin.faqs'
+import { Route as DashboardAdminClientsRouteImport } from './routes/dashboard.admin.clients'
+import { Route as DashboardAdminChatbotRouteImport } from './routes/dashboard.admin.chatbot'
+import { Route as DashboardAdminCareersRouteImport } from './routes/dashboard.admin.careers'
+import { Route as DashboardAdminAboutRouteImport } from './routes/dashboard.admin.about'
 import { Route as DashboardWorkspaceTicketsIndexRouteImport } from './routes/dashboard.workspace.tickets.index'
+import { Route as DashboardWorkspaceOrdersIndexRouteImport } from './routes/dashboard.workspace.orders.index'
+import { Route as DashboardAdminUsersIndexRouteImport } from './routes/dashboard.admin.users.index'
+import { Route as DashboardAdminTicketsIndexRouteImport } from './routes/dashboard.admin.tickets.index'
+import { Route as DashboardAdminQuotationsIndexRouteImport } from './routes/dashboard.admin.quotations.index'
+import { Route as DashboardAdminProjectsIndexRouteImport } from './routes/dashboard.admin.projects.index'
+import { Route as DashboardAdminProductsIndexRouteImport } from './routes/dashboard.admin.products.index'
+import { Route as DashboardAdminProductCategoriesIndexRouteImport } from './routes/dashboard.admin.product-categories.index'
+import { Route as DashboardAdminOrdersIndexRouteImport } from './routes/dashboard.admin.orders.index'
+import { Route as DashboardAdminNationalitiesIndexRouteImport } from './routes/dashboard.admin.nationalities.index'
+import { Route as DashboardAdminLocationsIndexRouteImport } from './routes/dashboard.admin.locations.index'
+import { Route as DashboardAdminLeadsIndexRouteImport } from './routes/dashboard.admin.leads.index'
+import { Route as DashboardAdminClientsIndexRouteImport } from './routes/dashboard.admin.clients.index'
+import { Route as DashboardAdminCareersIndexRouteImport } from './routes/dashboard.admin.careers.index'
 import { Route as DashboardWorkspaceTicketsIdRouteImport } from './routes/dashboard.workspace.tickets.$id'
-import { Route as DashboardAdminCareersApplicationsIndexRouteImport } from './routes/dashboard.admin.careers.applications.index'
-import { Route as DashboardAdminCareersApplicationsIdRouteImport } from './routes/dashboard.admin.careers.applications.$id'
-import { Route as DashboardAdminHelpdeskTicketsIndexRouteImport } from './routes/dashboard.admin.helpdesk.tickets.index'
-import { Route as DashboardAdminHelpdeskTicketsIdRouteImport } from './routes/dashboard.admin.helpdesk.tickets.$id'
-import { Route as DashboardAdminHelpdeskTicketsNewRouteImport } from './routes/dashboard.admin.helpdesk.tickets.new'
-import { Route as DashboardAdminLeadsQuotesIdRouteImport } from './routes/dashboard.admin.leads.quotes.$id'
-import { Route as DashboardAdminLeadsQuotesEmailSettingsRouteImport } from './routes/dashboard.admin.leads.quotes.email-settings'
+import { Route as DashboardWorkspaceOrdersIdRouteImport } from './routes/dashboard.workspace.orders.$id'
+import { Route as DashboardAdminUsersIdRouteImport } from './routes/dashboard.admin.users.$id'
+import { Route as DashboardAdminTicketsIdRouteImport } from './routes/dashboard.admin.tickets.$id'
+import { Route as DashboardAdminQuotationsIdRouteImport } from './routes/dashboard.admin.quotations.$id'
+import { Route as DashboardAdminProjectsNewRouteImport } from './routes/dashboard.admin.projects.new'
+import { Route as DashboardAdminProjectsIdRouteImport } from './routes/dashboard.admin.projects.$id'
+import { Route as DashboardAdminOrdersIdRouteImport } from './routes/dashboard.admin.orders.$id'
+import { Route as DashboardAdminLeadsQuotesRouteImport } from './routes/dashboard.admin.leads.quotes'
+import { Route as DashboardAdminLeadsIdRouteImport } from './routes/dashboard.admin.leads.$id'
+import { Route as DashboardAdminHelpdeskTicketsRouteImport } from './routes/dashboard.admin.helpdesk.tickets'
+import { Route as DashboardAdminHelpdeskSlaRouteImport } from './routes/dashboard.admin.helpdesk.sla'
+import { Route as DashboardAdminHelpdeskPerformanceRouteImport } from './routes/dashboard.admin.helpdesk.performance'
+import { Route as DashboardAdminHelpdeskInvoiceRecipientsRouteImport } from './routes/dashboard.admin.helpdesk.invoice-recipients'
+import { Route as DashboardAdminHelpdeskDevicesRouteImport } from './routes/dashboard.admin.helpdesk.devices'
+import { Route as DashboardAdminHelpdeskCategoriesRouteImport } from './routes/dashboard.admin.helpdesk.categories'
+import { Route as DashboardAdminHelpdeskBranchesRouteImport } from './routes/dashboard.admin.helpdesk.branches'
+import { Route as DashboardAdminClientsIdRouteImport } from './routes/dashboard.admin.clients.$id'
+import { Route as DashboardAdminCareersAnalyticsRouteImport } from './routes/dashboard.admin.careers.analytics'
+import { Route as ApiPublicHooksSeoBotDailyRouteImport } from './routes/api/public/hooks/seo-bot-daily'
 import { Route as DashboardAdminProjectsIdIndexRouteImport } from './routes/dashboard.admin.projects.$id.index'
+import { Route as DashboardAdminHelpdeskTicketsIndexRouteImport } from './routes/dashboard.admin.helpdesk.tickets.index'
+import { Route as DashboardAdminCareersApplicationsIndexRouteImport } from './routes/dashboard.admin.careers.applications.index'
 import { Route as DashboardAdminProjectsIdEditRouteImport } from './routes/dashboard.admin.projects.$id.edit'
+import { Route as DashboardAdminLeadsQuotesEmailSettingsRouteImport } from './routes/dashboard.admin.leads.quotes.email-settings'
+import { Route as DashboardAdminLeadsQuotesIdRouteImport } from './routes/dashboard.admin.leads.quotes.$id'
+import { Route as DashboardAdminHelpdeskTicketsNewRouteImport } from './routes/dashboard.admin.helpdesk.tickets.new'
+import { Route as DashboardAdminHelpdeskTicketsIdRouteImport } from './routes/dashboard.admin.helpdesk.tickets.$id'
+import { Route as DashboardAdminCareersApplicationsIdRouteImport } from './routes/dashboard.admin.careers.applications.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CareersRoute = CareersRouteImport.update({
-  id: '/careers',
-  path: '/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndustriesRoute = IndustriesRouteImport.update({
-  id: '/industries',
-  path: '/industries',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PoliciesRoute = PoliciesRouteImport.update({
-  id: '/policies',
-  path: '/policies',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectsRoute = ProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ServicesRoute = ServicesRouteImport.update({
-  id: '/services',
-  path: '/services',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SigninRoute = SigninRouteImport.update({
-  id: '/signin',
-  path: '/signin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
+const TrackQuoteRoute = TrackQuoteRouteImport.update({
+  id: '/track-quote',
+  path: '/track-quote',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrackApplicationRoute = TrackApplicationRouteImport.update({
@@ -204,44 +129,84 @@ const TrackApplicationRoute = TrackApplicationRouteImport.update({
   path: '/track-application',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TrackQuoteRoute = TrackQuoteRouteImport.update({
-  id: '/track-quote',
-  path: '/track-quote',
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardIndexRoute = DashboardIndexRouteImport.update({
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliciesRoute = PoliciesRouteImport.update({
+  id: '/policies',
+  path: '/policies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndustriesRoute = IndustriesRouteImport.update({
+  id: '/industries',
+  path: '/industries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardAdminRoute = DashboardAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardWorkspaceRoute = DashboardWorkspaceRouteImport.update({
-  id: '/workspace',
-  path: '/workspace',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const NewsIndexRoute = NewsIndexRouteImport.update({
-  id: '/news/',
-  path: '/news/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NewsSlugRoute = NewsSlugRouteImport.update({
-  id: '/news/$slug',
-  path: '/news/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartnersIndexRoute = PartnersIndexRouteImport.update({
-  id: '/partners/',
-  path: '/partners/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartnersIdRoute = PartnersIdRouteImport.update({
-  id: '/partners_/$id',
-  path: '/partners/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsIndexRoute = ProductsIndexRouteImport.update({
@@ -249,197 +214,70 @@ const ProductsIndexRoute = ProductsIndexRouteImport.update({
   path: '/products/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProductsSlugRoute = ProductsSlugRouteImport.update({
-  id: '/products/$slug',
-  path: '/products/$slug',
+const PartnersIndexRoute = PartnersIndexRouteImport.update({
+  id: '/partners/',
+  path: '/partners/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const NewsIndexRoute = NewsIndexRouteImport.update({
+  id: '/news/',
+  path: '/news/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const ServicesSlugRoute = ServicesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ServicesRoute,
 } as any)
-const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardAdminRoute,
+const ProductsSlugRoute = ProductsSlugRouteImport.update({
+  id: '/products/$slug',
+  path: '/products/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardAdminAboutRoute = DashboardAdminAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => DashboardAdminRoute,
+const PartnersIdRoute = PartnersIdRouteImport.update({
+  id: '/partners_/$id',
+  path: '/partners/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardAdminCareersRoute = DashboardAdminCareersRouteImport.update({
-  id: '/careers',
-  path: '/careers',
-  getParentRoute: () => DashboardAdminRoute,
+const NewsSlugRoute = NewsSlugRouteImport.update({
+  id: '/news/$slug',
+  path: '/news/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardAdminChatbotRoute = DashboardAdminChatbotRouteImport.update({
-  id: '/chatbot',
-  path: '/chatbot',
-  getParentRoute: () => DashboardAdminRoute,
+const DashboardWorkspaceRoute = DashboardWorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
+  getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardAdminClientsRoute = DashboardAdminClientsRouteImport.update({
-  id: '/clients',
-  path: '/clients',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminFaqsRoute = DashboardAdminFaqsRouteImport.update({
-  id: '/faqs',
-  path: '/faqs',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminHelpdeskRoute = DashboardAdminHelpdeskRouteImport.update({
-  id: '/helpdesk',
-  path: '/helpdesk',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminIndustriesRoute =
-  DashboardAdminIndustriesRouteImport.update({
-    id: '/industries',
-    path: '/industries',
-    getParentRoute: () => DashboardAdminRoute,
-  } as any)
-const DashboardAdminLeadsRoute = DashboardAdminLeadsRouteImport.update({
-  id: '/leads',
-  path: '/leads',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminNewsRoute = DashboardAdminNewsRouteImport.update({
-  id: '/news',
-  path: '/news',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminNotificationsRoute =
-  DashboardAdminNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => DashboardAdminRoute,
-  } as any)
-const DashboardAdminOrdersRoute = DashboardAdminOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminPartnersRoute = DashboardAdminPartnersRouteImport.update({
-  id: '/partners',
-  path: '/partners',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminPermissionsRoute =
-  DashboardAdminPermissionsRouteImport.update({
-    id: '/permissions',
-    path: '/permissions',
-    getParentRoute: () => DashboardAdminRoute,
-  } as any)
-const DashboardAdminPoliciesRoute = DashboardAdminPoliciesRouteImport.update({
-  id: '/policies',
-  path: '/policies',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminProductCategoriesRoute =
-  DashboardAdminProductCategoriesRouteImport.update({
-    id: '/product-categories',
-    path: '/product-categories',
-    getParentRoute: () => DashboardAdminRoute,
-  } as any)
-const DashboardAdminProductsRoute = DashboardAdminProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminProjectsRoute = DashboardAdminProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminQuotationsRoute =
-  DashboardAdminQuotationsRouteImport.update({
-    id: '/quotations',
-    path: '/quotations',
-    getParentRoute: () => DashboardAdminRoute,
-  } as any)
-const DashboardAdminRecommendationsRoute =
-  DashboardAdminRecommendationsRouteImport.update({
-    id: '/recommendations',
-    path: '/recommendations',
-    getParentRoute: () => DashboardAdminRoute,
-  } as any)
-const DashboardAdminReportsRoute = DashboardAdminReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminReviewsRoute = DashboardAdminReviewsRouteImport.update({
-  id: '/reviews',
-  path: '/reviews',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminSecurityRoute = DashboardAdminSecurityRouteImport.update({
-  id: '/security',
-  path: '/security',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminSeoRoute = DashboardAdminSeoRouteImport.update({
-  id: '/seo',
-  path: '/seo',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminServicesRoute = DashboardAdminServicesRouteImport.update({
-  id: '/services',
-  path: '/services',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminSettingsRoute = DashboardAdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminSlidersRoute = DashboardAdminSlidersRouteImport.update({
-  id: '/sliders',
-  path: '/sliders',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminSmtpRoute = DashboardAdminSmtpRouteImport.update({
-  id: '/smtp',
-  path: '/smtp',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminTermsRoute = DashboardAdminTermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminTicketsRoute = DashboardAdminTicketsRouteImport.update({
-  id: '/tickets',
-  path: '/tickets',
-  getParentRoute: () => DashboardAdminRoute,
-} as any)
-const DashboardAdminUsersRoute = DashboardAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => DashboardAdminRoute,
+const DashboardAdminRoute = DashboardAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardWorkspaceIndexRoute = DashboardWorkspaceIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardWorkspaceRoute,
 } as any)
-const DashboardWorkspaceAssessmentRoute =
-  DashboardWorkspaceAssessmentRouteImport.update({
-    id: '/assessment',
-    path: '/assessment',
-    getParentRoute: () => DashboardWorkspaceRoute,
-  } as any)
-const DashboardWorkspaceNewRoute = DashboardWorkspaceNewRouteImport.update({
-  id: '/new',
-  path: '/new',
+const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardWorkspaceTrackRoute = DashboardWorkspaceTrackRouteImport.update({
+  id: '/track',
+  path: '/track',
   getParentRoute: () => DashboardWorkspaceRoute,
 } as any)
-const DashboardWorkspaceOrdersRoute =
-  DashboardWorkspaceOrdersRouteImport.update({
-    id: '/orders',
-    path: '/orders',
+const DashboardWorkspaceTicketsRoute =
+  DashboardWorkspaceTicketsRouteImport.update({
+    id: '/tickets',
+    path: '/tickets',
     getParentRoute: () => DashboardWorkspaceRoute,
   } as any)
 const DashboardWorkspaceProfileRoute =
@@ -448,133 +286,214 @@ const DashboardWorkspaceProfileRoute =
     path: '/profile',
     getParentRoute: () => DashboardWorkspaceRoute,
   } as any)
-const DashboardWorkspaceTicketsRoute =
-  DashboardWorkspaceTicketsRouteImport.update({
-    id: '/tickets',
-    path: '/tickets',
+const DashboardWorkspaceOrdersRoute =
+  DashboardWorkspaceOrdersRouteImport.update({
+    id: '/orders',
+    path: '/orders',
     getParentRoute: () => DashboardWorkspaceRoute,
   } as any)
-const DashboardWorkspaceTrackRoute = DashboardWorkspaceTrackRouteImport.update({
-  id: '/track',
-  path: '/track',
+const DashboardWorkspaceNewRoute = DashboardWorkspaceNewRouteImport.update({
+  id: '/new',
+  path: '/new',
   getParentRoute: () => DashboardWorkspaceRoute,
 } as any)
-const ApiPublicHooksSeoBotDailyRoute =
-  ApiPublicHooksSeoBotDailyRouteImport.update({
-    id: '/api/public/hooks/seo-bot-daily',
-    path: '/api/public/hooks/seo-bot-daily',
-    getParentRoute: () => rootRouteImport,
+const DashboardWorkspaceAssessmentRoute =
+  DashboardWorkspaceAssessmentRouteImport.update({
+    id: '/assessment',
+    path: '/assessment',
+    getParentRoute: () => DashboardWorkspaceRoute,
   } as any)
-const DashboardAdminCareersIndexRoute =
-  DashboardAdminCareersIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminCareersRoute,
-  } as any)
-const DashboardAdminCareersAnalyticsRoute =
-  DashboardAdminCareersAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => DashboardAdminCareersRoute,
-  } as any)
-const DashboardAdminClientsIndexRoute =
-  DashboardAdminClientsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminClientsRoute,
-  } as any)
-const DashboardAdminClientsIdRoute = DashboardAdminClientsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => DashboardAdminClientsRoute,
+const DashboardAdminUsersRoute = DashboardAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => DashboardAdminRoute,
 } as any)
-const DashboardAdminHelpdeskBranchesRoute =
-  DashboardAdminHelpdeskBranchesRouteImport.update({
-    id: '/branches',
-    path: '/branches',
-    getParentRoute: () => DashboardAdminHelpdeskRoute,
-  } as any)
-const DashboardAdminHelpdeskCategoriesRoute =
-  DashboardAdminHelpdeskCategoriesRouteImport.update({
-    id: '/categories',
-    path: '/categories',
-    getParentRoute: () => DashboardAdminHelpdeskRoute,
-  } as any)
-const DashboardAdminHelpdeskDevicesRoute =
-  DashboardAdminHelpdeskDevicesRouteImport.update({
-    id: '/devices',
-    path: '/devices',
-    getParentRoute: () => DashboardAdminHelpdeskRoute,
-  } as any)
-const DashboardAdminHelpdeskInvoiceRecipientsRoute =
-  DashboardAdminHelpdeskInvoiceRecipientsRouteImport.update({
-    id: '/invoice-recipients',
-    path: '/invoice-recipients',
-    getParentRoute: () => DashboardAdminHelpdeskRoute,
-  } as any)
-const DashboardAdminHelpdeskPerformanceRoute =
-  DashboardAdminHelpdeskPerformanceRouteImport.update({
-    id: '/performance',
-    path: '/performance',
-    getParentRoute: () => DashboardAdminHelpdeskRoute,
-  } as any)
-const DashboardAdminHelpdeskSlaRoute =
-  DashboardAdminHelpdeskSlaRouteImport.update({
-    id: '/sla',
-    path: '/sla',
-    getParentRoute: () => DashboardAdminHelpdeskRoute,
-  } as any)
-const DashboardAdminHelpdeskTicketsRoute =
-  DashboardAdminHelpdeskTicketsRouteImport.update({
-    id: '/tickets',
-    path: '/tickets',
-    getParentRoute: () => DashboardAdminHelpdeskRoute,
-  } as any)
-const DashboardAdminLeadsIndexRoute =
-  DashboardAdminLeadsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminLeadsRoute,
-  } as any)
-const DashboardAdminLeadsIdRoute = DashboardAdminLeadsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => DashboardAdminLeadsRoute,
+const DashboardAdminTicketsRoute = DashboardAdminTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => DashboardAdminRoute,
 } as any)
-const DashboardAdminLeadsQuotesRoute =
-  DashboardAdminLeadsQuotesRouteImport.update({
-    id: '/quotes',
-    path: '/quotes',
-    getParentRoute: () => DashboardAdminLeadsRoute,
-  } as any)
-const DashboardAdminLocationsIndexRoute =
-  DashboardAdminLocationsIndexRouteImport.update({
-    id: '/locations/',
-    path: '/locations/',
+const DashboardAdminTermsRoute = DashboardAdminTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminSmtpRoute = DashboardAdminSmtpRouteImport.update({
+  id: '/smtp',
+  path: '/smtp',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminSlidersRoute = DashboardAdminSlidersRouteImport.update({
+  id: '/sliders',
+  path: '/sliders',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminSettingsRoute = DashboardAdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminServicesRoute = DashboardAdminServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminSeoRoute = DashboardAdminSeoRouteImport.update({
+  id: '/seo',
+  path: '/seo',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminSecurityRoute = DashboardAdminSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminReviewsRoute = DashboardAdminReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminReportsRoute = DashboardAdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminRecommendationsRoute =
+  DashboardAdminRecommendationsRouteImport.update({
+    id: '/recommendations',
+    path: '/recommendations',
     getParentRoute: () => DashboardAdminRoute,
   } as any)
-const DashboardAdminNationalitiesIndexRoute =
-  DashboardAdminNationalitiesIndexRouteImport.update({
-    id: '/nationalities/',
-    path: '/nationalities/',
+const DashboardAdminQuotationsRoute =
+  DashboardAdminQuotationsRouteImport.update({
+    id: '/quotations',
+    path: '/quotations',
     getParentRoute: () => DashboardAdminRoute,
   } as any)
-const DashboardAdminOrdersIndexRoute =
-  DashboardAdminOrdersIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminOrdersRoute,
-  } as any)
-const DashboardAdminOrdersIdRoute = DashboardAdminOrdersIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => DashboardAdminOrdersRoute,
+const DashboardAdminProjectsRoute = DashboardAdminProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => DashboardAdminRoute,
 } as any)
-const DashboardAdminProductCategoriesIndexRoute =
-  DashboardAdminProductCategoriesIndexRouteImport.update({
+const DashboardAdminProductsRoute = DashboardAdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminProductCategoriesRoute =
+  DashboardAdminProductCategoriesRouteImport.update({
+    id: '/product-categories',
+    path: '/product-categories',
+    getParentRoute: () => DashboardAdminRoute,
+  } as any)
+const DashboardAdminPoliciesRoute = DashboardAdminPoliciesRouteImport.update({
+  id: '/policies',
+  path: '/policies',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminPermissionsRoute =
+  DashboardAdminPermissionsRouteImport.update({
+    id: '/permissions',
+    path: '/permissions',
+    getParentRoute: () => DashboardAdminRoute,
+  } as any)
+const DashboardAdminPartnersRoute = DashboardAdminPartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminOrdersRoute = DashboardAdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminNotificationsRoute =
+  DashboardAdminNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => DashboardAdminRoute,
+  } as any)
+const DashboardAdminNewsRoute = DashboardAdminNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminLeadsRoute = DashboardAdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminIndustriesRoute =
+  DashboardAdminIndustriesRouteImport.update({
+    id: '/industries',
+    path: '/industries',
+    getParentRoute: () => DashboardAdminRoute,
+  } as any)
+const DashboardAdminHelpdeskRoute = DashboardAdminHelpdeskRouteImport.update({
+  id: '/helpdesk',
+  path: '/helpdesk',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminFaqsRoute = DashboardAdminFaqsRouteImport.update({
+  id: '/faqs',
+  path: '/faqs',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminClientsRoute = DashboardAdminClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminChatbotRoute = DashboardAdminChatbotRouteImport.update({
+  id: '/chatbot',
+  path: '/chatbot',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminCareersRoute = DashboardAdminCareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminAboutRoute = DashboardAdminAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardWorkspaceTicketsIndexRoute =
+  DashboardWorkspaceTicketsIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => DashboardAdminProductCategoriesRoute,
+    getParentRoute: () => DashboardWorkspaceTicketsRoute,
+  } as any)
+const DashboardWorkspaceOrdersIndexRoute =
+  DashboardWorkspaceOrdersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardWorkspaceOrdersRoute,
+  } as any)
+const DashboardAdminUsersIndexRoute =
+  DashboardAdminUsersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminUsersRoute,
+  } as any)
+const DashboardAdminTicketsIndexRoute =
+  DashboardAdminTicketsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminTicketsRoute,
+  } as any)
+const DashboardAdminQuotationsIndexRoute =
+  DashboardAdminQuotationsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminQuotationsRoute,
+  } as any)
+const DashboardAdminProjectsIndexRoute =
+  DashboardAdminProjectsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminProjectsRoute,
   } as any)
 const DashboardAdminProductsIndexRoute =
   DashboardAdminProductsIndexRouteImport.update({
@@ -582,10 +501,80 @@ const DashboardAdminProductsIndexRoute =
     path: '/',
     getParentRoute: () => DashboardAdminProductsRoute,
   } as any)
-const DashboardAdminProjectsIndexRoute =
-  DashboardAdminProjectsIndexRouteImport.update({
+const DashboardAdminProductCategoriesIndexRoute =
+  DashboardAdminProductCategoriesIndexRouteImport.update({
     id: '/',
     path: '/',
+    getParentRoute: () => DashboardAdminProductCategoriesRoute,
+  } as any)
+const DashboardAdminOrdersIndexRoute =
+  DashboardAdminOrdersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminOrdersRoute,
+  } as any)
+const DashboardAdminNationalitiesIndexRoute =
+  DashboardAdminNationalitiesIndexRouteImport.update({
+    id: '/nationalities/',
+    path: '/nationalities/',
+    getParentRoute: () => DashboardAdminRoute,
+  } as any)
+const DashboardAdminLocationsIndexRoute =
+  DashboardAdminLocationsIndexRouteImport.update({
+    id: '/locations/',
+    path: '/locations/',
+    getParentRoute: () => DashboardAdminRoute,
+  } as any)
+const DashboardAdminLeadsIndexRoute =
+  DashboardAdminLeadsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminLeadsRoute,
+  } as any)
+const DashboardAdminClientsIndexRoute =
+  DashboardAdminClientsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminClientsRoute,
+  } as any)
+const DashboardAdminCareersIndexRoute =
+  DashboardAdminCareersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminCareersRoute,
+  } as any)
+const DashboardWorkspaceTicketsIdRoute =
+  DashboardWorkspaceTicketsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => DashboardWorkspaceTicketsRoute,
+  } as any)
+const DashboardWorkspaceOrdersIdRoute =
+  DashboardWorkspaceOrdersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => DashboardWorkspaceOrdersRoute,
+  } as any)
+const DashboardAdminUsersIdRoute = DashboardAdminUsersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DashboardAdminUsersRoute,
+} as any)
+const DashboardAdminTicketsIdRoute = DashboardAdminTicketsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DashboardAdminTicketsRoute,
+} as any)
+const DashboardAdminQuotationsIdRoute =
+  DashboardAdminQuotationsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => DashboardAdminQuotationsRoute,
+  } as any)
+const DashboardAdminProjectsNewRoute =
+  DashboardAdminProjectsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
     getParentRoute: () => DashboardAdminProjectsRoute,
   } as any)
 const DashboardAdminProjectsIdRoute =
@@ -594,69 +583,92 @@ const DashboardAdminProjectsIdRoute =
     path: '/$id',
     getParentRoute: () => DashboardAdminProjectsRoute,
   } as any)
-const DashboardAdminProjectsNewRoute =
-  DashboardAdminProjectsNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => DashboardAdminProjectsRoute,
-  } as any)
-const DashboardAdminQuotationsIndexRoute =
-  DashboardAdminQuotationsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminQuotationsRoute,
-  } as any)
-const DashboardAdminQuotationsIdRoute =
-  DashboardAdminQuotationsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => DashboardAdminQuotationsRoute,
-  } as any)
-const DashboardAdminTicketsIndexRoute =
-  DashboardAdminTicketsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminTicketsRoute,
-  } as any)
-const DashboardAdminTicketsIdRoute = DashboardAdminTicketsIdRouteImport.update({
+const DashboardAdminOrdersIdRoute = DashboardAdminOrdersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => DashboardAdminTicketsRoute,
+  getParentRoute: () => DashboardAdminOrdersRoute,
 } as any)
-const DashboardAdminUsersIndexRoute =
-  DashboardAdminUsersIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminUsersRoute,
+const DashboardAdminLeadsQuotesRoute =
+  DashboardAdminLeadsQuotesRouteImport.update({
+    id: '/quotes',
+    path: '/quotes',
+    getParentRoute: () => DashboardAdminLeadsRoute,
   } as any)
-const DashboardAdminUsersIdRoute = DashboardAdminUsersIdRouteImport.update({
+const DashboardAdminLeadsIdRoute = DashboardAdminLeadsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => DashboardAdminUsersRoute,
+  getParentRoute: () => DashboardAdminLeadsRoute,
 } as any)
-const DashboardWorkspaceOrdersIndexRoute =
-  DashboardWorkspaceOrdersIndexRouteImport.update({
+const DashboardAdminHelpdeskTicketsRoute =
+  DashboardAdminHelpdeskTicketsRouteImport.update({
+    id: '/tickets',
+    path: '/tickets',
+    getParentRoute: () => DashboardAdminHelpdeskRoute,
+  } as any)
+const DashboardAdminHelpdeskSlaRoute =
+  DashboardAdminHelpdeskSlaRouteImport.update({
+    id: '/sla',
+    path: '/sla',
+    getParentRoute: () => DashboardAdminHelpdeskRoute,
+  } as any)
+const DashboardAdminHelpdeskPerformanceRoute =
+  DashboardAdminHelpdeskPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => DashboardAdminHelpdeskRoute,
+  } as any)
+const DashboardAdminHelpdeskInvoiceRecipientsRoute =
+  DashboardAdminHelpdeskInvoiceRecipientsRouteImport.update({
+    id: '/invoice-recipients',
+    path: '/invoice-recipients',
+    getParentRoute: () => DashboardAdminHelpdeskRoute,
+  } as any)
+const DashboardAdminHelpdeskDevicesRoute =
+  DashboardAdminHelpdeskDevicesRouteImport.update({
+    id: '/devices',
+    path: '/devices',
+    getParentRoute: () => DashboardAdminHelpdeskRoute,
+  } as any)
+const DashboardAdminHelpdeskCategoriesRoute =
+  DashboardAdminHelpdeskCategoriesRouteImport.update({
+    id: '/categories',
+    path: '/categories',
+    getParentRoute: () => DashboardAdminHelpdeskRoute,
+  } as any)
+const DashboardAdminHelpdeskBranchesRoute =
+  DashboardAdminHelpdeskBranchesRouteImport.update({
+    id: '/branches',
+    path: '/branches',
+    getParentRoute: () => DashboardAdminHelpdeskRoute,
+  } as any)
+const DashboardAdminClientsIdRoute = DashboardAdminClientsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DashboardAdminClientsRoute,
+} as any)
+const DashboardAdminCareersAnalyticsRoute =
+  DashboardAdminCareersAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => DashboardAdminCareersRoute,
+  } as any)
+const ApiPublicHooksSeoBotDailyRoute =
+  ApiPublicHooksSeoBotDailyRouteImport.update({
+    id: '/api/public/hooks/seo-bot-daily',
+    path: '/api/public/hooks/seo-bot-daily',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardAdminProjectsIdIndexRoute =
+  DashboardAdminProjectsIdIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => DashboardWorkspaceOrdersRoute,
+    getParentRoute: () => DashboardAdminProjectsIdRoute,
   } as any)
-const DashboardWorkspaceOrdersIdRoute =
-  DashboardWorkspaceOrdersIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => DashboardWorkspaceOrdersRoute,
-  } as any)
-const DashboardWorkspaceTicketsIndexRoute =
-  DashboardWorkspaceTicketsIndexRouteImport.update({
+const DashboardAdminHelpdeskTicketsIndexRoute =
+  DashboardAdminHelpdeskTicketsIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => DashboardWorkspaceTicketsRoute,
-  } as any)
-const DashboardWorkspaceTicketsIdRoute =
-  DashboardWorkspaceTicketsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => DashboardWorkspaceTicketsRoute,
+    getParentRoute: () => DashboardAdminHelpdeskTicketsRoute,
   } as any)
 const DashboardAdminCareersApplicationsIndexRoute =
   DashboardAdminCareersApplicationsIndexRouteImport.update({
@@ -664,16 +676,28 @@ const DashboardAdminCareersApplicationsIndexRoute =
     path: '/applications/',
     getParentRoute: () => DashboardAdminCareersRoute,
   } as any)
-const DashboardAdminCareersApplicationsIdRoute =
-  DashboardAdminCareersApplicationsIdRouteImport.update({
-    id: '/applications/$id',
-    path: '/applications/$id',
-    getParentRoute: () => DashboardAdminCareersRoute,
+const DashboardAdminProjectsIdEditRoute =
+  DashboardAdminProjectsIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => DashboardAdminProjectsIdRoute,
   } as any)
-const DashboardAdminHelpdeskTicketsIndexRoute =
-  DashboardAdminHelpdeskTicketsIndexRouteImport.update({
-    id: '/',
-    path: '/',
+const DashboardAdminLeadsQuotesEmailSettingsRoute =
+  DashboardAdminLeadsQuotesEmailSettingsRouteImport.update({
+    id: '/email-settings',
+    path: '/email-settings',
+    getParentRoute: () => DashboardAdminLeadsQuotesRoute,
+  } as any)
+const DashboardAdminLeadsQuotesIdRoute =
+  DashboardAdminLeadsQuotesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => DashboardAdminLeadsQuotesRoute,
+  } as any)
+const DashboardAdminHelpdeskTicketsNewRoute =
+  DashboardAdminHelpdeskTicketsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
     getParentRoute: () => DashboardAdminHelpdeskTicketsRoute,
   } as any)
 const DashboardAdminHelpdeskTicketsIdRoute =
@@ -682,35 +706,11 @@ const DashboardAdminHelpdeskTicketsIdRoute =
     path: '/$id',
     getParentRoute: () => DashboardAdminHelpdeskTicketsRoute,
   } as any)
-const DashboardAdminHelpdeskTicketsNewRoute =
-  DashboardAdminHelpdeskTicketsNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => DashboardAdminHelpdeskTicketsRoute,
-  } as any)
-const DashboardAdminLeadsQuotesIdRoute =
-  DashboardAdminLeadsQuotesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => DashboardAdminLeadsQuotesRoute,
-  } as any)
-const DashboardAdminLeadsQuotesEmailSettingsRoute =
-  DashboardAdminLeadsQuotesEmailSettingsRouteImport.update({
-    id: '/email-settings',
-    path: '/email-settings',
-    getParentRoute: () => DashboardAdminLeadsQuotesRoute,
-  } as any)
-const DashboardAdminProjectsIdIndexRoute =
-  DashboardAdminProjectsIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminProjectsIdRoute,
-  } as any)
-const DashboardAdminProjectsIdEditRoute =
-  DashboardAdminProjectsIdEditRouteImport.update({
-    id: '/edit',
-    path: '/edit',
-    getParentRoute: () => DashboardAdminProjectsIdRoute,
+const DashboardAdminCareersApplicationsIdRoute =
+  DashboardAdminCareersApplicationsIdRouteImport.update({
+    id: '/applications/$id',
+    path: '/applications/$id',
+    getParentRoute: () => DashboardAdminCareersRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -1379,116 +1379,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/careers': {
-      id: '/careers'
-      path: '/careers'
-      fullPath: '/careers'
-      preLoaderRoute: typeof CareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/industries': {
-      id: '/industries'
-      path: '/industries'
-      fullPath: '/industries'
-      preLoaderRoute: typeof IndustriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/policies': {
-      id: '/policies'
-      path: '/policies'
-      fullPath: '/policies'
-      preLoaderRoute: typeof PoliciesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/projects': {
-      id: '/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof ProjectsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/services': {
-      id: '/services'
-      path: '/services'
-      fullPath: '/services'
-      preLoaderRoute: typeof ServicesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signin': {
-      id: '/signin'
-      path: '/signin'
-      fullPath: '/signin'
-      preLoaderRoute: typeof SigninRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
+    '/track-quote': {
+      id: '/track-quote'
+      path: '/track-quote'
+      fullPath: '/track-quote'
+      preLoaderRoute: typeof TrackQuoteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/track-application': {
@@ -1498,60 +1393,116 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrackApplicationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/track-quote': {
-      id: '/track-quote'
-      path: '/track-quote'
-      fullPath: '/track-quote'
-      preLoaderRoute: typeof TrackQuoteRouteImport
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/': {
-      id: '/dashboard/'
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/policies': {
+      id: '/policies'
+      path: '/policies'
+      fullPath: '/policies'
+      preLoaderRoute: typeof PoliciesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/industries': {
+      id: '/industries'
+      path: '/industries'
+      fullPath: '/industries'
+      preLoaderRoute: typeof IndustriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
       path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/admin': {
-      id: '/dashboard/admin'
-      path: '/admin'
-      fullPath: '/dashboard/admin'
-      preLoaderRoute: typeof DashboardAdminRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/workspace': {
-      id: '/dashboard/workspace'
-      path: '/workspace'
-      fullPath: '/dashboard/workspace'
-      preLoaderRoute: typeof DashboardWorkspaceRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/news/': {
-      id: '/news/'
-      path: '/news'
-      fullPath: '/news/'
-      preLoaderRoute: typeof NewsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/news/$slug': {
-      id: '/news/$slug'
-      path: '/news/$slug'
-      fullPath: '/news/$slug'
-      preLoaderRoute: typeof NewsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/partners/': {
-      id: '/partners/'
-      path: '/partners'
-      fullPath: '/partners/'
-      preLoaderRoute: typeof PartnersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/partners_/$id': {
-      id: '/partners_/$id'
-      path: '/partners/$id'
-      fullPath: '/partners/$id'
-      preLoaderRoute: typeof PartnersIdRouteImport
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/products/': {
@@ -1561,12 +1512,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/products/$slug': {
-      id: '/products/$slug'
-      path: '/products/$slug'
-      fullPath: '/products/$slug'
-      preLoaderRoute: typeof ProductsSlugRouteImport
+    '/partners/': {
+      id: '/partners/'
+      path: '/partners'
+      fullPath: '/partners/'
+      preLoaderRoute: typeof PartnersIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/news/': {
+      id: '/news/'
+      path: '/news'
+      fullPath: '/news/'
+      preLoaderRoute: typeof NewsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/services/$slug': {
       id: '/services/$slug'
@@ -1575,222 +1540,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesSlugRouteImport
       parentRoute: typeof ServicesRoute
     }
-    '/dashboard/admin/': {
-      id: '/dashboard/admin/'
-      path: '/'
-      fullPath: '/dashboard/admin/'
-      preLoaderRoute: typeof DashboardAdminIndexRouteImport
-      parentRoute: typeof DashboardAdminRoute
+    '/products/$slug': {
+      id: '/products/$slug'
+      path: '/products/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof ProductsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/dashboard/admin/about': {
-      id: '/dashboard/admin/about'
-      path: '/about'
-      fullPath: '/dashboard/admin/about'
-      preLoaderRoute: typeof DashboardAdminAboutRouteImport
-      parentRoute: typeof DashboardAdminRoute
+    '/partners_/$id': {
+      id: '/partners_/$id'
+      path: '/partners/$id'
+      fullPath: '/partners/$id'
+      preLoaderRoute: typeof PartnersIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/dashboard/admin/careers': {
-      id: '/dashboard/admin/careers'
-      path: '/careers'
-      fullPath: '/dashboard/admin/careers'
-      preLoaderRoute: typeof DashboardAdminCareersRouteImport
-      parentRoute: typeof DashboardAdminRoute
+    '/news/$slug': {
+      id: '/news/$slug'
+      path: '/news/$slug'
+      fullPath: '/news/$slug'
+      preLoaderRoute: typeof NewsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/dashboard/admin/chatbot': {
-      id: '/dashboard/admin/chatbot'
-      path: '/chatbot'
-      fullPath: '/dashboard/admin/chatbot'
-      preLoaderRoute: typeof DashboardAdminChatbotRouteImport
-      parentRoute: typeof DashboardAdminRoute
+    '/dashboard/workspace': {
+      id: '/dashboard/workspace'
+      path: '/workspace'
+      fullPath: '/dashboard/workspace'
+      preLoaderRoute: typeof DashboardWorkspaceRouteImport
+      parentRoute: typeof DashboardRoute
     }
-    '/dashboard/admin/clients': {
-      id: '/dashboard/admin/clients'
-      path: '/clients'
-      fullPath: '/dashboard/admin/clients'
-      preLoaderRoute: typeof DashboardAdminClientsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/faqs': {
-      id: '/dashboard/admin/faqs'
-      path: '/faqs'
-      fullPath: '/dashboard/admin/faqs'
-      preLoaderRoute: typeof DashboardAdminFaqsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/helpdesk': {
-      id: '/dashboard/admin/helpdesk'
-      path: '/helpdesk'
-      fullPath: '/dashboard/admin/helpdesk'
-      preLoaderRoute: typeof DashboardAdminHelpdeskRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/industries': {
-      id: '/dashboard/admin/industries'
-      path: '/industries'
-      fullPath: '/dashboard/admin/industries'
-      preLoaderRoute: typeof DashboardAdminIndustriesRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/leads': {
-      id: '/dashboard/admin/leads'
-      path: '/leads'
-      fullPath: '/dashboard/admin/leads'
-      preLoaderRoute: typeof DashboardAdminLeadsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/news': {
-      id: '/dashboard/admin/news'
-      path: '/news'
-      fullPath: '/dashboard/admin/news'
-      preLoaderRoute: typeof DashboardAdminNewsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/notifications': {
-      id: '/dashboard/admin/notifications'
-      path: '/notifications'
-      fullPath: '/dashboard/admin/notifications'
-      preLoaderRoute: typeof DashboardAdminNotificationsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/orders': {
-      id: '/dashboard/admin/orders'
-      path: '/orders'
-      fullPath: '/dashboard/admin/orders'
-      preLoaderRoute: typeof DashboardAdminOrdersRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/partners': {
-      id: '/dashboard/admin/partners'
-      path: '/partners'
-      fullPath: '/dashboard/admin/partners'
-      preLoaderRoute: typeof DashboardAdminPartnersRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/permissions': {
-      id: '/dashboard/admin/permissions'
-      path: '/permissions'
-      fullPath: '/dashboard/admin/permissions'
-      preLoaderRoute: typeof DashboardAdminPermissionsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/policies': {
-      id: '/dashboard/admin/policies'
-      path: '/policies'
-      fullPath: '/dashboard/admin/policies'
-      preLoaderRoute: typeof DashboardAdminPoliciesRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/product-categories': {
-      id: '/dashboard/admin/product-categories'
-      path: '/product-categories'
-      fullPath: '/dashboard/admin/product-categories'
-      preLoaderRoute: typeof DashboardAdminProductCategoriesRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/products': {
-      id: '/dashboard/admin/products'
-      path: '/products'
-      fullPath: '/dashboard/admin/products'
-      preLoaderRoute: typeof DashboardAdminProductsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/projects': {
-      id: '/dashboard/admin/projects'
-      path: '/projects'
-      fullPath: '/dashboard/admin/projects'
-      preLoaderRoute: typeof DashboardAdminProjectsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/quotations': {
-      id: '/dashboard/admin/quotations'
-      path: '/quotations'
-      fullPath: '/dashboard/admin/quotations'
-      preLoaderRoute: typeof DashboardAdminQuotationsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/recommendations': {
-      id: '/dashboard/admin/recommendations'
-      path: '/recommendations'
-      fullPath: '/dashboard/admin/recommendations'
-      preLoaderRoute: typeof DashboardAdminRecommendationsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/reports': {
-      id: '/dashboard/admin/reports'
-      path: '/reports'
-      fullPath: '/dashboard/admin/reports'
-      preLoaderRoute: typeof DashboardAdminReportsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/reviews': {
-      id: '/dashboard/admin/reviews'
-      path: '/reviews'
-      fullPath: '/dashboard/admin/reviews'
-      preLoaderRoute: typeof DashboardAdminReviewsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/security': {
-      id: '/dashboard/admin/security'
-      path: '/security'
-      fullPath: '/dashboard/admin/security'
-      preLoaderRoute: typeof DashboardAdminSecurityRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/seo': {
-      id: '/dashboard/admin/seo'
-      path: '/seo'
-      fullPath: '/dashboard/admin/seo'
-      preLoaderRoute: typeof DashboardAdminSeoRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/services': {
-      id: '/dashboard/admin/services'
-      path: '/services'
-      fullPath: '/dashboard/admin/services'
-      preLoaderRoute: typeof DashboardAdminServicesRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/settings': {
-      id: '/dashboard/admin/settings'
-      path: '/settings'
-      fullPath: '/dashboard/admin/settings'
-      preLoaderRoute: typeof DashboardAdminSettingsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/sliders': {
-      id: '/dashboard/admin/sliders'
-      path: '/sliders'
-      fullPath: '/dashboard/admin/sliders'
-      preLoaderRoute: typeof DashboardAdminSlidersRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/smtp': {
-      id: '/dashboard/admin/smtp'
-      path: '/smtp'
-      fullPath: '/dashboard/admin/smtp'
-      preLoaderRoute: typeof DashboardAdminSmtpRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/terms': {
-      id: '/dashboard/admin/terms'
-      path: '/terms'
-      fullPath: '/dashboard/admin/terms'
-      preLoaderRoute: typeof DashboardAdminTermsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/tickets': {
-      id: '/dashboard/admin/tickets'
-      path: '/tickets'
-      fullPath: '/dashboard/admin/tickets'
-      preLoaderRoute: typeof DashboardAdminTicketsRouteImport
-      parentRoute: typeof DashboardAdminRoute
-    }
-    '/dashboard/admin/users': {
-      id: '/dashboard/admin/users'
-      path: '/users'
-      fullPath: '/dashboard/admin/users'
-      preLoaderRoute: typeof DashboardAdminUsersRouteImport
-      parentRoute: typeof DashboardAdminRoute
+    '/dashboard/admin': {
+      id: '/dashboard/admin'
+      path: '/admin'
+      fullPath: '/dashboard/admin'
+      preLoaderRoute: typeof DashboardAdminRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/workspace/': {
       id: '/dashboard/workspace/'
@@ -1799,32 +1582,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardWorkspaceIndexRouteImport
       parentRoute: typeof DashboardWorkspaceRoute
     }
-    '/dashboard/workspace/assessment': {
-      id: '/dashboard/workspace/assessment'
-      path: '/assessment'
-      fullPath: '/dashboard/workspace/assessment'
-      preLoaderRoute: typeof DashboardWorkspaceAssessmentRouteImport
-      parentRoute: typeof DashboardWorkspaceRoute
+    '/dashboard/admin/': {
+      id: '/dashboard/admin/'
+      path: '/'
+      fullPath: '/dashboard/admin/'
+      preLoaderRoute: typeof DashboardAdminIndexRouteImport
+      parentRoute: typeof DashboardAdminRoute
     }
-    '/dashboard/workspace/new': {
-      id: '/dashboard/workspace/new'
-      path: '/new'
-      fullPath: '/dashboard/workspace/new'
-      preLoaderRoute: typeof DashboardWorkspaceNewRouteImport
-      parentRoute: typeof DashboardWorkspaceRoute
-    }
-    '/dashboard/workspace/orders': {
-      id: '/dashboard/workspace/orders'
-      path: '/orders'
-      fullPath: '/dashboard/workspace/orders'
-      preLoaderRoute: typeof DashboardWorkspaceOrdersRouteImport
-      parentRoute: typeof DashboardWorkspaceRoute
-    }
-    '/dashboard/workspace/profile': {
-      id: '/dashboard/workspace/profile'
-      path: '/profile'
-      fullPath: '/dashboard/workspace/profile'
-      preLoaderRoute: typeof DashboardWorkspaceProfileRouteImport
+    '/dashboard/workspace/track': {
+      id: '/dashboard/workspace/track'
+      path: '/track'
+      fullPath: '/dashboard/workspace/track'
+      preLoaderRoute: typeof DashboardWorkspaceTrackRouteImport
       parentRoute: typeof DashboardWorkspaceRoute
     }
     '/dashboard/workspace/tickets': {
@@ -1834,152 +1603,285 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardWorkspaceTicketsRouteImport
       parentRoute: typeof DashboardWorkspaceRoute
     }
-    '/dashboard/workspace/track': {
-      id: '/dashboard/workspace/track'
-      path: '/track'
-      fullPath: '/dashboard/workspace/track'
-      preLoaderRoute: typeof DashboardWorkspaceTrackRouteImport
+    '/dashboard/workspace/profile': {
+      id: '/dashboard/workspace/profile'
+      path: '/profile'
+      fullPath: '/dashboard/workspace/profile'
+      preLoaderRoute: typeof DashboardWorkspaceProfileRouteImport
       parentRoute: typeof DashboardWorkspaceRoute
     }
-    '/api/public/hooks/seo-bot-daily': {
-      id: '/api/public/hooks/seo-bot-daily'
-      path: '/api/public/hooks/seo-bot-daily'
-      fullPath: '/api/public/hooks/seo-bot-daily'
-      preLoaderRoute: typeof ApiPublicHooksSeoBotDailyRouteImport
-      parentRoute: typeof rootRouteImport
+    '/dashboard/workspace/orders': {
+      id: '/dashboard/workspace/orders'
+      path: '/orders'
+      fullPath: '/dashboard/workspace/orders'
+      preLoaderRoute: typeof DashboardWorkspaceOrdersRouteImport
+      parentRoute: typeof DashboardWorkspaceRoute
     }
-    '/dashboard/admin/careers/': {
-      id: '/dashboard/admin/careers/'
-      path: '/'
-      fullPath: '/dashboard/admin/careers/'
-      preLoaderRoute: typeof DashboardAdminCareersIndexRouteImport
-      parentRoute: typeof DashboardAdminCareersRoute
+    '/dashboard/workspace/new': {
+      id: '/dashboard/workspace/new'
+      path: '/new'
+      fullPath: '/dashboard/workspace/new'
+      preLoaderRoute: typeof DashboardWorkspaceNewRouteImport
+      parentRoute: typeof DashboardWorkspaceRoute
     }
-    '/dashboard/admin/careers/analytics': {
-      id: '/dashboard/admin/careers/analytics'
-      path: '/analytics'
-      fullPath: '/dashboard/admin/careers/analytics'
-      preLoaderRoute: typeof DashboardAdminCareersAnalyticsRouteImport
-      parentRoute: typeof DashboardAdminCareersRoute
+    '/dashboard/workspace/assessment': {
+      id: '/dashboard/workspace/assessment'
+      path: '/assessment'
+      fullPath: '/dashboard/workspace/assessment'
+      preLoaderRoute: typeof DashboardWorkspaceAssessmentRouteImport
+      parentRoute: typeof DashboardWorkspaceRoute
     }
-    '/dashboard/admin/clients/': {
-      id: '/dashboard/admin/clients/'
-      path: '/'
-      fullPath: '/dashboard/admin/clients/'
-      preLoaderRoute: typeof DashboardAdminClientsIndexRouteImport
-      parentRoute: typeof DashboardAdminClientsRoute
+    '/dashboard/admin/users': {
+      id: '/dashboard/admin/users'
+      path: '/users'
+      fullPath: '/dashboard/admin/users'
+      preLoaderRoute: typeof DashboardAdminUsersRouteImport
+      parentRoute: typeof DashboardAdminRoute
     }
-    '/dashboard/admin/clients/$id': {
-      id: '/dashboard/admin/clients/$id'
-      path: '/$id'
-      fullPath: '/dashboard/admin/clients/$id'
-      preLoaderRoute: typeof DashboardAdminClientsIdRouteImport
-      parentRoute: typeof DashboardAdminClientsRoute
-    }
-    '/dashboard/admin/helpdesk/branches': {
-      id: '/dashboard/admin/helpdesk/branches'
-      path: '/branches'
-      fullPath: '/dashboard/admin/helpdesk/branches'
-      preLoaderRoute: typeof DashboardAdminHelpdeskBranchesRouteImport
-      parentRoute: typeof DashboardAdminHelpdeskRoute
-    }
-    '/dashboard/admin/helpdesk/categories': {
-      id: '/dashboard/admin/helpdesk/categories'
-      path: '/categories'
-      fullPath: '/dashboard/admin/helpdesk/categories'
-      preLoaderRoute: typeof DashboardAdminHelpdeskCategoriesRouteImport
-      parentRoute: typeof DashboardAdminHelpdeskRoute
-    }
-    '/dashboard/admin/helpdesk/devices': {
-      id: '/dashboard/admin/helpdesk/devices'
-      path: '/devices'
-      fullPath: '/dashboard/admin/helpdesk/devices'
-      preLoaderRoute: typeof DashboardAdminHelpdeskDevicesRouteImport
-      parentRoute: typeof DashboardAdminHelpdeskRoute
-    }
-    '/dashboard/admin/helpdesk/invoice-recipients': {
-      id: '/dashboard/admin/helpdesk/invoice-recipients'
-      path: '/invoice-recipients'
-      fullPath: '/dashboard/admin/helpdesk/invoice-recipients'
-      preLoaderRoute: typeof DashboardAdminHelpdeskInvoiceRecipientsRouteImport
-      parentRoute: typeof DashboardAdminHelpdeskRoute
-    }
-    '/dashboard/admin/helpdesk/performance': {
-      id: '/dashboard/admin/helpdesk/performance'
-      path: '/performance'
-      fullPath: '/dashboard/admin/helpdesk/performance'
-      preLoaderRoute: typeof DashboardAdminHelpdeskPerformanceRouteImport
-      parentRoute: typeof DashboardAdminHelpdeskRoute
-    }
-    '/dashboard/admin/helpdesk/sla': {
-      id: '/dashboard/admin/helpdesk/sla'
-      path: '/sla'
-      fullPath: '/dashboard/admin/helpdesk/sla'
-      preLoaderRoute: typeof DashboardAdminHelpdeskSlaRouteImport
-      parentRoute: typeof DashboardAdminHelpdeskRoute
-    }
-    '/dashboard/admin/helpdesk/tickets': {
-      id: '/dashboard/admin/helpdesk/tickets'
+    '/dashboard/admin/tickets': {
+      id: '/dashboard/admin/tickets'
       path: '/tickets'
-      fullPath: '/dashboard/admin/helpdesk/tickets'
-      preLoaderRoute: typeof DashboardAdminHelpdeskTicketsRouteImport
-      parentRoute: typeof DashboardAdminHelpdeskRoute
-    }
-    '/dashboard/admin/leads/': {
-      id: '/dashboard/admin/leads/'
-      path: '/'
-      fullPath: '/dashboard/admin/leads/'
-      preLoaderRoute: typeof DashboardAdminLeadsIndexRouteImport
-      parentRoute: typeof DashboardAdminLeadsRoute
-    }
-    '/dashboard/admin/leads/$id': {
-      id: '/dashboard/admin/leads/$id'
-      path: '/$id'
-      fullPath: '/dashboard/admin/leads/$id'
-      preLoaderRoute: typeof DashboardAdminLeadsIdRouteImport
-      parentRoute: typeof DashboardAdminLeadsRoute
-    }
-    '/dashboard/admin/leads/quotes': {
-      id: '/dashboard/admin/leads/quotes'
-      path: '/quotes'
-      fullPath: '/dashboard/admin/leads/quotes'
-      preLoaderRoute: typeof DashboardAdminLeadsQuotesRouteImport
-      parentRoute: typeof DashboardAdminLeadsRoute
-    }
-    '/dashboard/admin/locations/': {
-      id: '/dashboard/admin/locations/'
-      path: '/locations'
-      fullPath: '/dashboard/admin/locations/'
-      preLoaderRoute: typeof DashboardAdminLocationsIndexRouteImport
+      fullPath: '/dashboard/admin/tickets'
+      preLoaderRoute: typeof DashboardAdminTicketsRouteImport
       parentRoute: typeof DashboardAdminRoute
     }
-    '/dashboard/admin/nationalities/': {
-      id: '/dashboard/admin/nationalities/'
-      path: '/nationalities'
-      fullPath: '/dashboard/admin/nationalities/'
-      preLoaderRoute: typeof DashboardAdminNationalitiesIndexRouteImport
+    '/dashboard/admin/terms': {
+      id: '/dashboard/admin/terms'
+      path: '/terms'
+      fullPath: '/dashboard/admin/terms'
+      preLoaderRoute: typeof DashboardAdminTermsRouteImport
       parentRoute: typeof DashboardAdminRoute
     }
-    '/dashboard/admin/orders/': {
-      id: '/dashboard/admin/orders/'
-      path: '/'
-      fullPath: '/dashboard/admin/orders/'
-      preLoaderRoute: typeof DashboardAdminOrdersIndexRouteImport
-      parentRoute: typeof DashboardAdminOrdersRoute
+    '/dashboard/admin/smtp': {
+      id: '/dashboard/admin/smtp'
+      path: '/smtp'
+      fullPath: '/dashboard/admin/smtp'
+      preLoaderRoute: typeof DashboardAdminSmtpRouteImport
+      parentRoute: typeof DashboardAdminRoute
     }
-    '/dashboard/admin/orders/$id': {
-      id: '/dashboard/admin/orders/$id'
-      path: '/$id'
-      fullPath: '/dashboard/admin/orders/$id'
-      preLoaderRoute: typeof DashboardAdminOrdersIdRouteImport
-      parentRoute: typeof DashboardAdminOrdersRoute
+    '/dashboard/admin/sliders': {
+      id: '/dashboard/admin/sliders'
+      path: '/sliders'
+      fullPath: '/dashboard/admin/sliders'
+      preLoaderRoute: typeof DashboardAdminSlidersRouteImport
+      parentRoute: typeof DashboardAdminRoute
     }
-    '/dashboard/admin/product-categories/': {
-      id: '/dashboard/admin/product-categories/'
+    '/dashboard/admin/settings': {
+      id: '/dashboard/admin/settings'
+      path: '/settings'
+      fullPath: '/dashboard/admin/settings'
+      preLoaderRoute: typeof DashboardAdminSettingsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/services': {
+      id: '/dashboard/admin/services'
+      path: '/services'
+      fullPath: '/dashboard/admin/services'
+      preLoaderRoute: typeof DashboardAdminServicesRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/seo': {
+      id: '/dashboard/admin/seo'
+      path: '/seo'
+      fullPath: '/dashboard/admin/seo'
+      preLoaderRoute: typeof DashboardAdminSeoRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/security': {
+      id: '/dashboard/admin/security'
+      path: '/security'
+      fullPath: '/dashboard/admin/security'
+      preLoaderRoute: typeof DashboardAdminSecurityRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/reviews': {
+      id: '/dashboard/admin/reviews'
+      path: '/reviews'
+      fullPath: '/dashboard/admin/reviews'
+      preLoaderRoute: typeof DashboardAdminReviewsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/reports': {
+      id: '/dashboard/admin/reports'
+      path: '/reports'
+      fullPath: '/dashboard/admin/reports'
+      preLoaderRoute: typeof DashboardAdminReportsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/recommendations': {
+      id: '/dashboard/admin/recommendations'
+      path: '/recommendations'
+      fullPath: '/dashboard/admin/recommendations'
+      preLoaderRoute: typeof DashboardAdminRecommendationsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/quotations': {
+      id: '/dashboard/admin/quotations'
+      path: '/quotations'
+      fullPath: '/dashboard/admin/quotations'
+      preLoaderRoute: typeof DashboardAdminQuotationsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/projects': {
+      id: '/dashboard/admin/projects'
+      path: '/projects'
+      fullPath: '/dashboard/admin/projects'
+      preLoaderRoute: typeof DashboardAdminProjectsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/products': {
+      id: '/dashboard/admin/products'
+      path: '/products'
+      fullPath: '/dashboard/admin/products'
+      preLoaderRoute: typeof DashboardAdminProductsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/product-categories': {
+      id: '/dashboard/admin/product-categories'
+      path: '/product-categories'
+      fullPath: '/dashboard/admin/product-categories'
+      preLoaderRoute: typeof DashboardAdminProductCategoriesRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/policies': {
+      id: '/dashboard/admin/policies'
+      path: '/policies'
+      fullPath: '/dashboard/admin/policies'
+      preLoaderRoute: typeof DashboardAdminPoliciesRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/permissions': {
+      id: '/dashboard/admin/permissions'
+      path: '/permissions'
+      fullPath: '/dashboard/admin/permissions'
+      preLoaderRoute: typeof DashboardAdminPermissionsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/partners': {
+      id: '/dashboard/admin/partners'
+      path: '/partners'
+      fullPath: '/dashboard/admin/partners'
+      preLoaderRoute: typeof DashboardAdminPartnersRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/orders': {
+      id: '/dashboard/admin/orders'
+      path: '/orders'
+      fullPath: '/dashboard/admin/orders'
+      preLoaderRoute: typeof DashboardAdminOrdersRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/notifications': {
+      id: '/dashboard/admin/notifications'
+      path: '/notifications'
+      fullPath: '/dashboard/admin/notifications'
+      preLoaderRoute: typeof DashboardAdminNotificationsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/news': {
+      id: '/dashboard/admin/news'
+      path: '/news'
+      fullPath: '/dashboard/admin/news'
+      preLoaderRoute: typeof DashboardAdminNewsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/leads': {
+      id: '/dashboard/admin/leads'
+      path: '/leads'
+      fullPath: '/dashboard/admin/leads'
+      preLoaderRoute: typeof DashboardAdminLeadsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/industries': {
+      id: '/dashboard/admin/industries'
+      path: '/industries'
+      fullPath: '/dashboard/admin/industries'
+      preLoaderRoute: typeof DashboardAdminIndustriesRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/helpdesk': {
+      id: '/dashboard/admin/helpdesk'
+      path: '/helpdesk'
+      fullPath: '/dashboard/admin/helpdesk'
+      preLoaderRoute: typeof DashboardAdminHelpdeskRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/faqs': {
+      id: '/dashboard/admin/faqs'
+      path: '/faqs'
+      fullPath: '/dashboard/admin/faqs'
+      preLoaderRoute: typeof DashboardAdminFaqsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/clients': {
+      id: '/dashboard/admin/clients'
+      path: '/clients'
+      fullPath: '/dashboard/admin/clients'
+      preLoaderRoute: typeof DashboardAdminClientsRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/chatbot': {
+      id: '/dashboard/admin/chatbot'
+      path: '/chatbot'
+      fullPath: '/dashboard/admin/chatbot'
+      preLoaderRoute: typeof DashboardAdminChatbotRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/careers': {
+      id: '/dashboard/admin/careers'
+      path: '/careers'
+      fullPath: '/dashboard/admin/careers'
+      preLoaderRoute: typeof DashboardAdminCareersRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/about': {
+      id: '/dashboard/admin/about'
+      path: '/about'
+      fullPath: '/dashboard/admin/about'
+      preLoaderRoute: typeof DashboardAdminAboutRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/workspace/tickets/': {
+      id: '/dashboard/workspace/tickets/'
       path: '/'
-      fullPath: '/dashboard/admin/product-categories/'
-      preLoaderRoute: typeof DashboardAdminProductCategoriesIndexRouteImport
-      parentRoute: typeof DashboardAdminProductCategoriesRoute
+      fullPath: '/dashboard/workspace/tickets/'
+      preLoaderRoute: typeof DashboardWorkspaceTicketsIndexRouteImport
+      parentRoute: typeof DashboardWorkspaceTicketsRoute
+    }
+    '/dashboard/workspace/orders/': {
+      id: '/dashboard/workspace/orders/'
+      path: '/'
+      fullPath: '/dashboard/workspace/orders/'
+      preLoaderRoute: typeof DashboardWorkspaceOrdersIndexRouteImport
+      parentRoute: typeof DashboardWorkspaceOrdersRoute
+    }
+    '/dashboard/admin/users/': {
+      id: '/dashboard/admin/users/'
+      path: '/'
+      fullPath: '/dashboard/admin/users/'
+      preLoaderRoute: typeof DashboardAdminUsersIndexRouteImport
+      parentRoute: typeof DashboardAdminUsersRoute
+    }
+    '/dashboard/admin/tickets/': {
+      id: '/dashboard/admin/tickets/'
+      path: '/'
+      fullPath: '/dashboard/admin/tickets/'
+      preLoaderRoute: typeof DashboardAdminTicketsIndexRouteImport
+      parentRoute: typeof DashboardAdminTicketsRoute
+    }
+    '/dashboard/admin/quotations/': {
+      id: '/dashboard/admin/quotations/'
+      path: '/'
+      fullPath: '/dashboard/admin/quotations/'
+      preLoaderRoute: typeof DashboardAdminQuotationsIndexRouteImport
+      parentRoute: typeof DashboardAdminQuotationsRoute
+    }
+    '/dashboard/admin/projects/': {
+      id: '/dashboard/admin/projects/'
+      path: '/'
+      fullPath: '/dashboard/admin/projects/'
+      preLoaderRoute: typeof DashboardAdminProjectsIndexRouteImport
+      parentRoute: typeof DashboardAdminProjectsRoute
     }
     '/dashboard/admin/products/': {
       id: '/dashboard/admin/products/'
@@ -1988,11 +1890,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminProductsIndexRouteImport
       parentRoute: typeof DashboardAdminProductsRoute
     }
-    '/dashboard/admin/projects/': {
-      id: '/dashboard/admin/projects/'
+    '/dashboard/admin/product-categories/': {
+      id: '/dashboard/admin/product-categories/'
       path: '/'
-      fullPath: '/dashboard/admin/projects/'
-      preLoaderRoute: typeof DashboardAdminProjectsIndexRouteImport
+      fullPath: '/dashboard/admin/product-categories/'
+      preLoaderRoute: typeof DashboardAdminProductCategoriesIndexRouteImport
+      parentRoute: typeof DashboardAdminProductCategoriesRoute
+    }
+    '/dashboard/admin/orders/': {
+      id: '/dashboard/admin/orders/'
+      path: '/'
+      fullPath: '/dashboard/admin/orders/'
+      preLoaderRoute: typeof DashboardAdminOrdersIndexRouteImport
+      parentRoute: typeof DashboardAdminOrdersRoute
+    }
+    '/dashboard/admin/nationalities/': {
+      id: '/dashboard/admin/nationalities/'
+      path: '/nationalities'
+      fullPath: '/dashboard/admin/nationalities/'
+      preLoaderRoute: typeof DashboardAdminNationalitiesIndexRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/locations/': {
+      id: '/dashboard/admin/locations/'
+      path: '/locations'
+      fullPath: '/dashboard/admin/locations/'
+      preLoaderRoute: typeof DashboardAdminLocationsIndexRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/leads/': {
+      id: '/dashboard/admin/leads/'
+      path: '/'
+      fullPath: '/dashboard/admin/leads/'
+      preLoaderRoute: typeof DashboardAdminLeadsIndexRouteImport
+      parentRoute: typeof DashboardAdminLeadsRoute
+    }
+    '/dashboard/admin/clients/': {
+      id: '/dashboard/admin/clients/'
+      path: '/'
+      fullPath: '/dashboard/admin/clients/'
+      preLoaderRoute: typeof DashboardAdminClientsIndexRouteImport
+      parentRoute: typeof DashboardAdminClientsRoute
+    }
+    '/dashboard/admin/careers/': {
+      id: '/dashboard/admin/careers/'
+      path: '/'
+      fullPath: '/dashboard/admin/careers/'
+      preLoaderRoute: typeof DashboardAdminCareersIndexRouteImport
+      parentRoute: typeof DashboardAdminCareersRoute
+    }
+    '/dashboard/workspace/tickets/$id': {
+      id: '/dashboard/workspace/tickets/$id'
+      path: '/$id'
+      fullPath: '/dashboard/workspace/tickets/$id'
+      preLoaderRoute: typeof DashboardWorkspaceTicketsIdRouteImport
+      parentRoute: typeof DashboardWorkspaceTicketsRoute
+    }
+    '/dashboard/workspace/orders/$id': {
+      id: '/dashboard/workspace/orders/$id'
+      path: '/$id'
+      fullPath: '/dashboard/workspace/orders/$id'
+      preLoaderRoute: typeof DashboardWorkspaceOrdersIdRouteImport
+      parentRoute: typeof DashboardWorkspaceOrdersRoute
+    }
+    '/dashboard/admin/users/$id': {
+      id: '/dashboard/admin/users/$id'
+      path: '/$id'
+      fullPath: '/dashboard/admin/users/$id'
+      preLoaderRoute: typeof DashboardAdminUsersIdRouteImport
+      parentRoute: typeof DashboardAdminUsersRoute
+    }
+    '/dashboard/admin/tickets/$id': {
+      id: '/dashboard/admin/tickets/$id'
+      path: '/$id'
+      fullPath: '/dashboard/admin/tickets/$id'
+      preLoaderRoute: typeof DashboardAdminTicketsIdRouteImport
+      parentRoute: typeof DashboardAdminTicketsRoute
+    }
+    '/dashboard/admin/quotations/$id': {
+      id: '/dashboard/admin/quotations/$id'
+      path: '/$id'
+      fullPath: '/dashboard/admin/quotations/$id'
+      preLoaderRoute: typeof DashboardAdminQuotationsIdRouteImport
+      parentRoute: typeof DashboardAdminQuotationsRoute
+    }
+    '/dashboard/admin/projects/new': {
+      id: '/dashboard/admin/projects/new'
+      path: '/new'
+      fullPath: '/dashboard/admin/projects/new'
+      preLoaderRoute: typeof DashboardAdminProjectsNewRouteImport
       parentRoute: typeof DashboardAdminProjectsRoute
     }
     '/dashboard/admin/projects/$id': {
@@ -2002,82 +1988,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminProjectsIdRouteImport
       parentRoute: typeof DashboardAdminProjectsRoute
     }
-    '/dashboard/admin/projects/new': {
-      id: '/dashboard/admin/projects/new'
-      path: '/new'
-      fullPath: '/dashboard/admin/projects/new'
-      preLoaderRoute: typeof DashboardAdminProjectsNewRouteImport
-      parentRoute: typeof DashboardAdminProjectsRoute
-    }
-    '/dashboard/admin/quotations/': {
-      id: '/dashboard/admin/quotations/'
-      path: '/'
-      fullPath: '/dashboard/admin/quotations/'
-      preLoaderRoute: typeof DashboardAdminQuotationsIndexRouteImport
-      parentRoute: typeof DashboardAdminQuotationsRoute
-    }
-    '/dashboard/admin/quotations/$id': {
-      id: '/dashboard/admin/quotations/$id'
+    '/dashboard/admin/orders/$id': {
+      id: '/dashboard/admin/orders/$id'
       path: '/$id'
-      fullPath: '/dashboard/admin/quotations/$id'
-      preLoaderRoute: typeof DashboardAdminQuotationsIdRouteImport
-      parentRoute: typeof DashboardAdminQuotationsRoute
+      fullPath: '/dashboard/admin/orders/$id'
+      preLoaderRoute: typeof DashboardAdminOrdersIdRouteImport
+      parentRoute: typeof DashboardAdminOrdersRoute
     }
-    '/dashboard/admin/tickets/': {
-      id: '/dashboard/admin/tickets/'
-      path: '/'
-      fullPath: '/dashboard/admin/tickets/'
-      preLoaderRoute: typeof DashboardAdminTicketsIndexRouteImport
-      parentRoute: typeof DashboardAdminTicketsRoute
+    '/dashboard/admin/leads/quotes': {
+      id: '/dashboard/admin/leads/quotes'
+      path: '/quotes'
+      fullPath: '/dashboard/admin/leads/quotes'
+      preLoaderRoute: typeof DashboardAdminLeadsQuotesRouteImport
+      parentRoute: typeof DashboardAdminLeadsRoute
     }
-    '/dashboard/admin/tickets/$id': {
-      id: '/dashboard/admin/tickets/$id'
+    '/dashboard/admin/leads/$id': {
+      id: '/dashboard/admin/leads/$id'
       path: '/$id'
-      fullPath: '/dashboard/admin/tickets/$id'
-      preLoaderRoute: typeof DashboardAdminTicketsIdRouteImport
-      parentRoute: typeof DashboardAdminTicketsRoute
+      fullPath: '/dashboard/admin/leads/$id'
+      preLoaderRoute: typeof DashboardAdminLeadsIdRouteImport
+      parentRoute: typeof DashboardAdminLeadsRoute
     }
-    '/dashboard/admin/users/': {
-      id: '/dashboard/admin/users/'
-      path: '/'
-      fullPath: '/dashboard/admin/users/'
-      preLoaderRoute: typeof DashboardAdminUsersIndexRouteImport
-      parentRoute: typeof DashboardAdminUsersRoute
+    '/dashboard/admin/helpdesk/tickets': {
+      id: '/dashboard/admin/helpdesk/tickets'
+      path: '/tickets'
+      fullPath: '/dashboard/admin/helpdesk/tickets'
+      preLoaderRoute: typeof DashboardAdminHelpdeskTicketsRouteImport
+      parentRoute: typeof DashboardAdminHelpdeskRoute
     }
-    '/dashboard/admin/users/$id': {
-      id: '/dashboard/admin/users/$id'
+    '/dashboard/admin/helpdesk/sla': {
+      id: '/dashboard/admin/helpdesk/sla'
+      path: '/sla'
+      fullPath: '/dashboard/admin/helpdesk/sla'
+      preLoaderRoute: typeof DashboardAdminHelpdeskSlaRouteImport
+      parentRoute: typeof DashboardAdminHelpdeskRoute
+    }
+    '/dashboard/admin/helpdesk/performance': {
+      id: '/dashboard/admin/helpdesk/performance'
+      path: '/performance'
+      fullPath: '/dashboard/admin/helpdesk/performance'
+      preLoaderRoute: typeof DashboardAdminHelpdeskPerformanceRouteImport
+      parentRoute: typeof DashboardAdminHelpdeskRoute
+    }
+    '/dashboard/admin/helpdesk/invoice-recipients': {
+      id: '/dashboard/admin/helpdesk/invoice-recipients'
+      path: '/invoice-recipients'
+      fullPath: '/dashboard/admin/helpdesk/invoice-recipients'
+      preLoaderRoute: typeof DashboardAdminHelpdeskInvoiceRecipientsRouteImport
+      parentRoute: typeof DashboardAdminHelpdeskRoute
+    }
+    '/dashboard/admin/helpdesk/devices': {
+      id: '/dashboard/admin/helpdesk/devices'
+      path: '/devices'
+      fullPath: '/dashboard/admin/helpdesk/devices'
+      preLoaderRoute: typeof DashboardAdminHelpdeskDevicesRouteImport
+      parentRoute: typeof DashboardAdminHelpdeskRoute
+    }
+    '/dashboard/admin/helpdesk/categories': {
+      id: '/dashboard/admin/helpdesk/categories'
+      path: '/categories'
+      fullPath: '/dashboard/admin/helpdesk/categories'
+      preLoaderRoute: typeof DashboardAdminHelpdeskCategoriesRouteImport
+      parentRoute: typeof DashboardAdminHelpdeskRoute
+    }
+    '/dashboard/admin/helpdesk/branches': {
+      id: '/dashboard/admin/helpdesk/branches'
+      path: '/branches'
+      fullPath: '/dashboard/admin/helpdesk/branches'
+      preLoaderRoute: typeof DashboardAdminHelpdeskBranchesRouteImport
+      parentRoute: typeof DashboardAdminHelpdeskRoute
+    }
+    '/dashboard/admin/clients/$id': {
+      id: '/dashboard/admin/clients/$id'
       path: '/$id'
-      fullPath: '/dashboard/admin/users/$id'
-      preLoaderRoute: typeof DashboardAdminUsersIdRouteImport
-      parentRoute: typeof DashboardAdminUsersRoute
+      fullPath: '/dashboard/admin/clients/$id'
+      preLoaderRoute: typeof DashboardAdminClientsIdRouteImport
+      parentRoute: typeof DashboardAdminClientsRoute
     }
-    '/dashboard/workspace/orders/': {
-      id: '/dashboard/workspace/orders/'
+    '/dashboard/admin/careers/analytics': {
+      id: '/dashboard/admin/careers/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/admin/careers/analytics'
+      preLoaderRoute: typeof DashboardAdminCareersAnalyticsRouteImport
+      parentRoute: typeof DashboardAdminCareersRoute
+    }
+    '/api/public/hooks/seo-bot-daily': {
+      id: '/api/public/hooks/seo-bot-daily'
+      path: '/api/public/hooks/seo-bot-daily'
+      fullPath: '/api/public/hooks/seo-bot-daily'
+      preLoaderRoute: typeof ApiPublicHooksSeoBotDailyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/admin/projects/$id/': {
+      id: '/dashboard/admin/projects/$id/'
       path: '/'
-      fullPath: '/dashboard/workspace/orders/'
-      preLoaderRoute: typeof DashboardWorkspaceOrdersIndexRouteImport
-      parentRoute: typeof DashboardWorkspaceOrdersRoute
+      fullPath: '/dashboard/admin/projects/$id/'
+      preLoaderRoute: typeof DashboardAdminProjectsIdIndexRouteImport
+      parentRoute: typeof DashboardAdminProjectsIdRoute
     }
-    '/dashboard/workspace/orders/$id': {
-      id: '/dashboard/workspace/orders/$id'
-      path: '/$id'
-      fullPath: '/dashboard/workspace/orders/$id'
-      preLoaderRoute: typeof DashboardWorkspaceOrdersIdRouteImport
-      parentRoute: typeof DashboardWorkspaceOrdersRoute
-    }
-    '/dashboard/workspace/tickets/': {
-      id: '/dashboard/workspace/tickets/'
+    '/dashboard/admin/helpdesk/tickets/': {
+      id: '/dashboard/admin/helpdesk/tickets/'
       path: '/'
-      fullPath: '/dashboard/workspace/tickets/'
-      preLoaderRoute: typeof DashboardWorkspaceTicketsIndexRouteImport
-      parentRoute: typeof DashboardWorkspaceTicketsRoute
-    }
-    '/dashboard/workspace/tickets/$id': {
-      id: '/dashboard/workspace/tickets/$id'
-      path: '/$id'
-      fullPath: '/dashboard/workspace/tickets/$id'
-      preLoaderRoute: typeof DashboardWorkspaceTicketsIdRouteImport
-      parentRoute: typeof DashboardWorkspaceTicketsRoute
+      fullPath: '/dashboard/admin/helpdesk/tickets/'
+      preLoaderRoute: typeof DashboardAdminHelpdeskTicketsIndexRouteImport
+      parentRoute: typeof DashboardAdminHelpdeskTicketsRoute
     }
     '/dashboard/admin/careers/applications/': {
       id: '/dashboard/admin/careers/applications/'
@@ -2086,18 +2100,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminCareersApplicationsIndexRouteImport
       parentRoute: typeof DashboardAdminCareersRoute
     }
-    '/dashboard/admin/careers/applications/$id': {
-      id: '/dashboard/admin/careers/applications/$id'
-      path: '/applications/$id'
-      fullPath: '/dashboard/admin/careers/applications/$id'
-      preLoaderRoute: typeof DashboardAdminCareersApplicationsIdRouteImport
-      parentRoute: typeof DashboardAdminCareersRoute
+    '/dashboard/admin/projects/$id/edit': {
+      id: '/dashboard/admin/projects/$id/edit'
+      path: '/edit'
+      fullPath: '/dashboard/admin/projects/$id/edit'
+      preLoaderRoute: typeof DashboardAdminProjectsIdEditRouteImport
+      parentRoute: typeof DashboardAdminProjectsIdRoute
     }
-    '/dashboard/admin/helpdesk/tickets/': {
-      id: '/dashboard/admin/helpdesk/tickets/'
-      path: '/'
-      fullPath: '/dashboard/admin/helpdesk/tickets/'
-      preLoaderRoute: typeof DashboardAdminHelpdeskTicketsIndexRouteImport
+    '/dashboard/admin/leads/quotes/email-settings': {
+      id: '/dashboard/admin/leads/quotes/email-settings'
+      path: '/email-settings'
+      fullPath: '/dashboard/admin/leads/quotes/email-settings'
+      preLoaderRoute: typeof DashboardAdminLeadsQuotesEmailSettingsRouteImport
+      parentRoute: typeof DashboardAdminLeadsQuotesRoute
+    }
+    '/dashboard/admin/leads/quotes/$id': {
+      id: '/dashboard/admin/leads/quotes/$id'
+      path: '/$id'
+      fullPath: '/dashboard/admin/leads/quotes/$id'
+      preLoaderRoute: typeof DashboardAdminLeadsQuotesIdRouteImport
+      parentRoute: typeof DashboardAdminLeadsQuotesRoute
+    }
+    '/dashboard/admin/helpdesk/tickets/new': {
+      id: '/dashboard/admin/helpdesk/tickets/new'
+      path: '/new'
+      fullPath: '/dashboard/admin/helpdesk/tickets/new'
+      preLoaderRoute: typeof DashboardAdminHelpdeskTicketsNewRouteImport
       parentRoute: typeof DashboardAdminHelpdeskTicketsRoute
     }
     '/dashboard/admin/helpdesk/tickets/$id': {
@@ -2107,40 +2135,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminHelpdeskTicketsIdRouteImport
       parentRoute: typeof DashboardAdminHelpdeskTicketsRoute
     }
-    '/dashboard/admin/helpdesk/tickets/new': {
-      id: '/dashboard/admin/helpdesk/tickets/new'
-      path: '/new'
-      fullPath: '/dashboard/admin/helpdesk/tickets/new'
-      preLoaderRoute: typeof DashboardAdminHelpdeskTicketsNewRouteImport
-      parentRoute: typeof DashboardAdminHelpdeskTicketsRoute
-    }
-    '/dashboard/admin/leads/quotes/$id': {
-      id: '/dashboard/admin/leads/quotes/$id'
-      path: '/$id'
-      fullPath: '/dashboard/admin/leads/quotes/$id'
-      preLoaderRoute: typeof DashboardAdminLeadsQuotesIdRouteImport
-      parentRoute: typeof DashboardAdminLeadsQuotesRoute
-    }
-    '/dashboard/admin/leads/quotes/email-settings': {
-      id: '/dashboard/admin/leads/quotes/email-settings'
-      path: '/email-settings'
-      fullPath: '/dashboard/admin/leads/quotes/email-settings'
-      preLoaderRoute: typeof DashboardAdminLeadsQuotesEmailSettingsRouteImport
-      parentRoute: typeof DashboardAdminLeadsQuotesRoute
-    }
-    '/dashboard/admin/projects/$id/': {
-      id: '/dashboard/admin/projects/$id/'
-      path: '/'
-      fullPath: '/dashboard/admin/projects/$id/'
-      preLoaderRoute: typeof DashboardAdminProjectsIdIndexRouteImport
-      parentRoute: typeof DashboardAdminProjectsIdRoute
-    }
-    '/dashboard/admin/projects/$id/edit': {
-      id: '/dashboard/admin/projects/$id/edit'
-      path: '/edit'
-      fullPath: '/dashboard/admin/projects/$id/edit'
-      preLoaderRoute: typeof DashboardAdminProjectsIdEditRouteImport
-      parentRoute: typeof DashboardAdminProjectsIdRoute
+    '/dashboard/admin/careers/applications/$id': {
+      id: '/dashboard/admin/careers/applications/$id'
+      path: '/applications/$id'
+      fullPath: '/dashboard/admin/careers/applications/$id'
+      preLoaderRoute: typeof DashboardAdminCareersApplicationsIdRouteImport
+      parentRoute: typeof DashboardAdminCareersRoute
     }
   }
 }

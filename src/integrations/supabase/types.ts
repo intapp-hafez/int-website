@@ -47,6 +47,110 @@ export type Database = {
         }
         Relationships: []
       }
+      access_grants: {
+        Row: {
+          actions: string[]
+          created_at: string
+          expires_at: string | null
+          granted_by: string | null
+          id: string
+          note: string
+          page_key: string
+          request_id: string | null
+          revoked_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actions?: string[]
+          created_at?: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          note?: string
+          page_key: string
+          request_id?: string | null
+          revoked_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actions?: string[]
+          created_at?: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          note?: string
+          page_key?: string
+          request_id?: string | null
+          revoked_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_grants_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "access_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      access_requests: {
+        Row: {
+          actions: string[]
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string
+          expires_at: string | null
+          id: string
+          page_key: string
+          reason: string
+          requested_days: number | null
+          status: Database["public"]["Enums"]["access_request_status"]
+          updated_at: string
+          user_email: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          actions?: string[]
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string
+          expires_at?: string | null
+          id?: string
+          page_key: string
+          reason?: string
+          requested_days?: number | null
+          status?: Database["public"]["Enums"]["access_request_status"]
+          updated_at?: string
+          user_email?: string
+          user_id: string
+          user_name?: string
+        }
+        Update: {
+          actions?: string[]
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string
+          expires_at?: string | null
+          id?: string
+          page_key?: string
+          reason?: string
+          requested_days?: number | null
+          status?: Database["public"]["Enums"]["access_request_status"]
+          updated_at?: string
+          user_email?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
       admin_notifications: {
         Row: {
           created_at: string
@@ -76,183 +180,6 @@ export type Database = {
           read?: boolean
           title?: string
           type?: Database["public"]["Enums"]["notification_type"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      reviews: {
-        Row: {
-          approved: boolean
-          author: string
-          company: string
-          created_at: string
-          id: string
-          rating: number
-          text: string
-          updated_at: string
-        }
-        Insert: {
-          approved?: boolean
-          author?: string
-          company?: string
-          created_at?: string
-          id?: string
-          rating?: number
-          text?: string
-          updated_at?: string
-        }
-        Update: {
-          approved?: boolean
-          author?: string
-          company?: string
-          created_at?: string
-          id?: string
-          rating?: number
-          text?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      quotes: {
-        Row: {
-          company: string | null
-          created_at: string
-          currency: string
-          email: string | null
-          full_name: string | null
-          id: string
-          items: Json
-          notes: string | null
-          phone: string | null
-          service_name: string | null
-          status: string
-          total: number
-          updated_at: string
-        }
-        Insert: {
-          company?: string | null
-          created_at?: string
-          currency?: string
-          email?: string | null
-          full_name?: string | null
-          id?: string
-          items?: Json
-          notes?: string | null
-          phone?: string | null
-          service_name?: string | null
-          status?: string
-          total?: number
-          updated_at?: string
-        }
-        Update: {
-          company?: string | null
-          created_at?: string
-          currency?: string
-          email?: string | null
-          full_name?: string | null
-          id?: string
-          items?: Json
-          notes?: string | null
-          phone?: string | null
-          service_name?: string | null
-          status?: string
-          total?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      client_assessments: {
-        Row: {
-          answers: Json
-          business_type_key: string
-          client_id: string | null
-          client_name: string
-          created_at: string
-          id: string
-          project_name: string
-          results: Json
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          answers?: Json
-          business_type_key?: string
-          client_id?: string | null
-          client_name?: string
-          created_at?: string
-          id?: string
-          project_name?: string
-          results?: Json
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          answers?: Json
-          business_type_key?: string
-          client_id?: string | null
-          client_name?: string
-          created_at?: string
-          id?: string
-          project_name?: string
-          results?: Json
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      projects: {
-        Row: {
-          canonical_url: string | null
-          created_at: string
-          desc_ar: string
-          desc_en: string
-          id: number
-          image: string
-          industry: string
-          meta_description_ar: string | null
-          meta_description_en: string | null
-          meta_keywords: string | null
-          meta_title_ar: string | null
-          meta_title_en: string | null
-          og_image: string | null
-          title_ar: string
-          title_en: string
-          updated_at: string
-        }
-        Insert: {
-          canonical_url?: string | null
-          created_at?: string
-          desc_ar?: string
-          desc_en?: string
-          id?: number
-          image?: string
-          industry?: string
-          meta_description_ar?: string | null
-          meta_description_en?: string | null
-          meta_keywords?: string | null
-          meta_title_ar?: string | null
-          meta_title_en?: string | null
-          og_image?: string | null
-          title_ar?: string
-          title_en?: string
-          updated_at?: string
-        }
-        Update: {
-          canonical_url?: string | null
-          created_at?: string
-          desc_ar?: string
-          desc_en?: string
-          id?: number
-          image?: string
-          industry?: string
-          meta_description_ar?: string | null
-          meta_description_en?: string | null
-          meta_keywords?: string | null
-          meta_title_ar?: string | null
-          meta_title_en?: string | null
-          og_image?: string | null
-          title_ar?: string
-          title_en?: string
           updated_at?: string
         }
         Relationships: []
@@ -546,6 +473,87 @@ export type Database = {
         }
         Relationships: []
       }
+      client_assessments: {
+        Row: {
+          answers: Json
+          business_type_key: string
+          client_id: string | null
+          client_name: string
+          created_at: string
+          id: string
+          project_name: string
+          results: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answers?: Json
+          business_type_key?: string
+          client_id?: string | null
+          client_name?: string
+          created_at?: string
+          id?: string
+          project_name?: string
+          results?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answers?: Json
+          business_type_key?: string
+          client_id?: string | null
+          client_name?: string
+          created_at?: string
+          id?: string
+          project_name?: string
+          results?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      faqs: {
+        Row: {
+          active: boolean
+          answer_ar: string
+          answer_en: string
+          category_ar: string
+          category_en: string
+          created_at: string
+          id: string
+          question_ar: string
+          question_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          answer_ar?: string
+          answer_en?: string
+          category_ar?: string
+          category_en?: string
+          created_at?: string
+          id?: string
+          question_ar?: string
+          question_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          answer_ar?: string
+          answer_en?: string
+          category_ar?: string
+          category_en?: string
+          created_at?: string
+          id?: string
+          question_ar?: string
+          question_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       homepage_slides: {
         Row: {
           active: boolean
@@ -761,6 +769,72 @@ export type Database = {
         }
         Relationships: []
       }
+      partners: {
+        Row: {
+          active: boolean
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          featured: boolean
+          href: string
+          id: string
+          logo: string
+          name_ar: string
+          name_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          featured?: boolean
+          href?: string
+          id?: string
+          logo?: string
+          name_ar?: string
+          name_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          featured?: boolean
+          href?: string
+          id?: string
+          logo?: string
+          name_ar?: string
+          name_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      product_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name_ar: string
+          name_en: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name_ar: string
+          name_en: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name_ar?: string
+          name_en?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           active: boolean
@@ -848,6 +922,66 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          active: boolean
+          canonical_url: string | null
+          created_at: string
+          desc_ar: string
+          desc_en: string
+          id: number
+          image: string
+          industry: string
+          meta_description_ar: string | null
+          meta_description_en: string | null
+          meta_keywords: string | null
+          meta_title_ar: string | null
+          meta_title_en: string | null
+          og_image: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          canonical_url?: string | null
+          created_at?: string
+          desc_ar?: string
+          desc_en?: string
+          id?: number
+          image?: string
+          industry?: string
+          meta_description_ar?: string | null
+          meta_description_en?: string | null
+          meta_keywords?: string | null
+          meta_title_ar?: string | null
+          meta_title_en?: string | null
+          og_image?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          canonical_url?: string | null
+          created_at?: string
+          desc_ar?: string
+          desc_en?: string
+          id?: number
+          image?: string
+          industry?: string
+          meta_description_ar?: string | null
+          meta_description_en?: string | null
+          meta_keywords?: string | null
+          meta_title_ar?: string | null
+          meta_title_en?: string | null
+          og_image?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pwa_install_events: {
         Row: {
           created_at: string
@@ -869,6 +1003,165 @@ export type Database = {
           id?: string
           platform?: string | null
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          approved: boolean
+          author: string
+          company: string
+          created_at: string
+          id: string
+          rating: number
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean
+          author?: string
+          company?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          text?: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean
+          author?: string
+          company?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      security_remediations: {
+        Row: {
+          fixed_at: string | null
+          fixed_by: string | null
+          id: string
+          is_fixed: boolean
+          notes: string | null
+          rule_id: string
+          step_index: number
+          updated_at: string
+        }
+        Insert: {
+          fixed_at?: string | null
+          fixed_by?: string | null
+          id: string
+          is_fixed?: boolean
+          notes?: string | null
+          rule_id: string
+          step_index: number
+          updated_at?: string
+        }
+        Update: {
+          fixed_at?: string | null
+          fixed_by?: string | null
+          id?: string
+          is_fixed?: boolean
+          notes?: string | null
+          rule_id?: string
+          step_index?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      security_scans: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          critical_count: number
+          duration_seconds: number
+          findings: Json
+          findings_count: number
+          high_count: number
+          id: string
+          low_count: number
+          medium_count: number
+          status: string
+          template_id: string
+          template_name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          critical_count?: number
+          duration_seconds?: number
+          findings?: Json
+          findings_count?: number
+          high_count?: number
+          id?: string
+          low_count?: number
+          medium_count?: number
+          status?: string
+          template_id: string
+          template_name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          critical_count?: number
+          duration_seconds?: number
+          findings?: Json
+          findings_count?: number
+          high_count?: number
+          id?: string
+          low_count?: number
+          medium_count?: number
+          status?: string
+          template_id?: string
+          template_name?: string
+        }
+        Relationships: []
+      }
+      security_settings: {
+        Row: {
+          alert_email: string
+          alert_on_critical: boolean
+          alert_on_high: boolean
+          auto_scan_enabled: boolean
+          blocked_ips: Json
+          health_score: number
+          id: string
+          last_full_scan_at: string | null
+          rate_limit_rpm: number
+          scan_frequency: string
+          updated_at: string
+          waf_mode: string
+        }
+        Insert: {
+          alert_email?: string
+          alert_on_critical?: boolean
+          alert_on_high?: boolean
+          auto_scan_enabled?: boolean
+          blocked_ips?: Json
+          health_score?: number
+          id?: string
+          last_full_scan_at?: string | null
+          rate_limit_rpm?: number
+          scan_frequency?: string
+          updated_at?: string
+          waf_mode?: string
+        }
+        Update: {
+          alert_email?: string
+          alert_on_critical?: boolean
+          alert_on_high?: boolean
+          auto_scan_enabled?: boolean
+          blocked_ips?: Json
+          health_score?: number
+          id?: string
+          last_full_scan_at?: string | null
+          rate_limit_rpm?: number
+          scan_frequency?: string
+          updated_at?: string
+          waf_mode?: string
         }
         Relationships: []
       }
@@ -1108,47 +1401,155 @@ export type Database = {
         }
         Relationships: []
       }
+      services: {
+        Row: {
+          canonical_url: string | null
+          created_at: string
+          desc_ar: string
+          desc_en: string
+          features: Json | null
+          icon_name: string
+          image: string
+          meta_description_ar: string | null
+          meta_description_en: string | null
+          meta_keywords: string | null
+          meta_title_ar: string | null
+          meta_title_en: string | null
+          og_image: string | null
+          published: boolean
+          slug: string
+          sort_order: number
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          canonical_url?: string | null
+          created_at?: string
+          desc_ar?: string
+          desc_en?: string
+          features?: Json | null
+          icon_name?: string
+          image?: string
+          meta_description_ar?: string | null
+          meta_description_en?: string | null
+          meta_keywords?: string | null
+          meta_title_ar?: string | null
+          meta_title_en?: string | null
+          og_image?: string | null
+          published?: boolean
+          slug: string
+          sort_order?: number
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Update: {
+          canonical_url?: string | null
+          created_at?: string
+          desc_ar?: string
+          desc_en?: string
+          features?: Json | null
+          icon_name?: string
+          image?: string
+          meta_description_ar?: string | null
+          meta_description_en?: string | null
+          meta_keywords?: string | null
+          meta_title_ar?: string | null
+          meta_title_en?: string | null
+          og_image?: string | null
+          published?: boolean
+          slug?: string
+          sort_order?: number
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          id: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          id: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       smtp_settings: {
         Row: {
           created_at: string
           enabled: boolean
+          encryption_type: string
           from_email: string
           from_name: string
           host: string
           id: string
+          last_test_log: string | null
+          last_test_status: string | null
+          last_tested_at: string | null
           password: string
           port: number
+          provider: string
           reply_to: string
           secure: boolean
+          test_recipient: string | null
           updated_at: string
+          updated_by: string | null
           username: string
         }
         Insert: {
           created_at?: string
           enabled?: boolean
+          encryption_type?: string
           from_email?: string
           from_name?: string
           host?: string
           id?: string
+          last_test_log?: string | null
+          last_test_status?: string | null
+          last_tested_at?: string | null
           password?: string
           port?: number
+          provider?: string
           reply_to?: string
           secure?: boolean
+          test_recipient?: string | null
           updated_at?: string
+          updated_by?: string | null
           username?: string
         }
         Update: {
           created_at?: string
           enabled?: boolean
+          encryption_type?: string
           from_email?: string
           from_name?: string
           host?: string
           id?: string
+          last_test_log?: string | null
+          last_test_status?: string | null
+          last_tested_at?: string | null
           password?: string
           port?: number
+          provider?: string
           reply_to?: string
           secure?: boolean
+          test_recipient?: string | null
           updated_at?: string
+          updated_by?: string | null
           username?: string
         }
         Relationships: []
@@ -1197,6 +1598,7 @@ export type Database = {
           id: string
           name_ar: string
           name_en: string
+          responsible_emails: string
           sort_order: number
           updated_at: string
           value: string
@@ -1208,6 +1610,7 @@ export type Database = {
           id?: string
           name_ar?: string
           name_en?: string
+          responsible_emails?: string
           sort_order?: number
           updated_at?: string
           value: string
@@ -1219,6 +1622,7 @@ export type Database = {
           id?: string
           name_ar?: string
           name_en?: string
+          responsible_emails?: string
           sort_order?: number
           updated_at?: string
           value?: string
@@ -1668,18 +2072,21 @@ export type Database = {
       user_roles: {
         Row: {
           created_at: string
+          display_name: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string
+          display_name?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           created_at?: string
+          display_name?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
@@ -1691,7 +2098,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_manage_access: { Args: { _user_id: string }; Returns: boolean }
       can_manage_tickets: { Args: { _user_id: string }; Returns: boolean }
+      expire_access_grants: { Args: never; Returns: number }
+      has_page_access: {
+        Args: { _action: string; _page_key: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1701,6 +2114,7 @@ export type Database = {
       }
     }
     Enums: {
+      access_request_status: "pending" | "approved" | "denied" | "revoked"
       app_role:
         | "admin"
         | "moderator"
@@ -1861,6 +2275,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      access_request_status: ["pending", "approved", "denied", "revoked"],
       app_role: [
         "admin",
         "moderator",
