@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Inbox, Check, X, Clock, ShieldOff } from "lucide-react";
+import { Inbox, Check, X, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { useAdminT } from "@/lib/admin-i18n";
 import { ADMIN_PAGES, PERM_ACTIONS, usePermissions, type PermAction } from "@/lib/permissions-store";
 import { useAccessRequests, type AccessRequestStatus } from "@/lib/access-requests";
+import { ActiveGrantsTable } from "@/components/admin/ActiveGrantsTable";
 
 const STATUS_STYLE: Record<AccessRequestStatus, string> = {
   pending: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300",
@@ -32,7 +33,7 @@ export function AccessRequestQueue() {
   const ar = lang === "ar";
   const { user } = useAuth();
   const { requests, decide } = useAccessRequests();
-  const { grants, grantAccess, revokeGrant } = usePermissions();
+  const { grantAccess } = usePermissions();
   const [showAll, setShowAll] = useState(false);
   const [durations, setDurations] = useState<Record<string, string>>({});
 
@@ -80,6 +81,7 @@ export function AccessRequestQueue() {
   };
 
   return (
+    <div className="space-y-4">
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 flex-wrap">
         <CardTitle className="font-display text-base inline-flex items-center gap-2">
@@ -160,35 +162,9 @@ export function AccessRequestQueue() {
             </div>
           ))
         )}
-
-        {grants.length > 0 && (
-          <div className="pt-4 mt-2 border-t space-y-2">
-            <div className="text-sm font-medium">{ar ? "الصلاحيات المؤقتة النشطة" : "Active grants"}</div>
-            {grants.map((g) => (
-              <div key={g.id} className="flex items-center justify-between gap-3 text-xs border rounded-lg px-3 py-2 flex-wrap">
-                <div className="min-w-0">
-                  <span className="font-medium">{label(g.pageKey)}</span>{" "}
-                  <span className="font-mono text-muted-foreground">{g.userId}</span>
-                  <div className="mt-1 flex flex-wrap items-center gap-1">
-                    {g.actions.map((a) => (
-                      <Badge key={a} variant="outline" className="font-mono text-[10px]">{a}</Badge>
-                    ))}
-                    <span className="text-muted-foreground ms-1 inline-flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {g.expiresAt
-                        ? `${ar ? "ينتهي" : "expires"} ${new Date(g.expiresAt).toLocaleString(ar ? "ar-EG" : "en-GB")}`
-                        : ar ? "دائم" : "permanent"}
-                    </span>
-                  </div>
-                </div>
-                <Button size="sm" variant="outline" onClick={() => { void revokeGrant(g.id); toast.success(ar ? "تم سحب الصلاحية" : "Grant revoked"); }}>
-                  <ShieldOff className="h-4 w-4 me-1" />{ar ? "سحب" : "Revoke"}
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
       </CardContent>
-    </Card>
+      </Card>
+      <ActiveGrantsTable />
+    </div>
   );
 }

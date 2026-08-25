@@ -37,7 +37,7 @@ function QuotationDetail() {
 
   const loadQuote = async () => {
     try {
-      const { data, error } = await supabase.from("quotes").select("*").eq("id", id).maybeSingle();
+      const { data, error } = await (supabase as any).from("quotes").select("*").eq("id", id).maybeSingle();
       if (data) setQuote(data);
     } catch (err) {
       console.warn("[quote-detail] fetch error:", err);
@@ -54,7 +54,7 @@ function QuotationDetail() {
   const updateStatus = async (newStatus: string) => {
     setSaving(true);
     try {
-      const { error } = await supabase.from("quotes").update({ status: newStatus }).eq("id", id);
+      const { error } = await (supabase as any).from("quotes").update({ status: newStatus }).eq("id", id);
       if (error) throw error;
       setQuote((prev: any) => ({ ...prev, status: newStatus }));
       toast.success(t("Quotation status updated", "تم تحديث حالة عرض السعر"));

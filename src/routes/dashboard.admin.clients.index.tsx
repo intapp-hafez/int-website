@@ -54,7 +54,7 @@ function ClientsPage() {
       const [rolesRes, leadsRes, quotesRes] = await Promise.all([
         supabase.from("user_roles").select("*"),
         supabase.from("leads").select("*"),
-        supabase.from("quotes").select("*"),
+        (supabase as any).from("quotes").select("*"),
       ]);
 
       const map = new Map<string, DbClient>();

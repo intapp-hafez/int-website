@@ -35,7 +35,7 @@ function ReportsPage() {
     const loadReportData = async () => {
       try {
         const { data: leads } = await supabase.from("leads").select("*");
-        const { data: quotes } = await supabase.from("quotes").select("*");
+        const { data: quotes } = await (supabase as any).from("quotes").select("*");
 
         const lList = leads || [];
         const qList = quotes || [];

@@ -90,8 +90,7 @@ function ClientOverview() {
       }
 
       // 2. Fetch Client Orders / Quotes
-      const { data: quotesData } = await supabase
-        .from("quotes")
+      const { data: quotesData } = await (supabase as any).from("quotes")
         .select("id, total, status")
         .eq("email", user.email);
 
