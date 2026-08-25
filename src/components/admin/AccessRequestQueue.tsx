@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Inbox, Check, X, Clock, ShieldOff } from "lucide-react";
+import { Inbox, Check, X, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { useAdminT } from "@/lib/admin-i18n";
 import { ADMIN_PAGES, PERM_ACTIONS, usePermissions, type PermAction } from "@/lib/permissions-store";
 import { useAccessRequests, type AccessRequestStatus } from "@/lib/access-requests";
+import { ActiveGrantsTable } from "@/components/admin/ActiveGrantsTable";
 
 const STATUS_STYLE: Record<AccessRequestStatus, string> = {
   pending: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300",
@@ -32,7 +33,7 @@ export function AccessRequestQueue() {
   const ar = lang === "ar";
   const { user } = useAuth();
   const { requests, decide } = useAccessRequests();
-  const { grants, grantAccess, revokeGrant } = usePermissions();
+  const { grantAccess } = usePermissions();
   const [showAll, setShowAll] = useState(false);
   const [durations, setDurations] = useState<Record<string, string>>({});
 
