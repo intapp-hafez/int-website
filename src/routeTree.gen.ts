@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrainingRouteImport } from './routes/training'
 import { Route as TrackQuoteRouteImport } from './routes/track-quote'
 import { Route as TrackApplicationRouteImport } from './routes/track-application'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -22,6 +23,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PoliciesRouteImport } from './routes/policies'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CareersRouteImport } from './routes/careers'
@@ -46,6 +48,7 @@ import { Route as DashboardWorkspaceOrdersRouteImport } from './routes/dashboard
 import { Route as DashboardWorkspaceNewRouteImport } from './routes/dashboard.workspace.new'
 import { Route as DashboardWorkspaceAssessmentRouteImport } from './routes/dashboard.workspace.assessment'
 import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard.admin.users'
+import { Route as DashboardAdminTrainingRouteImport } from './routes/dashboard.admin.training'
 import { Route as DashboardAdminTicketsRouteImport } from './routes/dashboard.admin.tickets'
 import { Route as DashboardAdminTermsRouteImport } from './routes/dashboard.admin.terms'
 import { Route as DashboardAdminSmtpRouteImport } from './routes/dashboard.admin.smtp'
@@ -119,6 +122,11 @@ import { Route as DashboardAdminHelpdeskTicketsNewRouteImport } from './routes/d
 import { Route as DashboardAdminHelpdeskTicketsIdRouteImport } from './routes/dashboard.admin.helpdesk.tickets.$id'
 import { Route as DashboardAdminCareersApplicationsIdRouteImport } from './routes/dashboard.admin.careers.applications.$id'
 
+const TrainingRoute = TrainingRouteImport.update({
+  id: '/training',
+  path: '/training',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrackQuoteRoute = TrackQuoteRouteImport.update({
   id: '/track-quote',
   path: '/track-quote',
@@ -182,6 +190,11 @@ const IndustriesRoute = IndustriesRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -306,6 +319,11 @@ const DashboardWorkspaceAssessmentRoute =
 const DashboardAdminUsersRoute = DashboardAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminTrainingRoute = DashboardAdminTrainingRouteImport.update({
+  id: '/training',
+  path: '/training',
   getParentRoute: () => DashboardAdminRoute,
 } as any)
 const DashboardAdminTicketsRoute = DashboardAdminTicketsRouteImport.update({
@@ -719,6 +737,7 @@ export interface FileRoutesByFullPath {
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
   '/policies': typeof PoliciesRoute
@@ -732,6 +751,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/track-application': typeof TrackApplicationRoute
   '/track-quote': typeof TrackQuoteRoute
+  '/training': typeof TrainingRoute
   '/dashboard/admin': typeof DashboardAdminRouteWithChildren
   '/dashboard/workspace': typeof DashboardWorkspaceRouteWithChildren
   '/news/$slug': typeof NewsSlugRoute
@@ -771,6 +791,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/smtp': typeof DashboardAdminSmtpRoute
   '/dashboard/admin/terms': typeof DashboardAdminTermsRoute
   '/dashboard/admin/tickets': typeof DashboardAdminTicketsRouteWithChildren
+  '/dashboard/admin/training': typeof DashboardAdminTrainingRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRouteWithChildren
   '/dashboard/workspace/assessment': typeof DashboardWorkspaceAssessmentRoute
   '/dashboard/workspace/new': typeof DashboardWorkspaceNewRoute
@@ -829,6 +850,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
   '/policies': typeof PoliciesRoute
@@ -842,6 +864,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/track-application': typeof TrackApplicationRoute
   '/track-quote': typeof TrackQuoteRoute
+  '/training': typeof TrainingRoute
   '/news/$slug': typeof NewsSlugRoute
   '/partners/$id': typeof PartnersIdRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -870,6 +893,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/sliders': typeof DashboardAdminSlidersRoute
   '/dashboard/admin/smtp': typeof DashboardAdminSmtpRoute
   '/dashboard/admin/terms': typeof DashboardAdminTermsRoute
+  '/dashboard/admin/training': typeof DashboardAdminTrainingRoute
   '/dashboard/workspace/assessment': typeof DashboardWorkspaceAssessmentRoute
   '/dashboard/workspace/new': typeof DashboardWorkspaceNewRoute
   '/dashboard/workspace/profile': typeof DashboardWorkspaceProfileRoute
@@ -925,6 +949,7 @@ export interface FileRoutesById {
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
   '/policies': typeof PoliciesRoute
@@ -938,6 +963,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/track-application': typeof TrackApplicationRoute
   '/track-quote': typeof TrackQuoteRoute
+  '/training': typeof TrainingRoute
   '/dashboard/admin': typeof DashboardAdminRouteWithChildren
   '/dashboard/workspace': typeof DashboardWorkspaceRouteWithChildren
   '/news/$slug': typeof NewsSlugRoute
@@ -977,6 +1003,7 @@ export interface FileRoutesById {
   '/dashboard/admin/smtp': typeof DashboardAdminSmtpRoute
   '/dashboard/admin/terms': typeof DashboardAdminTermsRoute
   '/dashboard/admin/tickets': typeof DashboardAdminTicketsRouteWithChildren
+  '/dashboard/admin/training': typeof DashboardAdminTrainingRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRouteWithChildren
   '/dashboard/workspace/assessment': typeof DashboardWorkspaceAssessmentRoute
   '/dashboard/workspace/new': typeof DashboardWorkspaceNewRoute
@@ -1038,6 +1065,7 @@ export interface FileRouteTypes {
     | '/careers'
     | '/contact'
     | '/dashboard'
+    | '/events'
     | '/forgot-password'
     | '/industries'
     | '/policies'
@@ -1051,6 +1079,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track-application'
     | '/track-quote'
+    | '/training'
     | '/dashboard/admin'
     | '/dashboard/workspace'
     | '/news/$slug'
@@ -1090,6 +1119,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/smtp'
     | '/dashboard/admin/terms'
     | '/dashboard/admin/tickets'
+    | '/dashboard/admin/training'
     | '/dashboard/admin/users'
     | '/dashboard/workspace/assessment'
     | '/dashboard/workspace/new'
@@ -1148,6 +1178,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/careers'
     | '/contact'
+    | '/events'
     | '/forgot-password'
     | '/industries'
     | '/policies'
@@ -1161,6 +1192,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track-application'
     | '/track-quote'
+    | '/training'
     | '/news/$slug'
     | '/partners/$id'
     | '/products/$slug'
@@ -1189,6 +1221,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/sliders'
     | '/dashboard/admin/smtp'
     | '/dashboard/admin/terms'
+    | '/dashboard/admin/training'
     | '/dashboard/workspace/assessment'
     | '/dashboard/workspace/new'
     | '/dashboard/workspace/profile'
@@ -1243,6 +1276,7 @@ export interface FileRouteTypes {
     | '/careers'
     | '/contact'
     | '/dashboard'
+    | '/events'
     | '/forgot-password'
     | '/industries'
     | '/policies'
@@ -1256,6 +1290,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track-application'
     | '/track-quote'
+    | '/training'
     | '/dashboard/admin'
     | '/dashboard/workspace'
     | '/news/$slug'
@@ -1295,6 +1330,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/smtp'
     | '/dashboard/admin/terms'
     | '/dashboard/admin/tickets'
+    | '/dashboard/admin/training'
     | '/dashboard/admin/users'
     | '/dashboard/workspace/assessment'
     | '/dashboard/workspace/new'
@@ -1355,6 +1391,7 @@ export interface RootRouteChildren {
   CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   IndustriesRoute: typeof IndustriesRoute
   PoliciesRoute: typeof PoliciesRoute
@@ -1368,6 +1405,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TrackApplicationRoute: typeof TrackApplicationRoute
   TrackQuoteRoute: typeof TrackQuoteRoute
+  TrainingRoute: typeof TrainingRoute
   NewsSlugRoute: typeof NewsSlugRoute
   PartnersIdRoute: typeof PartnersIdRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
@@ -1379,6 +1417,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/training': {
+      id: '/training'
+      path: '/training'
+      fullPath: '/training'
+      preLoaderRoute: typeof TrainingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/track-quote': {
       id: '/track-quote'
       path: '/track-quote'
@@ -1468,6 +1513,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -1636,6 +1688,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/dashboard/admin/users'
       preLoaderRoute: typeof DashboardAdminUsersRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/training': {
+      id: '/dashboard/admin/training'
+      path: '/training'
+      fullPath: '/dashboard/admin/training'
+      preLoaderRoute: typeof DashboardAdminTrainingRouteImport
       parentRoute: typeof DashboardAdminRoute
     }
     '/dashboard/admin/tickets': {
@@ -2413,6 +2472,7 @@ interface DashboardAdminRouteChildren {
   DashboardAdminSmtpRoute: typeof DashboardAdminSmtpRoute
   DashboardAdminTermsRoute: typeof DashboardAdminTermsRoute
   DashboardAdminTicketsRoute: typeof DashboardAdminTicketsRouteWithChildren
+  DashboardAdminTrainingRoute: typeof DashboardAdminTrainingRoute
   DashboardAdminUsersRoute: typeof DashboardAdminUsersRouteWithChildren
   DashboardAdminIndexRoute: typeof DashboardAdminIndexRoute
   DashboardAdminLocationsIndexRoute: typeof DashboardAdminLocationsIndexRoute
@@ -2450,6 +2510,7 @@ const DashboardAdminRouteChildren: DashboardAdminRouteChildren = {
   DashboardAdminSmtpRoute: DashboardAdminSmtpRoute,
   DashboardAdminTermsRoute: DashboardAdminTermsRoute,
   DashboardAdminTicketsRoute: DashboardAdminTicketsRouteWithChildren,
+  DashboardAdminTrainingRoute: DashboardAdminTrainingRoute,
   DashboardAdminUsersRoute: DashboardAdminUsersRouteWithChildren,
   DashboardAdminIndexRoute: DashboardAdminIndexRoute,
   DashboardAdminLocationsIndexRoute: DashboardAdminLocationsIndexRoute,
@@ -2549,6 +2610,7 @@ const rootRouteChildren: RootRouteChildren = {
   CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   IndustriesRoute: IndustriesRoute,
   PoliciesRoute: PoliciesRoute,
@@ -2562,6 +2624,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TrackApplicationRoute: TrackApplicationRoute,
   TrackQuoteRoute: TrackQuoteRoute,
+  TrainingRoute: TrainingRoute,
   NewsSlugRoute: NewsSlugRoute,
   PartnersIdRoute: PartnersIdRoute,
   ProductsSlugRoute: ProductsSlugRoute,
