@@ -23,6 +23,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PoliciesRouteImport } from './routes/policies'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CareersRouteImport } from './routes/careers'
@@ -188,6 +189,11 @@ const IndustriesRoute = IndustriesRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -725,6 +731,7 @@ export interface FileRoutesByFullPath {
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
   '/policies': typeof PoliciesRoute
@@ -836,6 +843,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
   '/policies': typeof PoliciesRoute
@@ -933,6 +941,7 @@ export interface FileRoutesById {
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/industries': typeof IndustriesRoute
   '/policies': typeof PoliciesRoute
@@ -1047,6 +1056,7 @@ export interface FileRouteTypes {
     | '/careers'
     | '/contact'
     | '/dashboard'
+    | '/events'
     | '/forgot-password'
     | '/industries'
     | '/policies'
@@ -1158,6 +1168,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/careers'
     | '/contact'
+    | '/events'
     | '/forgot-password'
     | '/industries'
     | '/policies'
@@ -1254,6 +1265,7 @@ export interface FileRouteTypes {
     | '/careers'
     | '/contact'
     | '/dashboard'
+    | '/events'
     | '/forgot-password'
     | '/industries'
     | '/policies'
@@ -1367,6 +1379,7 @@ export interface RootRouteChildren {
   CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   IndustriesRoute: typeof IndustriesRoute
   PoliciesRoute: typeof PoliciesRoute
@@ -1488,6 +1501,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -2569,6 +2589,7 @@ const rootRouteChildren: RootRouteChildren = {
   CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   IndustriesRoute: IndustriesRoute,
   PoliciesRoute: PoliciesRoute,
