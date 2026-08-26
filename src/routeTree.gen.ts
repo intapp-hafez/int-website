@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrainingRouteImport } from './routes/training'
 import { Route as TrackQuoteRouteImport } from './routes/track-quote'
 import { Route as TrackApplicationRouteImport } from './routes/track-application'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -119,6 +120,11 @@ import { Route as DashboardAdminHelpdeskTicketsNewRouteImport } from './routes/d
 import { Route as DashboardAdminHelpdeskTicketsIdRouteImport } from './routes/dashboard.admin.helpdesk.tickets.$id'
 import { Route as DashboardAdminCareersApplicationsIdRouteImport } from './routes/dashboard.admin.careers.applications.$id'
 
+const TrainingRoute = TrainingRouteImport.update({
+  id: '/training',
+  path: '/training',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrackQuoteRoute = TrackQuoteRouteImport.update({
   id: '/track-quote',
   path: '/track-quote',
@@ -732,6 +738,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/track-application': typeof TrackApplicationRoute
   '/track-quote': typeof TrackQuoteRoute
+  '/training': typeof TrainingRoute
   '/dashboard/admin': typeof DashboardAdminRouteWithChildren
   '/dashboard/workspace': typeof DashboardWorkspaceRouteWithChildren
   '/news/$slug': typeof NewsSlugRoute
@@ -842,6 +849,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/track-application': typeof TrackApplicationRoute
   '/track-quote': typeof TrackQuoteRoute
+  '/training': typeof TrainingRoute
   '/news/$slug': typeof NewsSlugRoute
   '/partners/$id': typeof PartnersIdRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -938,6 +946,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/track-application': typeof TrackApplicationRoute
   '/track-quote': typeof TrackQuoteRoute
+  '/training': typeof TrainingRoute
   '/dashboard/admin': typeof DashboardAdminRouteWithChildren
   '/dashboard/workspace': typeof DashboardWorkspaceRouteWithChildren
   '/news/$slug': typeof NewsSlugRoute
@@ -1051,6 +1060,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track-application'
     | '/track-quote'
+    | '/training'
     | '/dashboard/admin'
     | '/dashboard/workspace'
     | '/news/$slug'
@@ -1161,6 +1171,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track-application'
     | '/track-quote'
+    | '/training'
     | '/news/$slug'
     | '/partners/$id'
     | '/products/$slug'
@@ -1256,6 +1267,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track-application'
     | '/track-quote'
+    | '/training'
     | '/dashboard/admin'
     | '/dashboard/workspace'
     | '/news/$slug'
@@ -1368,6 +1380,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TrackApplicationRoute: typeof TrackApplicationRoute
   TrackQuoteRoute: typeof TrackQuoteRoute
+  TrainingRoute: typeof TrainingRoute
   NewsSlugRoute: typeof NewsSlugRoute
   PartnersIdRoute: typeof PartnersIdRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
@@ -1379,6 +1392,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/training': {
+      id: '/training'
+      path: '/training'
+      fullPath: '/training'
+      preLoaderRoute: typeof TrainingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/track-quote': {
       id: '/track-quote'
       path: '/track-quote'
@@ -2562,6 +2582,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TrackApplicationRoute: TrackApplicationRoute,
   TrackQuoteRoute: TrackQuoteRoute,
+  TrainingRoute: TrainingRoute,
   NewsSlugRoute: NewsSlugRoute,
   PartnersIdRoute: PartnersIdRoute,
   ProductsSlugRoute: ProductsSlugRoute,
