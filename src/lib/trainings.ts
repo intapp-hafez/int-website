@@ -1,0 +1,133 @@
+import { useCallback, useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+const db = supabase as any;
+
+export type TrainingKind = "training" | "event";
+
+export type TrainingRow = {
+  id: string;
+  kind: TrainingKind;
+  title_en: string;
+  title_ar: string;
+  details_en: string;
+  details_ar: string;
+  benefits_en: string;
+  benefits_ar: string;
+  trainer: string;
+  start_date: string | null;
+  end_date: string | null;
+  location: string;
+  banner_url: string;
+  active: boolean;
+  sort_order: number;
+  created_at?: string;
+};
+
+export type TrainingRegistration = {
+  id: string;
+  training_id: string;
+  full_name: string;
+  gender: string;
+  email: string;
+  phone: string;
+  education_field: string;
+  city: string;
+  district: string;
+  status: string;
+  created_at?: string;
+};
+
+export const emptyTraining: Omit<TrainingRow, "id"> = {
+  kind: "training",
+  title_en: "",
+  title_ar: "",
+  details_en: "",
+  details_ar: "",
+  benefits_en: "",
+  benefits_ar: "",
+  trainer: "",
+  start_date: null,
+  end_date: null,
+  location: "",
+  banner_url: "",
+  active: true,
+  sort_order: 0,
+};
+
+/** Public/admin list of trainings. Pass a kind to filter, or omit for all. */
+export function useTrainings(kind?: TrainingKind, activeOnly = false) {
+  const [items, setItems] = useState<TrainingRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    try {
+      let q = db.from("trainings").select("*").order("sort_order", { ascending: true }).order("start_date", { ascending: true });
+      if (kind) q = q.eq("kind", kind);
+      if (activeOnly) q = q.eq("active", true);
+      const { data, error } = await q;
+      if (error) setError(error.message);
+      else {
+        setItems((data ?? []) as TrainingRow[]);
+        setError(null);
+      }
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load");
+    } finally {
+      setLoading(false);
+    }
+  }, [kind, activeOnly]);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  return { items, loading, error, refresh };
+}
+
+export async function saveTraining(row: Partial<TrainingRow> & { id?: string }) {
+  const payload: any = { ...row };
+  if (!payload.start_date) payload.start_date = null;
+  if (!payload.end_date) payload.end_date = null;
+  const { data, error } = await db.from("trainings").upsert(payload).select().single();
+  if (error) throw new Error(error.message);
+  return data as TrainingRow;
+}
+
+export async function deleteTraining(id: string) {
+  const { error } = await db.from("trainings").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export async function registerForTraining(input: Omit<TrainingRegistration, "id" | "status" | "created_at">) {
+  const { error } = await db.from("training_registrations").insert({ ...input, status: "new" });
+  if (error) throw new Error(error.message);
+}
+
+export function useRegistrations(trainingId?: string) {
+  const [items, setItems] = useState<TrainingRegistration[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    try {
+      let q = db.from("training_registrations").select("*").order("created_at", { ascending: false });
+      if (trainingId) q = q.eq("training_id", trainingId);
+      const { data } = await q;
+      setItems((data ?? []) as TrainingRegistration[]);
+    } finally {
+      setLoading(false);
+    }
+  }, [trainingId]);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  return { items, loading, refresh };
+}
+
+export async function deleteRegistration(id: string) {
+  const { error } = await db.from("training_registrations").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
