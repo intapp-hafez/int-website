@@ -48,6 +48,7 @@ import { Route as DashboardWorkspaceOrdersRouteImport } from './routes/dashboard
 import { Route as DashboardWorkspaceNewRouteImport } from './routes/dashboard.workspace.new'
 import { Route as DashboardWorkspaceAssessmentRouteImport } from './routes/dashboard.workspace.assessment'
 import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard.admin.users'
+import { Route as DashboardAdminTrainingRouteImport } from './routes/dashboard.admin.training'
 import { Route as DashboardAdminTicketsRouteImport } from './routes/dashboard.admin.tickets'
 import { Route as DashboardAdminTermsRouteImport } from './routes/dashboard.admin.terms'
 import { Route as DashboardAdminSmtpRouteImport } from './routes/dashboard.admin.smtp'
@@ -318,6 +319,11 @@ const DashboardWorkspaceAssessmentRoute =
 const DashboardAdminUsersRoute = DashboardAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardAdminTrainingRoute = DashboardAdminTrainingRouteImport.update({
+  id: '/training',
+  path: '/training',
   getParentRoute: () => DashboardAdminRoute,
 } as any)
 const DashboardAdminTicketsRoute = DashboardAdminTicketsRouteImport.update({
@@ -785,6 +791,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/smtp': typeof DashboardAdminSmtpRoute
   '/dashboard/admin/terms': typeof DashboardAdminTermsRoute
   '/dashboard/admin/tickets': typeof DashboardAdminTicketsRouteWithChildren
+  '/dashboard/admin/training': typeof DashboardAdminTrainingRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRouteWithChildren
   '/dashboard/workspace/assessment': typeof DashboardWorkspaceAssessmentRoute
   '/dashboard/workspace/new': typeof DashboardWorkspaceNewRoute
@@ -886,6 +893,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/sliders': typeof DashboardAdminSlidersRoute
   '/dashboard/admin/smtp': typeof DashboardAdminSmtpRoute
   '/dashboard/admin/terms': typeof DashboardAdminTermsRoute
+  '/dashboard/admin/training': typeof DashboardAdminTrainingRoute
   '/dashboard/workspace/assessment': typeof DashboardWorkspaceAssessmentRoute
   '/dashboard/workspace/new': typeof DashboardWorkspaceNewRoute
   '/dashboard/workspace/profile': typeof DashboardWorkspaceProfileRoute
@@ -995,6 +1003,7 @@ export interface FileRoutesById {
   '/dashboard/admin/smtp': typeof DashboardAdminSmtpRoute
   '/dashboard/admin/terms': typeof DashboardAdminTermsRoute
   '/dashboard/admin/tickets': typeof DashboardAdminTicketsRouteWithChildren
+  '/dashboard/admin/training': typeof DashboardAdminTrainingRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRouteWithChildren
   '/dashboard/workspace/assessment': typeof DashboardWorkspaceAssessmentRoute
   '/dashboard/workspace/new': typeof DashboardWorkspaceNewRoute
@@ -1110,6 +1119,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/smtp'
     | '/dashboard/admin/terms'
     | '/dashboard/admin/tickets'
+    | '/dashboard/admin/training'
     | '/dashboard/admin/users'
     | '/dashboard/workspace/assessment'
     | '/dashboard/workspace/new'
@@ -1211,6 +1221,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/sliders'
     | '/dashboard/admin/smtp'
     | '/dashboard/admin/terms'
+    | '/dashboard/admin/training'
     | '/dashboard/workspace/assessment'
     | '/dashboard/workspace/new'
     | '/dashboard/workspace/profile'
@@ -1319,6 +1330,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/smtp'
     | '/dashboard/admin/terms'
     | '/dashboard/admin/tickets'
+    | '/dashboard/admin/training'
     | '/dashboard/admin/users'
     | '/dashboard/workspace/assessment'
     | '/dashboard/workspace/new'
@@ -1676,6 +1688,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/dashboard/admin/users'
       preLoaderRoute: typeof DashboardAdminUsersRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/admin/training': {
+      id: '/dashboard/admin/training'
+      path: '/training'
+      fullPath: '/dashboard/admin/training'
+      preLoaderRoute: typeof DashboardAdminTrainingRouteImport
       parentRoute: typeof DashboardAdminRoute
     }
     '/dashboard/admin/tickets': {
@@ -2453,6 +2472,7 @@ interface DashboardAdminRouteChildren {
   DashboardAdminSmtpRoute: typeof DashboardAdminSmtpRoute
   DashboardAdminTermsRoute: typeof DashboardAdminTermsRoute
   DashboardAdminTicketsRoute: typeof DashboardAdminTicketsRouteWithChildren
+  DashboardAdminTrainingRoute: typeof DashboardAdminTrainingRoute
   DashboardAdminUsersRoute: typeof DashboardAdminUsersRouteWithChildren
   DashboardAdminIndexRoute: typeof DashboardAdminIndexRoute
   DashboardAdminLocationsIndexRoute: typeof DashboardAdminLocationsIndexRoute
@@ -2490,6 +2510,7 @@ const DashboardAdminRouteChildren: DashboardAdminRouteChildren = {
   DashboardAdminSmtpRoute: DashboardAdminSmtpRoute,
   DashboardAdminTermsRoute: DashboardAdminTermsRoute,
   DashboardAdminTicketsRoute: DashboardAdminTicketsRouteWithChildren,
+  DashboardAdminTrainingRoute: DashboardAdminTrainingRoute,
   DashboardAdminUsersRoute: DashboardAdminUsersRouteWithChildren,
   DashboardAdminIndexRoute: DashboardAdminIndexRoute,
   DashboardAdminLocationsIndexRoute: DashboardAdminLocationsIndexRoute,
