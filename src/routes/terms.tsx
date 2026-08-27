@@ -4,6 +4,7 @@ import { useLegalContent, DEFAULT_TERMS } from "@/lib/legal-store";
 import { ScrollText, ShieldCheck, Clock, ArrowRight, CheckCircle2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
+import DOMPurify from "dompurify";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -64,9 +65,11 @@ function TermsPage() {
               className="prose dark:prose-invert max-w-none text-foreground leading-relaxed text-sm sm:text-base prose-headings:font-display prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-accent"
               dir={isAr ? "rtl" : "ltr"}
               dangerouslySetInnerHTML={{
-                __html: activeText.includes("<")
-                  ? activeText
-                  : activeText.replace(/\n\n/g, "<br/><br/>").replace(/\n/g, "<br/>"),
+                __html: DOMPurify.sanitize(
+                  activeText.includes("<")
+                    ? activeText
+                    : activeText.replace(/\n\n/g, "<br/><br/>").replace(/\n/g, "<br/>")
+                ),
               }}
             />
 

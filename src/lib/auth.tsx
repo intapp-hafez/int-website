@@ -119,6 +119,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut();
     } catch (err) {
       console.warn("[auth] signOut error", err);
+    } finally {
+      // Clear any session-specific storage items
+      try {
+        localStorage.removeItem("it_admin_active_tab");
+        sessionStorage.clear();
+      } catch {}
     }
   };
 

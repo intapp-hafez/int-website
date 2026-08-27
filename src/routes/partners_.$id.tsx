@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { SmartLogo } from "@/components/ui/smart-logo";
+import DOMPurify from "dompurify";
 
 export const Route = createFileRoute("/partners_/$id")({
   component: PartnerDetailsPage,
@@ -76,7 +77,7 @@ function PartnerDetailsPage() {
           {description ? (
             <div
               className={`rich-text-content ${isAr ? "font-arabic leading-relaxed text-right" : "leading-relaxed text-left"}`}
-              dangerouslySetInnerHTML={{ __html: description }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }}
             />
           ) : (
             <div className="text-center text-muted-foreground italic py-10">

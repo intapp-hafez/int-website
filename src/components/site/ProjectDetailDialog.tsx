@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import type { Project } from "@/lib/projects-store";
 import { Building2, Calendar, CheckCircle2, FileText, ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import DOMPurify from "dompurify";
 
 export function ProjectDetailDialog({
   project,
@@ -58,7 +59,7 @@ export function ProjectDetailDialog({
             {isHtml ? (
               <div
                 className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: desc }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(desc) }}
               />
             ) : (
               <p className="text-sm sm:text-base text-muted-foreground whitespace-pre-wrap leading-relaxed">

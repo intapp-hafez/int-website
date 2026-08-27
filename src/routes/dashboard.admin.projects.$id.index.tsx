@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useProjects } from "@/lib/projects-store";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { useAdminT } from "@/lib/admin-i18n";
+import DOMPurify from "dompurify";
 
 export const Route = createFileRoute("/dashboard/admin/projects/$id/")({
   head: () => ({ meta: [{ title: "Project Details — Admin" }] }),
@@ -75,7 +76,7 @@ function ProjectDetail() {
           <div>
             <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-1">Description (EN)</h3>
             {/<[a-z][\s\S]*>/i.test(descEn) ? (
-              <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: descEn }} />
+              <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(descEn) }} />
             ) : (
               <p className="text-sm whitespace-pre-wrap text-muted-foreground">{descEn || "No English description provided."}</p>
             )}
@@ -83,7 +84,7 @@ function ProjectDetail() {
           <div dir="rtl">
             <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-1">الوصف (عربي)</h3>
             {/<[a-z][\s\S]*>/i.test(descAr) ? (
-              <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: descAr }} />
+              <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(descAr) }} />
             ) : (
               <p className="text-sm whitespace-pre-wrap text-muted-foreground">{descAr || "لا يوجد وصف بالعربية."}</p>
             )}

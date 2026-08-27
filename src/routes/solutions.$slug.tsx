@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import DOMPurify from "dompurify";
 
 export const Route = createFileRoute("/solutions/$slug")({
   head: () => ({
@@ -141,7 +142,7 @@ function SolutionDetail() {
 
               <div
                 className="prose dark:prose-invert max-w-none text-base sm:text-lg text-muted-foreground leading-relaxed [&_p]:mb-2 [&_ul]:list-disc [&_ul]:ms-5 [&_ol]:list-decimal [&_ol]:ms-5"
-                dangerouslySetInnerHTML={{ __html: bio }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(bio || "") }}
               />
 
               <div className="flex items-center gap-3 pt-2 flex-wrap">
@@ -214,7 +215,7 @@ function SolutionDetail() {
                       </h3>
                       <div
                         className="text-sm text-muted-foreground leading-relaxed mt-2 prose-sm dark:prose-invert [&_p]:mb-1"
-                        dangerouslySetInnerHTML={{ __html: isAr ? rel.bio_ar || rel.bio_en : rel.bio_en }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(isAr ? rel.bio_ar || rel.bio_en : rel.bio_en || "") }}
                       />
                     </div>
                   </div>

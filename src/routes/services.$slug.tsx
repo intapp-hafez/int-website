@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import DOMPurify from "dompurify";
 
 export const Route = createFileRoute("/services/$slug")({
   head: () => ({
@@ -114,7 +115,7 @@ function ServiceDetail() {
             {isRich ? (
               <div
                 className="prose prose-lg dark:prose-invert max-w-none prose-p:leading-relaxed prose-headings:font-display"
-                dangerouslySetInnerHTML={{ __html: desc }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(desc || "") }}
               />
             ) : (
               <p className="whitespace-pre-wrap">{desc}</p>

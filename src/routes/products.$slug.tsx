@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import DOMPurify from "dompurify";
 import {
   ArrowLeft,
   ShoppingBag,
@@ -386,7 +387,7 @@ function ProductDetailPage() {
                 <TabsContent value="overview" className="mt-4 p-5 rounded-2xl border bg-card/60 space-y-4">
                   <div
                     className="prose dark:prose-invert max-w-none text-sm sm:text-base text-muted-foreground leading-relaxed [&_p]:mb-3 [&_ul]:list-disc [&_ul]:ms-5 [&_ol]:list-decimal [&_ol]:ms-5"
-                    dangerouslySetInnerHTML={{ __html: desc }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(desc || "") }}
                   />
                 </TabsContent>
 

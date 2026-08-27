@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { useNews } from "@/lib/news-store";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { Countdown } from "@/components/ui/countdown";
+import DOMPurify from "dompurify";
 
 export const Route = createFileRoute("/news/$slug")({
   head: () => ({ meta: [{ title: "News — Integrated Technics" }] }),
@@ -107,7 +108,7 @@ function NewsDetailsPage() {
             {isHtml ? (
               <div
                 className="prose prose-neutral dark:prose-invert max-w-none text-[17px] leading-[1.9] [&_p]:mb-6 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-6 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:mt-8 [&_h3]:mb-4 [&_ul]:list-disc [&_ul]:ps-6 [&_ul]:mb-6 [&_ol]:list-decimal [&_ol]:ps-6 [&_ol]:mb-6 [&_blockquote]:border-s-4 [&_blockquote]:border-accent [&_blockquote]:ps-6 [&_blockquote]:italic [&_blockquote]:my-8 [&_blockquote]:text-xl [&_blockquote]:text-muted-foreground [&_a]:text-accent [&_a]:underline hover:[&_a]:text-accent/80 [&_hr]:my-10"
-                dangerouslySetInnerHTML={{ __html: body }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(body || "") }}
               />
             ) : (
               <div className="prose prose-neutral dark:prose-invert max-w-none whitespace-pre-wrap text-[17px] leading-[1.9]">

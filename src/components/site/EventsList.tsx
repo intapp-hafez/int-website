@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CalendarDays, MapPin, CheckCircle2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { registerForEvent, useEvents, type EventRow } from "@/lib/events";
+import DOMPurify from "dompurify";
 
 function fmt(d: string | null, isAr: boolean) {
   if (!d) return "";
@@ -112,7 +113,7 @@ function EventCard({ item, isAr }: { item: EventRow; isAr: boolean }) {
         {item.summary && (
           <div 
             className="text-sm text-muted-foreground leading-relaxed line-clamp-3 prose-sm prose-p:my-1 prose-ul:my-1" 
-            dangerouslySetInnerHTML={{ __html: item.summary }} 
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.summary) }} 
           />
         )}
         

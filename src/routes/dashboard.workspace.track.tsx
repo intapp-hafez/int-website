@@ -29,39 +29,48 @@ function TrackPage() {
     setResult(null);
 
     try {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(query);
+      const cleanText = query.replace(/[%,()]/g, "").trim();
+
       // 1. Try search in support_tickets by ticket_no or id
-      const { data: ticket } = await supabase
-        .from("support_tickets")
-        .select("*")
-        .or(`ticket_no.ilike.%${query}%,id.eq.${query}`)
-        .maybeSingle();
+      let ticketQuery = supabase.from("support_tickets").select("*");
+      if (isUuid) {
+        ticketQuery = ticketQuery.or(`ticket_no.ilike.%${cleanText}%,id.eq.${query}`);
+      } else if (cleanText) {
+        ticketQuery = ticketQuery.ilike("ticket_no", `%${cleanText}%`);
+      }
+
+      const { data: ticket } = await ticketQuery.maybeSingle();
 
       if (ticket) {
         setResult({ type: "ticket", data: ticket });
         return;
       }
 
-      // 2. Try search in quotes by id
-      const { data: quote } = await (supabase as any).from("quotes")
-        .select("*")
-        .eq("id", query)
-        .maybeSingle();
+      // 2. Try search in quotes by id (only if valid UUID)
+      if (isUuid) {
+        const { data: quote } = await (supabase as any)
+          .from("quotes")
+          .select("*")
+          .eq("id", query)
+          .maybeSingle();
 
-      if (quote) {
-        setResult({ type: "quote", data: quote });
-        return;
-      }
+        if (quote) {
+          setResult({ type: "quote", data: quote });
+          return;
+        }
 
-      // 3. Try search in leads by id
-      const { data: lead } = await supabase
-        .from("leads")
-        .select("*")
-        .eq("id", query)
-        .maybeSingle();
+        // 3. Try search in leads by id
+        const { data: lead } = await supabase
+          .from("leads")
+          .select("*")
+          .eq("id", query)
+          .maybeSingle();
 
-      if (lead) {
-        setResult({ type: "lead", data: lead });
-        return;
+        if (lead) {
+          setResult({ type: "lead", data: lead });
+          return;
+        }
       }
 
       setResult({ type: "none" });
