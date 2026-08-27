@@ -343,7 +343,8 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
     
     let uploadedUrl = form.resume_url;
     if (resumeFile) {
-      const ext = resumeFile.name.split('.').pop();
+      const rawExt = resumeFile.name.split('.').pop() || "pdf";
+      const ext = rawExt.replace(/[^a-zA-Z0-9]/g, "").toLowerCase().slice(0, 5);
       const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error: upError } = await supabase.storage.from("career-resumes").upload(filename, resumeFile);
       if (upError) {
