@@ -389,16 +389,21 @@ ${d.cover_letter}
       linkedin_url: d.linkedin_url || "",
       cover_letter: extraInfo,
     };
-    const { data, error } = await supabase.from("career_applications").insert(payload as any).select("ref").single();
+    const { data, error } = await (supabase as any)
+      .from("career_applications")
+      .insert(payload)
+      .select("ref")
+      .single();
     setSubmitting(false);
     if (error) { toast.error(ar ? "تعذر إرسال الطلب" : "Could not submit"); return; }
-    setDone(data?.ref ?? null);
-    if (data?.ref) {
+    const applicationRef = data?.ref ?? null;
+    setDone(applicationRef);
+    if (applicationRef) {
       try {
-        await sendApplicationConfirmation({ data: { ref: data.ref, origin: window.location.origin } });
+        await sendApplicationConfirmation({ data: { ref: applicationRef, origin: window.location.origin } });
       } catch { /* confirmation email is best-effort */ }
       try {
-        await sendApplicationSms({ data: { ref: data.ref, origin: window.location.origin } });
+        await sendApplicationSms({ data: { ref: applicationRef, origin: window.location.origin } });
       } catch { /* SMS / WhatsApp receipt is best-effort */ }
     }
   };
