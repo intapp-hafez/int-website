@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { LogIn, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuthT } from "@/lib/auth-i18n";
+import { TurnstileWidget } from "@/components/site/TurnstileWidget";
 
 export const Route = createFileRoute("/signin")({
   head: () => ({
@@ -32,6 +33,7 @@ function SignInPage() {
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -91,6 +93,17 @@ function SignInPage() {
             <Checkbox id="remember" checked={remember} onCheckedChange={(v) => setRemember(Boolean(v))} />
             <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">{t("signin.remember")}</Label>
           </div>
+
+          {/* Cloudflare Turnstile Bot Defense */}
+          <div className="pt-1 flex justify-center">
+            <TurnstileWidget
+              onSuccess={(token) => setTurnstileToken(token)}
+              onExpire={() => setTurnstileToken(null)}
+              theme="auto"
+              size="flexible"
+            />
+          </div>
+
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? t("signin.loading") : t("signin.submit")}
