@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type Role = "admin" | "manager" | "agent" | "seo" | "technician" | "client";
+export type Role = "admin" | "manager" | "agent" | "seo" | "technician" | "hr" | "assistant" | "client";
 export type AuthUser = { id: string; email: string; role: Role; name?: string; user_metadata?: Record<string, any> };
 
 type Ctx = {
@@ -13,31 +13,34 @@ type Ctx = {
 
 const AuthContext = createContext<Ctx | null>(null);
 
+export const isClientRole = (role?: string | null): boolean =>
+  !role || ["client", "client_user", "user"].includes(role.toLowerCase());
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [ready, setReady] = useState(false);
 
   // Helper to fetch user's actual database role
   const fetchUserRole = async (userId: string): Promise<Role> => {
-    try {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .maybeSingle();
+  try {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .maybeSingle();
 
-      if (!error && data?.role) {
-        const r = String(data.role).toLowerCase();
-        if (["client", "client_user", "user"].includes(r)) {
-          return "client";
-        }
-        return r as Role;
+    if (!error && data?.role) {
+      const r = String(data.role).toLowerCase();
+      if (isClientRole(r)) {
+        return "client";
       }
-    } catch (err) {
-      console.warn("[auth] failed to query user_roles", err);
+      return r as Role;
     }
-    return "client";
-  };
+  } catch (err) {
+    console.warn("[auth] failed to query user_roles", err);
+  }
+  return "client";
+};
 
   useEffect(() => {
     // 1. Initial Session Check

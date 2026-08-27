@@ -163,9 +163,9 @@ export function InteractiveHeroWheel() {
 
   return (
     <TooltipProvider delayDuration={150}>
-      <div className="relative mx-auto w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[530px] aspect-square select-none flex items-center justify-center">
+      <div className="relative mx-auto w-full max-w-[450px] sm:max-w-[500px] md:max-w-[540px] lg:max-w-[580px] xl:max-w-[620px] aspect-square select-none flex items-center justify-center p-3 sm:p-5">
         {/* Glow ambient background aura */}
-        <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-accent/20 via-orange-500/10 to-sky-500/20 blur-3xl opacity-60 pointer-events-none animate-pulse" />
+        <div className="absolute inset-2 sm:inset-4 rounded-full bg-gradient-to-tr from-accent/25 via-orange-500/15 to-sky-500/25 blur-3xl opacity-70 pointer-events-none animate-pulse" />
 
         {/* The SVG Diagram Base */}
         <svg
@@ -175,8 +175,9 @@ export function InteractiveHeroWheel() {
           <defs>
             {/* Sector Text Paths */}
             {sectors.map((s) => {
-              // Adjust text arc orientation based on quadrant
-              const isBottom = s.startAngle >= 90 && s.startAngle < 270;
+              // Adjust text arc orientation based on quadrant midpoint so tops of letters always face outward
+              const midAngle = (s.startAngle + s.endAngle) / 2;
+              const isBottom = midAngle >= 90 && midAngle < 270;
               const r = 142;
               const pathD = isBottom
                 ? describeTextArc(250, 250, r, s.endAngle - 2, s.startAngle + 2, 0)
@@ -218,13 +219,13 @@ export function InteractiveHeroWheel() {
           {/* Middle Sectors (The 4 category bands) */}
           {sectors.map((s) => {
             const isHovered = activeHover === s.id;
-            // Tailor font size & tracking so longer labels like NETWORK INFRASTRUCTURE fit completely
+            // Tailor font size & tracking so labels fit prominently and crisply
             const textStyle =
               s.id === "network"
-                ? "text-[9.5px] sm:text-[10px] tracking-normal font-bold"
+                ? "text-[11px] sm:text-[11.5px] md:text-[12px] font-extrabold tracking-tight"
                 : s.id === "security"
-                ? "text-[10.5px] sm:text-[11px] tracking-wider font-bold"
-                : "text-[11px] sm:text-[12px] tracking-widest font-bold";
+                ? "text-[11.5px] sm:text-[12px] md:text-[12.5px] font-extrabold tracking-normal"
+                : "text-[12px] sm:text-[12.5px] md:text-[13px] font-extrabold tracking-wide";
 
             return (
               <g
@@ -245,7 +246,7 @@ export function InteractiveHeroWheel() {
                   />
                   {/* Curved Text Label */}
                   <text
-                    className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]`}
+                    className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]`}
                   >
                     <textPath
                       href={`#sector-arc-${s.id}`}
@@ -273,7 +274,7 @@ export function InteractiveHeroWheel() {
         {/* Central Core: LOGO (Clickable -> Home) */}
         <Link
           to="/"
-          className="absolute z-20 w-[184px] h-[184px] sm:w-[200px] sm:h-[200px] rounded-full bg-white dark:bg-card border-[3px] border-border/80 shadow-2xl flex items-center justify-center p-6 sm:p-7 hover:scale-105 active:scale-95 transition-transform duration-300 group cursor-pointer"
+          className="absolute z-20 w-[190px] h-[190px] sm:w-[210px] sm:h-[210px] md:w-[230px] md:h-[230px] rounded-full bg-white dark:bg-card border-[3px] border-border/80 shadow-2xl flex items-center justify-center p-6 sm:p-7 md:p-8 hover:scale-105 active:scale-95 transition-transform duration-300 group cursor-pointer"
           title={lang === "ar" ? "الصفحة الرئيسية — إنتجريتد تكنيكس" : "Home — Integrated Technics"}
         >
           <div className="relative w-full h-full flex items-center justify-center">
@@ -305,10 +306,10 @@ export function InteractiveHeroWheel() {
                   <TooltipTrigger asChild>
                     <Link
                       to={node.href as any}
-                      className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full flex items-center justify-center text-white shadow-lg border-2 ${node.borderColor} ${node.bgColor} hover:scale-125 hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-90`}
+                      className={`h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 rounded-full flex items-center justify-center text-white shadow-lg border-2 ${node.borderColor} ${node.bgColor} hover:scale-125 hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-90`}
                       aria-label={node.title[lang]}
                     >
-                      <Icon className="h-4 w-4 sm:h-5 sm:w-5 drop-shadow" />
+                      <Icon className="h-4 w-4 sm:h-5 sm:w-5 md:h-5.5 md:w-5.5 drop-shadow" />
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent

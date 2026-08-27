@@ -346,7 +346,7 @@ function ProjectsCarouselSection() {
         />
       </Carousel>
       <CarouselDots api={api} label={lang === "ar" ? "التنقل بين المشاريع" : "Projects slide navigation"} />
-      <div className="text-center mt-10">
+      <div className="text-center mt-6">
         <Button asChild variant="outline"><Link to="/projects">{t("nav.projects")} <ArrowRight className="h-4 w-4 ms-2 rtl:rotate-180" /></Link></Button>
       </div>
 

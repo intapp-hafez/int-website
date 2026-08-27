@@ -18,6 +18,7 @@ import { PermissionsProvider } from "@/lib/permissions-store";
 import { AccessRequestsProvider } from "@/lib/access-requests";
 import { SlidesProvider } from "@/lib/slides-store";
 import { NewsProvider } from "@/lib/news-store";
+import { SolutionsProvider } from "@/lib/solutions-store";
 import { PartnersProvider } from "@/lib/partners-store";
 import { RecommendationsProvider } from "@/lib/recommendations-store";
 import { NotificationsProvider } from "@/lib/notifications-store";
@@ -158,6 +159,7 @@ function RootComponent() {
           <RecommendationsProvider>
           <AuthProvider>
           <NotificationsProvider>
+          <SolutionsProvider>
           <NewsProvider>
             <Navbar />
             <main className="min-h-screen pt-[104px] md:pt-[100px] pb-20 lg:pb-0">
@@ -175,6 +177,7 @@ function RootComponent() {
             <SeoHead />
             <Toaster />
           </NewsProvider>
+          </SolutionsProvider>
           </NotificationsProvider>
           </AuthProvider>
           </RecommendationsProvider>

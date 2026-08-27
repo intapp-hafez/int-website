@@ -17,6 +17,7 @@ export const ADMIN_PAGES: AdminPage[] = [
   { key: "leads", en: "Leads", ar: "العملاء المحتملون" },
   { key: "projects", en: "Projects", ar: "المشاريع" },
   { key: "services", en: "Services", ar: "الخدمات" },
+  { key: "solutions", en: "Solutions", ar: "الحلول" },
   { key: "clients", en: "Clients", ar: "العملاء" },
   { key: "quotations", en: "Quotations", ar: "عروض الأسعار" },
   { key: "tickets", en: "Support Tickets", ar: "تذاكر الدعم" },
@@ -31,6 +32,7 @@ export const ADMIN_PAGES: AdminPage[] = [
   { key: "policies", en: "Privacy Policy", ar: "سياسة الخصوصية" },
   { key: "settings", en: "Site Settings", ar: "إعدادات الموقع" },
   { key: "chatbot", en: "Chatbot", ar: "المساعد الذكي" },
+  { key: "chat", en: "Live Chat", ar: "المحادثات المباشرة" },
   { key: "seo", en: "SEO", ar: "تحسين محركات البحث" },
   { key: "smtp", en: "SMTP", ar: "إعدادات البريد" },
   { key: "careers", en: "Careers", ar: "الوظائف" },
@@ -38,6 +40,8 @@ export const ADMIN_PAGES: AdminPage[] = [
   { key: "careers_analytics", en: "Careers Analytics", ar: "تحليلات التوظيف" },
   { key: "products", en: "Products", ar: "المنتجات" },
   { key: "news", en: "News", ar: "الأخبار" },
+  { key: "events", en: "Events", ar: "الفعاليات" },
+  { key: "training", en: "Training", ar: "التدريب" },
   { key: "partners", en: "Partners", ar: "الشركاء" },
   { key: "orders", en: "Orders", ar: "الطلبات" },
   { key: "quotes", en: "Quote Requests", ar: "طلبات التسعير" },
@@ -111,11 +115,13 @@ export const isGrantActive = (g: AccessGrant, now = Date.now()) =>
 
 const AGENT_PAGES = new Set(["overview", "leads", "tickets", "clients", "quotations", "quotes", "orders", "helpdesk_tickets"]);
 const MANAGER_RESTRICTED = new Set(["users", "permissions", "settings", "reports", "security"]);
-const SEO_PAGES = new Set(["overview", "seo", "news", "products", "services", "sliders", "faqs", "settings", "about", "partners"]);
+const SEO_PAGES = new Set(["overview", "seo", "news", "products", "services", "solutions", "sliders", "faqs", "settings", "about", "partners"]);
+const HR_PAGES = new Set(["careers", "careers_applications", "careers_analytics"]);
 const TECHNICIAN_PAGES = new Set([
   "overview",
   "tickets",
   "services",
+  "solutions",
   "projects",
   "clients",
   "products",
@@ -187,6 +193,18 @@ export const BUILTIN_PRESETS: PermPreset[] = [
     ),
   },
   {
+    id: "preset-assistant",
+    builtin: true,
+    name: { en: "Assistant", ar: "مساعد" },
+    description: {
+      en: "Assistant permissions: view and add leads/tickets/orders, no destructive or settings access.",
+      ar: "صلاحيات المساعد: عرض وإضافة العملاء والتذاكر والطلبات، بدون حذف أو وصول للإعدادات.",
+    },
+    perms: buildPerms((k) =>
+      AGENT_PAGES.has(k) ? { view: true, add: true, edit: false, delete: false } : noPerms(),
+    ),
+  },
+  {
     id: "preset-viewer",
     builtin: true,
     name: { en: "Viewer (read-only)", ar: "مشاهد (للقراءة فقط)" },
@@ -208,6 +226,8 @@ export const defaultPermsForRole = (role?: string): UserPerms => {
   if (role === "seo") return buildPerms((k) => (SEO_PAGES.has(k) ? { view: true, add: true, edit: true, delete: false } : noPerms()));
   if (role === "technician") return buildPerms((k) => (TECHNICIAN_PAGES.has(k) ? { view: true, add: true, edit: true, delete: false } : noPerms()));
   if (role === "agent") return buildPerms((k) => (AGENT_PAGES.has(k) ? { view: true, add: true, edit: true, delete: false } : noPerms()));
+  if (role === "hr") return buildPerms((k) => (HR_PAGES.has(k) ? { view: true, add: true, edit: true, delete: false } : noPerms()));
+  if (role === "assistant") return buildPerms((k) => (AGENT_PAGES.has(k) ? { view: true, add: true, edit: false, delete: false } : noPerms()));
   return defaultUserPerms();
 };
 
@@ -277,37 +297,40 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
 
   const refreshRoles = async () => {
     try {
-      const { data } = await supabase.from("user_roles").select("user_id, role");
+      const { data } = await db.from("user_roles").select("user_id, role, permissions");
       if (data) {
         const m: Record<string, string> = {};
+        const permMap: PermsMap = {};
         for (const r of data as any[]) {
-          if (r.user_id) m[r.user_id] = r.role;
+          if (r.user_id) {
+            m[r.user_id] = r.role;
+            if (r.permissions) permMap[r.user_id] = r.permissions;
+          }
         }
         setUserRolesMap(m);
+        setPerms(permMap);
+      }
+    } catch {}
+  };
+
+  const refreshPresets = async () => {
+    try {
+      const { data } = await db.from("permission_presets").select("*");
+      if (data) {
+        setCustomPresets(data.map((p: any) => ({
+          id: p.preset_id,
+          name: { en: p.name_en, ar: p.name_ar },
+          description: p.description_en ? { en: p.description_en, ar: p.description_ar } : undefined,
+          perms: p.perms
+        })));
       }
     } catch {}
   };
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.v === STORAGE_VERSION && parsed.data) setPerms(parsed.data);
-      }
-    } catch {}
-    try {
-      const raw = localStorage.getItem(PRESETS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.v === STORAGE_VERSION && Array.isArray(parsed.data)) {
-          setCustomPresets(parsed.data);
-        }
-      }
-    } catch {}
-    
     void refreshGrants();
     void refreshRoles();
+    void refreshPresets();
     
     const channel = supabase
       .channel("access_grants_changes")
@@ -316,6 +339,9 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "user_roles" }, () => {
         void refreshRoles();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "permission_presets" }, () => {
+        void refreshPresets();
       })
       .subscribe();
       
@@ -334,14 +360,35 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
 
 
 
-  const persist = (next: PermsMap) => {
+  const persist = async (next: PermsMap, modifiedUsers: string[]) => {
     setPerms(next);
-    try { localStorage.setItem(KEY, JSON.stringify({ v: STORAGE_VERSION, data: next })); } catch {}
+    for (const uid of modifiedUsers) {
+      await db.from("user_roles").update({ permissions: next[uid] || null }).eq("user_id", uid);
+    }
   };
 
-  const persistPresets = (next: PermPreset[]) => {
+  const persistPresets = async (next: PermPreset[], action: "add" | "update" | "delete", preset?: PermPreset) => {
     setCustomPresets(next);
-    try { localStorage.setItem(PRESETS_KEY, JSON.stringify({ v: STORAGE_VERSION, data: next })); } catch {}
+    if (action === "add" && preset) {
+      await db.from("permission_presets").insert({
+        preset_id: preset.id,
+        name_en: preset.name.en,
+        name_ar: preset.name.ar,
+        description_en: preset.description?.en,
+        description_ar: preset.description?.ar,
+        perms: preset.perms
+      });
+    } else if (action === "update" && preset) {
+      await db.from("permission_presets").update({
+        name_en: preset.name.en,
+        name_ar: preset.name.ar,
+        description_en: preset.description?.en,
+        description_ar: preset.description?.ar,
+        perms: preset.perms
+      }).eq("preset_id", preset.id);
+    } else if (action === "delete" && preset) {
+      await db.from("permission_presets").delete().eq("preset_id", preset.id);
+    }
   };
 
   const getUserPerms: Ctx["getUserPerms"] = (userId) => {
@@ -374,7 +421,7 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       ...perms,
       [userId]: { ...current, [pageKey]: { ...current[pageKey], ...patch } },
     };
-    persist(next);
+    persist(next, [userId]);
   };
 
   const setAllForUser: Ctx["setAllForUser"] = (userId, value) => {
@@ -382,14 +429,14 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     for (const p of ADMIN_PAGES) {
       next[userId][p.key] = value ? allPerms() : noPerms();
     }
-    persist(next);
+    persist(next, [userId]);
   };
 
   const setActionForUser: Ctx["setActionForUser"] = (userId, action, value) => {
     const current = getUserPerms(userId);
     const updated: UserPerms = {};
     for (const p of ADMIN_PAGES) updated[p.key] = { ...current[p.key], [action]: value };
-    persist({ ...perms, [userId]: updated });
+    persist({ ...perms, [userId]: updated }, [userId]);
   };
 
   const setAllForPage: Ctx["setAllForPage"] = (userId, pageKey, value) => {
@@ -399,7 +446,7 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
   const resetUser: Ctx["resetUser"] = (userId) => {
     const next = { ...perms };
     delete next[userId];
-    persist(next);
+    persist(next, [userId]);
   };
 
   const presets = useMemo<PermPreset[]>(() => [...BUILTIN_PRESETS, ...customPresets], [customPresets]);
@@ -414,7 +461,7 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       for (const p of ADMIN_PAGES) cloned[p.key] = { ...(preset.perms[p.key] ?? noPerms()) };
       next[uid] = cloned;
     }
-    persist(next);
+    persist(next, userIds);
     return userIds.length;
   };
 
@@ -429,12 +476,15 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       name: { en: trimmed, ar: name.ar.trim() || trimmed },
       perms: cloned,
     };
-    persistPresets([...customPresets, preset]);
+    persistPresets([...customPresets, preset], "add", preset);
     return preset;
   };
 
   const deleteCustomPreset: Ctx["deleteCustomPreset"] = (presetId) => {
-    persistPresets(customPresets.filter((p) => p.id !== presetId));
+    const preset = customPresets.find((p) => p.id === presetId);
+    if (preset) {
+      persistPresets(customPresets.filter((p) => p.id !== presetId), "delete", preset);
+    }
   };
 
   const clonePerms = (source: UserPerms): UserPerms => {
@@ -446,13 +496,12 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
   const updateCustomPreset: Ctx["updateCustomPreset"] = (presetId, patch) => {
     const idx = customPresets.findIndex((p) => p.id === presetId);
     if (idx === -1) return false;
-    const current = customPresets[idx];
-    const name = patch.name
-      ? { en: patch.name.en.trim() || current.name.en, ar: patch.name.ar.trim() || patch.name.en.trim() || current.name.ar }
-      : current.name;
+    const preset = { ...customPresets[idx] };
+    if (patch.name) preset.name = patch.name;
+    if (patch.perms) preset.perms = clonePerms(patch.perms);
     const next = [...customPresets];
-    next[idx] = { ...current, name, perms: patch.perms ? clonePerms(patch.perms) : current.perms };
-    persistPresets(next);
+    next[idx] = preset;
+    persistPresets(next, "update", preset);
     return true;
   };
 
@@ -467,7 +516,7 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       description: source.description,
       perms: clonePerms(perms ?? source.perms),
     };
-    persistPresets([...customPresets, preset]);
+    persistPresets([...customPresets, preset], "add", preset);
     return preset;
   };
 

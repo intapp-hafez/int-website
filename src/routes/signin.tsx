@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { useAuth } from "@/lib/auth";
+import { useAuth, isClientRole } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,7 +38,8 @@ function SignInPage() {
     setError(""); setLoading(true);
     try {
       const u = await signIn(email, password);
-      const dest = redirect || (u.role === "admin" ? "/dashboard/admin" : "/dashboard/workspace");
+      const isClient = isClientRole(u.role);
+      const dest = redirect || (isClient ? "/dashboard/workspace" : "/dashboard/admin");
       navigate({ to: dest });
     } catch (err: any) {
       setError(err?.message || "Sign in failed");
@@ -46,10 +47,11 @@ function SignInPage() {
   };
 
   if (user) {
+    const isClient = isClientRole(user.role);
     return (
       <div className="container mx-auto px-4 py-16 max-w-md text-center" dir={dir}>
         <p className="mb-4">Signed in as <strong>{user.email}</strong></p>
-        <Button asChild><Link to={user.role === "admin" ? "/dashboard/admin" : "/dashboard/workspace"}>{t("signin.submit")}</Link></Button>
+        <Button asChild><Link to={isClient ? "/dashboard/workspace" : "/dashboard/admin"}>{t("signin.submit")}</Link></Button>
       </div>
     );
   }

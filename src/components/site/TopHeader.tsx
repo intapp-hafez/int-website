@@ -1,4 +1,4 @@
-import { Mail, Phone, Globe, LogIn, Search, LogOut, User, LayoutDashboard } from "lucide-react";
+import { Mail, Phone, Globe, LogIn, Search, LogOut, User, LayoutDashboard, Settings } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
@@ -7,7 +7,7 @@ import { useSettings } from "@/lib/settings-store";
 import { trackCta } from "@/lib/cta-tracking";
 import { RequestProposalDialog } from "./RequestProposalDialog";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/auth";
+import { useAuth, isClientRole } from "@/lib/auth";
 
 export function TopHeader() {
   const { lang, setLang, dir, t } = useI18n();
@@ -95,23 +95,33 @@ export function TopHeader() {
                       <div className="text-[10px] text-accent capitalize mt-0.5">{user.role}</div>
                     </div>
                     <Link
-                      to={user.role === "client" ? "/dashboard/workspace" : "/dashboard/admin"}
+                      to={isClientRole(user.role) ? "/dashboard/workspace" : (user.role === "hr" ? "/dashboard/admin/careers" : "/dashboard/admin")}
                       onClick={() => setAvatarOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted transition-colors"
                     >
                       <LayoutDashboard className="h-3.5 w-3.5" />
                       {lang === "ar" ? "لوحة التحكم" : "Dashboard"}
                     </Link>
-                    <Link
-                      to={user.role === "admin" ? "/dashboard/admin/settings" : "/dashboard/workspace/profile"}
-                      onClick={() => setAvatarOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted transition-colors"
-                    >
-                      <User className="h-3.5 w-3.5" />
-                      {user.role === "admin"
-                        ? (lang === "ar" ? "إعدادات الموقع" : "Site Settings")
-                        : (lang === "ar" ? "الملف الشخصي" : "My Profile")}
-                    </Link>
+                    {isClientRole(user.role) && (
+                      <Link
+                        to="/dashboard/workspace/profile"
+                        onClick={() => setAvatarOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted transition-colors"
+                      >
+                        <User className="h-3.5 w-3.5" />
+                        {lang === "ar" ? "الملف الشخصي" : "My Profile"}
+                      </Link>
+                    )}
+                    {user.role === "admin" && (
+                      <Link
+                        to="/dashboard/admin/settings"
+                        onClick={() => setAvatarOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted transition-colors"
+                      >
+                        <Settings className="h-3.5 w-3.5" />
+                        {lang === "ar" ? "إعدادات الموقع" : "Site Settings"}
+                      </Link>
+                    )}
                     <button
                       type="button"
                       onClick={handleSignOut}

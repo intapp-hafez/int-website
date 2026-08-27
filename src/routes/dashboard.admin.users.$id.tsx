@@ -24,11 +24,10 @@ const ROLE_BADGE_STYLE: Record<string, string> = {
   agent: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800",
   seo: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
   technician: "bg-cyan-100 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800",
+  hr: "bg-pink-100 text-pink-800 dark:bg-pink-950/60 dark:text-pink-300 border-pink-200 dark:border-pink-800",
+  assistant: "bg-violet-100 text-violet-800 dark:bg-violet-950/60 dark:text-violet-300 border-violet-200 dark:border-violet-800",
   moderator: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800",
   helpdesk_manager: "bg-teal-100 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200 dark:border-teal-800",
-  user: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700",
-  client: "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800",
-  client_user: "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800",
 };
 
 const ROLE_DISPLAY: Record<string, { en: string; ar: string }> = {
@@ -37,14 +36,13 @@ const ROLE_DISPLAY: Record<string, { en: string; ar: string }> = {
   agent: { en: "Agent", ar: "موظف" },
   seo: { en: "SEO Specialist", ar: "مسؤول SEO" },
   technician: { en: "Technician", ar: "فني تقني" },
+  hr: { en: "HR", ar: "الموارد البشرية" },
+  assistant: { en: "Assistant", ar: "مساعد" },
   moderator: { en: "Moderator", ar: "مشرف" },
   helpdesk_manager: { en: "Helpdesk Manager", ar: "مدير الدعم الفني" },
-  user: { en: "User", ar: "مستخدم" },
-  client: { en: "Client", ar: "عميل" },
-  client_user: { en: "Client User", ar: "مستخدم عميل" },
 };
 
-const ALL_ROLES = ["admin", "manager", "agent", "seo", "technician", "moderator", "helpdesk_manager", "user", "client"];
+const ALL_ROLES = ["admin", "manager", "agent", "seo", "technician", "hr", "assistant"];
 
 type UserRow = {
   id: string;         // user_id (UUID)

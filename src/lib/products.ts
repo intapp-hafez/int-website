@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+export type VendorItem = {
+  id: string;
+  name: string;
+  logo: string;
+  website_url?: string;
+};
+
 export type Product = {
   id: string;
   slug: string;
@@ -12,6 +19,7 @@ export type Product = {
   category_ar: string;
   image_url: string;
   gallery: string[];
+  vendors?: VendorItem[];
   featured: boolean;
   active: boolean;
   sort_order: number;
@@ -32,6 +40,7 @@ export const emptyProduct: Omit<Product, "id"> = {
   description_en: "", description_ar: "",
   category_en: "", category_ar: "",
   image_url: "", gallery: [],
+  vendors: [],
   featured: false, active: true, sort_order: 0,
   meta_title_en: "", meta_title_ar: "",
   meta_description_en: "", meta_description_ar: "",

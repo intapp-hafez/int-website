@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2, Search, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
+import { VendorBadgesOverlay } from "@/components/site/VendorBadgesOverlay";
 import type { Product } from "@/lib/products";
 import { toast } from "sonner";
 
@@ -113,19 +114,23 @@ export function ProductCard({ p }: { p: Product }) {
   const { lang } = useI18n();
   const name = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en;
   const cat = (lang === "ar" ? p.category_ar : p.category_en) || p.category_en;
+  const vendors = (p.vendors || []).filter((v) => v && (v.logo || v.name));
 
   return (
-    <Link to="/products/$slug" params={{ slug: p.slug }} className="group rounded-2xl overflow-hidden border bg-card glow-on-hover block relative">
-      <div className="aspect-square bg-muted overflow-hidden">
+    <Link to="/products/$slug" params={{ slug: p.slug }} className="group rounded-2xl overflow-hidden border bg-card glow-on-hover block relative shadow-xs hover:shadow-md transition-all duration-300">
+      <div className="aspect-square bg-muted overflow-hidden relative">
         {p.image_url ? (
           <img src={p.image_url} alt={name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
           <div className="h-full w-full flex items-center justify-center text-muted-foreground"><ShoppingBag className="h-8 w-8" /></div>
         )}
+
+        {/* Vendors Logo on image bottom center with interactive hover popups */}
+        <VendorBadgesOverlay vendors={p.vendors} max={8} size="md" />
       </div>
       <div className="p-4">
         {cat && <div className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1">{cat}</div>}
-        <h3 className="text-sm font-semibold line-clamp-2 mb-1">{name}</h3>
+        <h3 className="text-sm font-semibold line-clamp-2 mb-1 group-hover:text-accent transition-colors">{name}</h3>
       </div>
     </Link>
   );

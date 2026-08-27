@@ -9,10 +9,13 @@ export type PageKey =
   | "home"
   | "about"
   | "services"
+  | "solutions"
   | "products"
   | "projects"
   | "industries"
   | "careers"
+  | "events"
+  | "training"
   | "news"
   | "partners"
   | "contact";
@@ -191,10 +194,13 @@ export const defaultSettings: SiteSettings = {
     home: true,
     about: true,
     services: true,
+    solutions: true,
     products: true,
     projects: true,
     industries: true,
     careers: true,
+    events: true,
+    training: true,
     news: true,
     partners: true,
     contact: true,

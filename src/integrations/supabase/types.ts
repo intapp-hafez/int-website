@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      products: {
+        Row: {
+          id: string
+          slug: string
+          sku: string | null
+          name_en: string
+          name_ar: string
+          description_en: string
+          description_ar: string
+          category_en: string
+          category_ar: string
+          price: number | null
+          currency: string | null
+          image_url: string
+          gallery: string[]
+          vendors: Json
+          stock_status: string | null
+          featured: boolean
+          active: boolean
+          sort_order: number
+          meta_title_en: string | null
+          meta_title_ar: string | null
+          meta_description_en: string | null
+          meta_description_ar: string | null
+          meta_keywords: string | null
+          og_image: string | null
+          canonical_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          sku?: string | null
+          name_en?: string
+          name_ar?: string
+          description_en?: string
+          description_ar?: string
+          category_en?: string
+          category_ar?: string
+          price?: number | null
+          currency?: string | null
+          image_url?: string
+          gallery?: string[]
+          vendors?: Json
+          stock_status?: string | null
+          featured?: boolean
+          active?: boolean
+          sort_order?: number
+          meta_title_en?: string | null
+          meta_title_ar?: string | null
+          meta_description_en?: string | null
+          meta_description_ar?: string | null
+          meta_keywords?: string | null
+          og_image?: string | null
+          canonical_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          sku?: string | null
+          name_en?: string
+          name_ar?: string
+          description_en?: string
+          description_ar?: string
+          category_en?: string
+          category_ar?: string
+          price?: number | null
+          currency?: string | null
+          image_url?: string
+          gallery?: string[]
+          vendors?: Json
+          stock_status?: string | null
+          featured?: boolean
+          active?: boolean
+          sort_order?: number
+          meta_title_en?: string | null
+          meta_title_ar?: string | null
+          meta_description_en?: string | null
+          meta_description_ar?: string | null
+          meta_keywords?: string | null
+          og_image?: string | null
+          canonical_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       about_content: {
         Row: {
           data: Json
@@ -2066,6 +2155,54 @@ export type Database = {
           name_ar?: string
           name_en?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      solutions: {
+        Row: {
+          active: boolean
+          bio_ar: string | null
+          bio_en: string | null
+          created_at: string
+          id: string
+          image: string
+          name_ar: string
+          name_en: string
+          related_solutions: Json
+          slug: string
+          sort_order: number
+          updated_at: string
+          vendors: Json
+        }
+        Insert: {
+          active?: boolean
+          bio_ar?: string | null
+          bio_en?: string | null
+          created_at?: string
+          id?: string
+          image?: string
+          name_ar?: string
+          name_en?: string
+          related_solutions?: Json
+          slug: string
+          sort_order?: number
+          updated_at?: string
+          vendors?: Json
+        }
+        Update: {
+          active?: boolean
+          bio_ar?: string | null
+          bio_en?: string | null
+          created_at?: string
+          id?: string
+          image?: string
+          name_ar?: string
+          name_en?: string
+          related_solutions?: Json
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+          vendors?: Json
         }
         Relationships: []
       }

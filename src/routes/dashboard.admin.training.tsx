@@ -24,7 +24,7 @@ import {
 } from "@/lib/trainings";
 
 export const Route = createFileRoute("/dashboard/admin/training")({
-  head: () => ({ meta: [{ title: "Events & Training — Admin" }] }),
+  head: () => ({ meta: [{ title: "Training — Admin" }] }),
   component: TrainingAdminPage,
 });
 
@@ -43,9 +43,9 @@ async function uploadBanner(file: File): Promise<string> {
 type Draft = Omit<TrainingRow, "id"> & { id?: string };
 
 function TrainingAdminPage() {
-  const { items, loading, refresh } = useTrainings();
+  const { items, loading, refresh } = useTrainings("training");
   const [tab, setTab] = useState("list");
-  const [draft, setDraft] = useState<Draft>({ ...emptyTraining });
+  const [draft, setDraft] = useState<Draft>({ ...emptyTraining, kind: "training" });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -60,7 +60,7 @@ function TrainingAdminPage() {
     try {
       await saveTraining({ ...draft, sort_order: draft.sort_order || items.length });
       toast.success(draft.id ? "Updated" : "Published");
-      setDraft({ ...emptyTraining });
+      setDraft({ ...emptyTraining, kind: "training" });
       setTab("list");
       await refresh();
     } catch (e: any) {
@@ -83,8 +83,8 @@ function TrainingAdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold">Events &amp; Training</h1>
-        <p className="text-sm text-muted-foreground mt-1">Publish training programs and events, and review learner registrations.</p>
+        <h1 className="font-display text-2xl md:text-3xl font-bold">Training Programs</h1>
+        <p className="text-sm text-muted-foreground mt-1">Publish training programs and review learner registrations.</p>
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
@@ -109,7 +109,6 @@ function TrainingAdminPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Title</TableHead>
-                      <TableHead>Type</TableHead>
                       <TableHead>Trainer</TableHead>
                       <TableHead>Dates</TableHead>
                       <TableHead>Status</TableHead>
@@ -128,7 +127,6 @@ function TrainingAdminPage() {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell><Badge variant="secondary">{row.kind}</Badge></TableCell>
                         <TableCell>{row.trainer}</TableCell>
                         <TableCell className="text-xs">{row.start_date ?? "—"}{row.end_date ? ` → ${row.end_date}` : ""}</TableCell>
                         <TableCell>{row.active ? <Badge>Active</Badge> : <Badge variant="outline">Hidden</Badge>}</TableCell>
@@ -147,19 +145,9 @@ function TrainingAdminPage() {
 
         <TabsContent value="form" className="mt-0">
           <Card>
-            <CardHeader><CardTitle className="font-display text-lg">{draft.id ? "Edit" : "Publish new training / event"}</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="font-display text-lg">{draft.id ? "Edit training" : "Publish new training"}</CardTitle></CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label>Type</Label>
-                <Select value={draft.kind} onValueChange={(v) => setDraft({ ...draft, kind: v as TrainingRow["kind"] })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="training">Training</SelectItem>
-                    <SelectItem value="event">Event</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 md:col-span-2">
                 <Label>Trainer</Label>
                 <Input value={draft.trainer} onChange={(e) => setDraft({ ...draft, trainer: e.target.value })} />
               </div>
@@ -246,7 +234,7 @@ function TrainingAdminPage() {
                   <span className="text-sm">Visible on the website</span>
                 </div>
                 <div className="flex gap-2">
-                  {draft.id && <Button variant="outline" onClick={() => { setDraft({ ...emptyTraining }); setTab("list"); }}>Cancel</Button>}
+                  {draft.id && <Button variant="outline" onClick={() => { setDraft({ ...emptyTraining, kind: "training" }); setTab("list"); }}>Cancel</Button>}
                   <Button onClick={submit} disabled={saving}>{saving ? "Saving…" : draft.id ? "Save changes" : "Publish"}</Button>
                 </div>
               </div>
@@ -273,6 +261,7 @@ function RegistrationsPanel({ trainings }: { trainings: TrainingRow[] }) {
   }, [trainings]);
 
   const rows = items.filter((r) => {
+    if (filter === "all" && !trainings.some(t => t.id === r.training_id)) return false;
     const s = q.trim().toLowerCase();
     if (!s) return true;
     return [r.full_name, r.email, r.phone, r.city, r.district, r.education_field].join(" ").toLowerCase().includes(s);

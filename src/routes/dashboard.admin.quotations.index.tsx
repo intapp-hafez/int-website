@@ -473,7 +473,7 @@ function QuotationsPage() {
                 <Input
                   value={newQuote.full_name}
                   onChange={(e) => setNewQuote({ ...newQuote, full_name: e.target.value })}
-                  placeholder="e.g. John Doe"
+                  placeholder="e.g. Welcome to the Panel,"
                 />
               </div>
               <div className="space-y-1.5">

@@ -4,7 +4,6 @@ import { ArrowRight, Layers } from "lucide-react";
 import { Section } from "@/components/site/Section";
 import { useI18n } from "@/lib/i18n";
 import { useServices, getServiceIcon } from "@/lib/services-store";
-import { FaqSection } from "@/components/site/FaqSection";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
@@ -60,9 +59,25 @@ function ServicesIndex() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight text-foreground"
+            className={`text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight text-foreground ${
+              lang === "ar" ? "leading-[1.4] sm:leading-[1.3]" : ""
+            }`}
           >
-            Mission-Critical <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Solutions</span>
+            {lang === "ar" ? (
+              <>
+                حلول هندسية متكاملة{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                  للمهام الحيوية والحرجة
+                </span>
+              </>
+            ) : (
+              <>
+                Mission-Critical{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                  Solutions
+                </span>
+              </>
+            )}
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -152,8 +167,6 @@ function ServicesIndex() {
           );
         })}
       </div>
-
-      <FaqSection className="border-t border-border/50 bg-card" />
     </div>
   );
 }

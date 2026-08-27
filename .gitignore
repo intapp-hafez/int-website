@@ -31,3 +31,7 @@ supabase/.temp/
 *.njsproj
 *.sln
 *.sw?
+scratch/
+run-migration.cjs
+seed.cjs
+

@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { Briefcase, FileText, LifeBuoy, LayoutDashboard, User, Bell, LogOut, PlusCircle, Search } from "lucide-react";
 import { useClientT } from "@/lib/client-i18n";
-import { useAuth } from "@/lib/auth";
+import { useAuth, isClientRole } from "@/lib/auth";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/dashboard/workspace")({
@@ -11,9 +12,19 @@ export const Route = createFileRoute("/dashboard/workspace")({
 
 function WorkspaceLayout() {
   const { t } = useClientT();
-  const { user, signOut } = useAuth();
+  const { user, ready, signOut } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    if (ready && user && !isClientRole(user.role)) {
+      navigate({ to: "/dashboard/admin", replace: true });
+    }
+  }, [ready, user, navigate]);
+
+  if (!ready || !user) return null;
+  if (!isClientRole(user.role)) return null;
+
   const tabs = [
     { to: "/dashboard/workspace", label: t("overview"), icon: LayoutDashboard, exact: true },
     { to: "/dashboard/workspace/new", label: t("newRequest"), icon: PlusCircle },

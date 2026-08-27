@@ -666,22 +666,25 @@ function SettingsPage() {
             <p className="text-sm text-muted-foreground">Toggle which pages appear in the header menu, mobile bottom nav, and footer. Hidden pages are still reachable by direct URL.</p>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
               {([
-                ["home", "Home"],
-                ["about", "About"],
-                ["services", "Services"],
-                ["products", "Products"],
-                ["projects", "Projects"],
-                ["industries", "Industries"],
-                ["careers", "Careers"],
-                ["news", "News"],
-                ["partners", "Partners"],
-                ["contact", "Contact"],
-              ] as const).map(([key, label]) => (
+                ["home", "Home", "الرئيسية"],
+                ["about", "About", "من نحن"],
+                ["services", "Services", "الخدمات"],
+                ["solutions", "Solutions", "الحلول"],
+                ["products", "Products", "المنتجات"],
+                ["projects", "Projects", "المشاريع"],
+                ["industries", "Industries", "القطاعات"],
+                ["careers", "Careers", "الوظائف"],
+                ["events", "Events", "الفعاليات"],
+                ["training", "Training", "التدريب"],
+                ["news", "News", "الأخبار"],
+                ["partners", "Partners", "الشركاء"],
+                ["contact", "Contact", "اتصل بنا"],
+              ] as const).map(([key, labelEn, labelAr]) => (
                 <label key={key} htmlFor={`vis_${key}`} className="flex items-center justify-between gap-3 rounded-md border p-3 cursor-pointer hover:bg-muted/50 transition-colors">
-                  <span className="text-sm font-medium">{label}</span>
+                  <span className="text-sm font-medium">{lang === "ar" ? labelAr : labelEn}</span>
                   <Switch
                     id={`vis_${key}`}
-                    checked={form.visibility[key] !== false}
+                    checked={(form.visibility as any)?.[key] !== false}
                     onCheckedChange={(v) => setForm({ ...form, visibility: { ...form.visibility, [key]: v } })}
                   />
                 </label>

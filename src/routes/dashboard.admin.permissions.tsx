@@ -46,6 +46,8 @@ const ROLE_DISPLAY: Record<string, { en: string; ar: string }> = {
   agent: { en: "Agent", ar: "موظف" },
   seo: { en: "SEO Specialist", ar: "مسؤول SEO" },
   technician: { en: "Technician", ar: "فني تقني" },
+  hr: { en: "HR", ar: "الموارد البشرية" },
+  assistant: { en: "Assistant", ar: "مساعد" },
   moderator: { en: "Moderator", ar: "مشرف" },
   helpdesk_manager: { en: "Helpdesk Manager", ar: "مدير الدعم الفني" },
   client_user: { en: "Client User", ar: "مستخدم عميل" },

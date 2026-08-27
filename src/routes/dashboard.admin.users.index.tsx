@@ -50,10 +50,10 @@ const ROLE_BADGE_STYLE: Record<string, string> = {
   agent: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800",
   seo: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
   technician: "bg-cyan-100 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800",
+  hr: "bg-pink-100 text-pink-800 dark:bg-pink-950/60 dark:text-pink-300 border-pink-200 dark:border-pink-800",
+  assistant: "bg-violet-100 text-violet-800 dark:bg-violet-950/60 dark:text-violet-300 border-violet-200 dark:border-violet-800",
   moderator: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800",
   helpdesk_manager: "bg-teal-100 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200 dark:border-teal-800",
-  user: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700",
-  client: "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800",
 };
 
 const ROLE_DISPLAY: Record<string, { en: string; ar: string }> = {
@@ -62,16 +62,18 @@ const ROLE_DISPLAY: Record<string, { en: string; ar: string }> = {
   agent: { en: "Agent", ar: "موظف" },
   seo: { en: "SEO Specialist", ar: "مسؤول SEO" },
   technician: { en: "Technician", ar: "فني تقني" },
+  hr: { en: "HR", ar: "الموارد البشرية" },
+  assistant: { en: "Assistant", ar: "مساعد" },
   moderator: { en: "Moderator", ar: "مشرف" },
   helpdesk_manager: { en: "Helpdesk Manager", ar: "مدير الدعم الفني" },
-  user: { en: "User", ar: "مستخدم" },
-  client: { en: "Client", ar: "عميل" },
 };
 
 function UsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState<AdminUser>({ id: "", name: "", email: "", role: "agent", active: true, lastLogin: "—" });
+  const [draftPassword, setDraftPassword] = useState("");
+  const [isInviting, setIsInviting] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const navigate = useNavigate();
   const { t, lang, isRtl } = useAdminT();
@@ -80,22 +82,24 @@ function UsersPage() {
 
   const loadUsers = async () => {
     try {
-      const { data: rolesData } = await supabase.from("user_roles").select("*");
-      if (rolesData && rolesData.length > 0) {
-        const mapped: AdminUser[] = rolesData.map((r: any, idx: number) => ({
-          id: r.user_id || r.id,
-          name: r.display_name?.trim() || `Staff Member #${idx + 1}`,
-          email: `${r.role || "user"}@integratedtechnics.com`,
-          role: String(r.role || "admin"),
-          active: true,
-          lastLogin: new Date(r.created_at || Date.now()).toLocaleDateString(),
-        }));
-        setUsers(mapped);
+      const db = supabase as any;
+      const { data: usersData, error } = await db.rpc("get_admin_users");
+      if (usersData && usersData.length > 0) {
+        const mapped: AdminUser[] = usersData
+          .filter((r: any) => r.role !== "client" && r.role !== "client_user")
+          .map((r: any) => ({
+            id: r.id,
+            name: r.name || "Unknown",
+            email: r.email || `${r.role || "user"}@integratedtechnics.com`,
+            role: String(r.role || "admin"),
+            active: r.active !== false,
+            lastLogin: r.last_login ? new Date(r.last_login).toLocaleDateString() : "—",
+          }));
+        const unique = Array.from(new Map(mapped.map(item => [item.id, item])).values());
+        setUsers(unique);
       } else {
         setUsers([
           { id: "u-01", name: "System Administrator", email: "admin@web.int", role: "admin", active: true, lastLogin: new Date().toLocaleDateString() },
-          { id: "u-02", name: "Operations Manager", email: "operations@web.int", role: "manager", active: true, lastLogin: new Date().toLocaleDateString() },
-          { id: "u-03", name: "Lead Security Engineer", email: "security.tech@web.int", role: "technician", active: true, lastLogin: new Date().toLocaleDateString() },
         ]);
       }
     } catch (err) {
@@ -146,11 +150,108 @@ function UsersPage() {
   };
 
   const addUser = async () => {
-    if (!draft.name.trim() || !draft.email.trim()) return;
-    const next: AdminUser = { ...draft, id: `U-${Date.now().toString(36)}`, lastLogin: "—" };
-    setUsers([next, ...users]);
-    setDraft({ id: "", name: "", email: "", role: "agent", active: true, lastLogin: "—" });
-    toast.success(t("userAdded", "تمت إضافة المستخدم بنجاح"));
+    if (!draft.name.trim() || !draft.email.trim() || !draftPassword.trim()) {
+      toast.error(t("fillAllFields", "Please fill all fields including password"));
+      return;
+    }
+
+    setIsInviting(true);
+    try {
+      const emailHtml = `
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 40px 20px; color: #333;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.05);">
+            
+            <div style="padding: 30px 40px; text-align: center; border-bottom: 1px solid #eaeaea;">
+              <img src="${window.location.origin}/logo.svg" alt="Integrated Technics" style="max-height: 45px; display: block; margin: 0 auto;" />
+            </div>
+            
+            <div style="padding: 40px; text-align: left;">
+              <h2 style="margin-top: 0; color: #1a1a1a; font-size: 24px; font-weight: 600;">Welcome to the Panel, ${draft.name}!</h2>
+              <p style="font-size: 16px; color: #555; line-height: 1.6; margin-bottom: 30px;">
+                We are thrilled to have you on board at Integrated Technics. Your account has been successfully set up and you're ready to get started.
+              </p>
+              
+              <div style="background-color: #fff8f5; border-left: 4px solid #ea580c; padding: 20px; border-radius: 0 8px 8px 0; margin-bottom: 35px;">
+                <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #1a1a1a;">Your Login Credentials</h3>
+                <p style="margin: 0 0 8px 0; font-size: 15px; color: #444;"><strong>Email:</strong> ${draft.email}</p>
+                <p style="margin: 0; font-size: 15px; color: #444;"><strong>Password:</strong> ${draftPassword}</p>
+              </div>
+              
+              <div style="text-align: center;">
+                <a href="${window.location.origin}" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Access Dashboard</a>
+              </div>
+              
+              <p style="font-size: 14px; color: #888; margin-top: 40px; line-height: 1.5; border-top: 1px solid #eaeaea; padding-top: 20px;">
+                For security purposes, we strongly recommend changing your password immediately after your first login.
+              </p>
+            </div>
+            
+            <div style="background-color: #f9fafb; padding: 25px 40px; text-align: center; color: #6b7280; font-size: 13px; border-top: 1px solid #eaeaea;">
+              <p style="margin: 0 0 8px 0;">&copy; ${new Date().getFullYear()} Integrated Technics. All rights reserved.</p>
+              <p style="margin: 0;">This is an automated message, please do not reply.</p>
+            </div>
+            
+          </div>
+        </div>
+      `;
+
+      const session = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke("invite-admin-user", {
+        headers: {
+          Authorization: `Bearer ${session.data.session?.access_token}`
+        },
+        body: {
+          email: draft.email,
+          password: draftPassword,
+          name: draft.name,
+          role: draft.role
+        }
+      });
+
+      if (error || !data?.success) {
+        let msg = data?.error || error?.message || "Failed to create user";
+        if (error && (error as any).context) {
+          try {
+            const body = await (error as any).context.json();
+            if (body?.error) msg = body.error;
+          } catch {}
+        }
+        throw new Error(msg);
+      }
+
+      // Update local state with the actual user ID
+      const next: AdminUser = { ...draft, id: data.user.id, lastLogin: "—" };
+      setUsers([next, ...users]);
+
+      // Also trigger the welcome email if configured
+      try {
+        await supabase.functions.invoke("send-email", {
+          body: {
+            to: draft.email,
+            subject: "Welcome to Integrated Technics",
+            html: emailHtml
+          }
+        });
+      } catch (emailErr) {
+        console.warn("Welcome email could not be sent:", emailErr);
+      }
+
+      toast.success(t("userAdded", "تمت إضافة المستخدم بنجاح"));
+      setDraft({ id: "", name: "", email: "", role: "agent", active: true, lastLogin: "—" });
+      setDraftPassword("");
+    } catch (e: any) {
+      console.error("Failed to invite user:", e);
+      let errMsg = e.message || "Failed to send invitation email";
+      if (e.context) {
+        try {
+          const body = await e.context.json();
+          errMsg = body.error || errMsg;
+        } catch { }
+      }
+      toast.error(errMsg);
+    } finally {
+      setIsInviting(false);
+    }
   };
 
   return (
@@ -163,7 +264,7 @@ function UsersPage() {
               <span>{t("inviteUser", "دعوة مستخدم جديد")}</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+          <CardContent className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
             <div className="space-y-1.5">
               <Label>{t("name", "الاسم")}</Label>
               <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Full name" />
@@ -173,18 +274,23 @@ function UsersPage() {
               <Input type="email" value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} placeholder="user@domain.com" />
             </div>
             <div className="space-y-1.5">
+              <Label>{t("password", "كلمة المرور")}</Label>
+              <Input type="password" value={draftPassword} onChange={(e) => setDraftPassword(e.target.value)} placeholder="Password" />
+            </div>
+            <div className="space-y-1.5">
               <Label>{t("role", "الدور الوظيفي")}</Label>
               <Select value={draft.role} onValueChange={(v) => setDraft({ ...draft, role: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {["admin", "manager", "agent", "seo", "technician"].map((r) => (
+                  {["admin", "manager", "agent", "seo", "technician", "hr", "assistant"].map((r) => (
                     <SelectItem key={r} value={r}>{ROLE_DISPLAY[r]?.[lang as "en" | "ar"] ?? r}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={addUser} className="rounded-xl">
-              <Plus className={`h-4 w-4 ${isRtl ? "ms-1" : "me-1"}`} /> {t("add", "إضافة")}
+            <Button className="w-full" onClick={addUser} disabled={isInviting}>
+              {isInviting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("add", "إضافة")}
             </Button>
           </CardContent>
         </Card>
