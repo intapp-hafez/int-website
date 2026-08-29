@@ -330,15 +330,15 @@ export function Chatbot() {
 
   // Load FAQs from Supabase
   useEffect(() => {
-    let active = true;
+    let isMounted = true;
     (async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from("chatbot_qas")
           .select("*")
           .eq("active", true)
           .order("sort_order", { ascending: true });
-        if (!error && data && data.length > 0 && active) {
+        if (!error && data && data.length > 0 && isMounted) {
           setQas(data as QA[]);
         }
       } catch {
@@ -346,7 +346,7 @@ export function Chatbot() {
       }
     })();
     return () => {
-      active = false;
+      isMounted = false;
     };
   }, []);
 

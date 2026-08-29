@@ -165,6 +165,9 @@ function EventFormModal({ draft: initial, onClose, onSaved }: { draft: Draft, on
 
   const submit = async () => {
     if (!draft.title.trim()) return toast.error("Event Title is required");
+    if (draft.accept_registration === false && !draft.external_registration_url?.trim()) {
+      return toast.error("External Registration URL is required when registration is off");
+    }
     setSaving(true);
     try {
       await saveEvent(draft);
@@ -244,6 +247,46 @@ function EventFormModal({ draft: initial, onClose, onSaved }: { draft: Draft, on
                   <Input readOnly disabled value="0" className="bg-muted" />
                 </div>
               </div>
+
+              <div className="p-4 border rounded-md bg-white space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="font-semibold text-sm">Accept Registration</Label>
+                    <p className="text-xs text-muted-foreground">
+                      {draft.accept_registration !== false
+                        ? "Attendees can register directly on this website."
+                        : "Redirect attendees to register on an external website."}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={draft.accept_registration !== false}
+                    onCheckedChange={(checked) =>
+                      setDraft({ ...draft, accept_registration: checked })
+                    }
+                  />
+                </div>
+
+                {draft.accept_registration === false && (
+                  <div className="space-y-1.5 pt-2 border-t">
+                    <Label className="text-xs font-semibold">
+                      External Registration URL <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="url"
+                      placeholder="https://example.com/register-event"
+                      value={draft.external_registration_url || ""}
+                      onChange={(e) =>
+                        setDraft({ ...draft, external_registration_url: e.target.value })
+                      }
+                      required
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Attendees clicking "Register now" will be redirected to this external website URL.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-1.5 pt-2">
                 <div className="flex items-center justify-between">
                   <Label>Summary & Objectives (Rich Text Editor)</Label>

@@ -43,6 +43,8 @@ export type EventRow = {
   agenda: EventAgendaItem[];
   active: boolean;
   sort_order: number;
+  accept_registration?: boolean;
+  external_registration_url?: string;
   created_at?: string;
 };
 
@@ -89,6 +91,8 @@ export const emptyEvent: Omit<EventRow, "id"> = {
   agenda: [],
   active: true,
   sort_order: 0,
+  accept_registration: true,
+  external_registration_url: "",
 };
 
 export function useEvents(activeOnly = false) {

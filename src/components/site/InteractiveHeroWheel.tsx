@@ -219,10 +219,12 @@ export function InteractiveHeroWheel() {
           {/* Middle Sectors (The 4 category bands) */}
           {sectors.map((s) => {
             const isHovered = activeHover === s.id;
-            // Tailor font size & tracking so labels fit prominently and crisply
+            const isAr = lang === "ar";
+
+            // Only reduce font size for NETWORK INFRASTRUCTURE, keep all other sectors at their original full size
             const textStyle =
               s.id === "network"
-                ? "text-[11px] sm:text-[11.5px] md:text-[12px] font-extrabold tracking-tight"
+                ? "text-[9px] sm:text-[9.5px] md:text-[10px] font-extrabold tracking-tighter"
                 : s.id === "security"
                 ? "text-[11.5px] sm:text-[12px] md:text-[12.5px] font-extrabold tracking-normal"
                 : "text-[12px] sm:text-[12.5px] md:text-[13px] font-extrabold tracking-wide";
@@ -244,9 +246,10 @@ export function InteractiveHeroWheel() {
                     stroke="rgba(255,255,255,0.4)"
                     strokeWidth="1.5"
                   />
-                  {/* Curved Text Label */}
+                  {/* Curved Text Label - only NETWORK INFRASTRUCTURE size is reduced */}
                   <text
                     className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]`}
+                    {...(s.id === "network" ? { fontSize: isAr ? 8.5 : 7.4 } : {})}
                   >
                     <textPath
                       href={`#sector-arc-${s.id}`}

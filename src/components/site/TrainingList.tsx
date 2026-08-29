@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CalendarDays, MapPin, User, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { registerForTraining, useTrainings, type TrainingKind, type TrainingRow } from "@/lib/trainings";
+import { buildIcs, downloadIcs } from "@/lib/ics";
+import { notifyTrainingRegistration } from "@/lib/training-notify.functions";
 
 function fmt(d: string | null, isAr: boolean) {
   if (!d) return "";
@@ -128,8 +130,32 @@ function TrainingCard({ item, isAr }: { item: TrainingRow; isAr: boolean }) {
             ))}
           </ul>
         )}
-        <div className="mt-auto pt-3">
+        <div className="mt-auto pt-3 flex flex-col gap-2">
           <RegisterDialog item={item} isAr={isAr} />
+          {item.start_date && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-xs gap-1.5"
+              onClick={() => {
+                const ics = buildIcs({
+                  uid: `training-${item.id}`,
+                  title,
+                  description: details,
+                  location: item.location || "",
+                  organizer: item.trainer || "Integrated Technics",
+                  startDate: item.start_date!,
+                  endDate: item.end_date,
+                });
+                const filename = `${(item.title_en || item.title_ar || "training").replace(/[\s/]+/g, "-")}.ics`;
+                downloadIcs(filename, ics);
+                toast.success(isAr ? "تم تحميل ملف التقويم" : "Calendar file downloaded");
+              }}
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+              {isAr ? "إضافة إلى التقويم (.ics)" : "Add to calendar (.ics)"}
+            </Button>
+          )}
         </div>
       </div>
     </article>
@@ -158,7 +184,7 @@ function RegisterDialog({ item, isAr }: { item: TrainingRow; isAr: boolean }) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return toast.error(L("Enter a valid email", "أدخل بريداً إلكترونياً صحيحاً"));
     setBusy(true);
     try {
-      await registerForTraining({
+      const regId = await registerForTraining({
         training_id: item.id,
         full_name: form.full_name.trim().slice(0, 120),
         gender: form.gender,
@@ -168,8 +194,11 @@ function RegisterDialog({ item, isAr }: { item: TrainingRow; isAr: boolean }) {
         city: form.city.trim().slice(0, 80),
         district: form.district.trim().slice(0, 80),
       });
+      if (regId) {
+        void notifyTrainingRegistration({ data: { registrationId: regId, kind: "received" } }).catch(() => {});
+      }
       setDone(true);
-      toast.success(L("Registration received", "تم استلام تسجيلك"));
+      toast.success(L("Registration received — Pending approval", "تم استلام طلب التسجيل — قيد المراجعة"));
     } catch (err: any) {
       toast.error(err?.message ?? L("Registration failed", "فشل التسجيل"));
     } finally {
@@ -191,8 +220,14 @@ function RegisterDialog({ item, isAr }: { item: TrainingRow; isAr: boolean }) {
         {done ? (
           <div className="py-8 text-center space-y-3">
             <CheckCircle2 className="h-10 w-10 mx-auto text-accent" />
-            <p className={`font-medium ${isAr ? "font-arabic" : ""}`}>
-              {L("Thank you! We'll contact you with the details.", "شكراً لك! سنتواصل معك بالتفاصيل.")}
+            <Badge variant="secondary" className="mx-auto">
+              {L("Pending approval", "قيد المراجعة")}
+            </Badge>
+            <p className={`font-medium text-sm text-muted-foreground ${isAr ? "font-arabic leading-relaxed" : ""}`}>
+              {L(
+                "Thank you for registering! Your application is currently pending approval. We will review your details and send you a confirmation email.",
+                "شكراً لتسجيلك! طلبك الآن قيد المراجعة والموافقة. سنقوم بمراجعة بياناتك وإرسال تأكيد عبر البريد الإلكتروني."
+              )}
             </p>
             <Button variant="outline" onClick={() => setOpen(false)}>{L("Close", "إغلاق")}</Button>
           </div>

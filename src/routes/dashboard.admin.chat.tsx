@@ -19,6 +19,7 @@ import {
   ShieldAlert,
   ExternalLink,
   ChevronRight,
+  ChevronLeft,
   Filter,
   Check,
   CheckCheck,
@@ -140,6 +141,7 @@ export function AdminChatPage() {
   const [adminNotes, setAdminNotes] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -387,6 +389,10 @@ export function AdminChatPage() {
 
   // Send Reply
   const handleSendReply = async (customText?: string) => {
+    if (selectedSession?.status === "closed") {
+      toast.error(isAr ? "المحادثة مغلقة. يرجى إعادة فتح المحادثة أولاً." : "This chat session is closed. Please reopen it first.");
+      return;
+    }
     const text = (customText || replyText).trim();
     if (!text || !selectedSessionId || !perms.edit) return;
 
@@ -585,77 +591,102 @@ export function AdminChatPage() {
 
       {/* Main 3-Pane Interface */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-[calc(100vh-240px)] min-h-[620px]">
-        {/* Left Pane: Sessions List (4 cols) */}
-        <div className="lg:col-span-4 bg-card border rounded-2xl flex flex-col overflow-hidden shadow-xs">
+        {/* Left Pane: Sessions List (4 cols or 1 col when collapsed) */}
+        <div
+          className={`bg-card border rounded-2xl flex flex-col overflow-hidden shadow-xs transition-all duration-300 ${
+            sidebarCollapsed ? "lg:col-span-1" : "lg:col-span-4"
+          }`}
+        >
           {/* Search and Filters */}
           <div className="p-3 border-b space-y-2.5 bg-muted/20">
-            <div className="relative">
-              <Search className="absolute start-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t.searchPlaceholder}
-                className="ps-9 h-9 text-xs"
-              />
+            <div className="flex items-center justify-between gap-2">
+              {!sidebarCollapsed && (
+                <div className="relative flex-1">
+                  <Search className="absolute start-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={t.searchPlaceholder}
+                    className="ps-9 h-9 text-xs"
+                  />
+                </div>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                title={sidebarCollapsed ? (isAr ? "إظهار قائمة المحادثات" : "Expand chat list") : (isAr ? "طي قائمة المحادثات" : "Collapse chat list")}
+                className="h-9 w-9 text-muted-foreground hover:text-foreground shrink-0 mx-auto"
+              >
+                {sidebarCollapsed ? (
+                  isAr ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
+                ) : (
+                  isAr ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />
+                )}
+              </Button>
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs">
-              <button
-                onClick={() => setStatusFilter("all")}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                  statusFilter === "all"
-                    ? "bg-accent text-accent-foreground font-semibold"
-                    : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                }`}
-              >
-                {t.allChats} ({sessions.length})
-              </button>
-              <button
-                onClick={() => setStatusFilter("active")}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                  statusFilter === "active"
-                    ? "bg-emerald-600 text-white font-semibold"
-                    : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                }`}
-              >
-                {t.activeChats} ({sessions.filter((s) => s.status !== "closed").length})
-              </button>
-              <button
-                onClick={() => setStatusFilter("closed")}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                  statusFilter === "closed"
-                    ? "bg-muted-foreground text-background font-semibold"
-                    : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                }`}
-              >
-                {t.closedChats} ({sessions.filter((s) => s.status === "closed").length})
-              </button>
-            </div>
+            {!sidebarCollapsed && (
+              <>
+                <div className="flex items-center gap-1.5 text-xs">
+                  <button
+                    onClick={() => setStatusFilter("all")}
+                    className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
+                      statusFilter === "all"
+                        ? "bg-accent text-accent-foreground font-semibold"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                    }`}
+                  >
+                    {t.allChats} ({sessions.length})
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter("active")}
+                    className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
+                      statusFilter === "active"
+                        ? "bg-emerald-600 text-white font-semibold"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                    }`}
+                  >
+                    {t.activeChats} ({sessions.filter((s) => s.status !== "closed").length})
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter("closed")}
+                    className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
+                      statusFilter === "closed"
+                        ? "bg-muted-foreground text-background font-semibold"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                    }`}
+                  >
+                    {t.closedChats} ({sessions.filter((s) => s.status === "closed").length})
+                  </button>
+                </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-0.5 text-[11px]">
-              {["all", "support", "sales", "projects", "general"].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setCategoryFilter(cat)}
-                  className={`px-2 py-0.5 rounded-md border whitespace-nowrap transition-colors ${
-                    categoryFilter === cat
-                      ? "border-accent bg-accent/10 text-accent font-semibold"
-                      : "border-transparent bg-background/50 hover:bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {cat === "all"
-                    ? t.allCategories
-                    : cat === "support"
-                    ? t.supportCat
-                    : cat === "sales"
-                    ? t.salesCat
-                    : cat === "projects"
-                    ? t.projectsCat
-                    : t.generalCat}
-                </button>
-              ))}
-            </div>
+                {/* Category Filter Pills */}
+                <div className="flex items-center gap-1 overflow-x-auto pb-0.5 text-[11px]">
+                  {["all", "support", "sales", "projects", "general"].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setCategoryFilter(cat)}
+                      className={`px-2 py-0.5 rounded-md border whitespace-nowrap transition-colors ${
+                        categoryFilter === cat
+                          ? "border-accent bg-accent/10 text-accent font-semibold"
+                          : "border-transparent bg-background/50 hover:bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {cat === "all"
+                        ? t.allCategories
+                        : cat === "support"
+                        ? t.supportCat
+                        : cat === "sales"
+                        ? t.salesCat
+                        : cat === "projects"
+                        ? t.projectsCat
+                        : t.generalCat}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Sessions Scroll List */}
@@ -663,12 +694,12 @@ export function AdminChatPage() {
             {loadingSessions ? (
               <div className="p-8 text-center text-xs text-muted-foreground">
                 <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2 text-accent" />
-                <span>Loading conversations...</span>
+                {!sidebarCollapsed && <span>Loading conversations...</span>}
               </div>
             ) : filteredSessions.length === 0 ? (
               <div className="p-8 text-center text-xs text-muted-foreground space-y-2">
                 <AlertCircle className="h-6 w-6 mx-auto text-muted-foreground/60" />
-                <p>{t.noSessions}</p>
+                {!sidebarCollapsed && <p>{t.noSessions}</p>}
               </div>
             ) : (
               filteredSessions.map((session) => {
@@ -677,10 +708,14 @@ export function AdminChatPage() {
                 return (
                   <button
                     key={session.id}
-                    onClick={() => setSelectedSessionId(session.id)}
+                    onClick={() => {
+                      setSelectedSessionId(session.id);
+                      setSidebarCollapsed(true);
+                    }}
+                    title={sidebarCollapsed ? `${session.visitor_name} (${session.category})` : undefined}
                     className={`w-full text-start p-3.5 transition-all flex items-start gap-3 relative hover:bg-accent/5 ${
                       isSelected ? "bg-accent/10 border-s-4 border-accent" : ""
-                    }`}
+                    } ${sidebarCollapsed ? "justify-center p-2.5" : ""}`}
                   >
                     {/* Visitor Avatar */}
                     <div className="relative shrink-0">
@@ -692,54 +727,56 @@ export function AdminChatPage() {
                       )}
                     </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <span className="font-semibold text-xs text-foreground truncate">
-                          {session.visitor_name}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground shrink-0">
-                          {new Date(session.last_message_at).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span
-                          className={`text-[9px] px-1.5 py-0.2 rounded font-medium ${
-                            session.category === "sales"
-                              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                              : session.category === "support"
-                              ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
-                              : session.category === "projects"
-                              ? "bg-purple-500/15 text-purple-600 dark:text-purple-400"
-                              : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          {session.category === "support"
-                            ? t.supportCat
-                            : session.category === "sales"
-                            ? t.salesCat
-                            : session.category === "projects"
-                            ? t.projectsCat
-                            : t.generalCat}
-                        </span>
-                        {session.visitor_phone && (
-                          <span dir="ltr" className="text-[10px] text-muted-foreground truncate">
-                            {session.visitor_phone}
+                    {!sidebarCollapsed && (
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="font-semibold text-xs text-foreground truncate">
+                            {session.visitor_name}
                           </span>
-                        )}
-                      </div>
+                          <span className="text-[10px] text-muted-foreground shrink-0">
+                            {new Date(session.last_message_at).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        </div>
 
-                      <p className="text-xs text-muted-foreground truncate mt-1 leading-tight">
-                        {session.last_message || "(No messages yet)"}
-                      </p>
-                    </div>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span
+                            className={`text-[9px] px-1.5 py-0.2 rounded font-medium ${
+                              session.category === "sales"
+                                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                                : session.category === "support"
+                                ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
+                                : session.category === "projects"
+                                ? "bg-purple-500/15 text-purple-600 dark:text-purple-400"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {session.category === "support"
+                              ? t.supportCat
+                              : session.category === "sales"
+                              ? t.salesCat
+                              : session.category === "projects"
+                              ? t.projectsCat
+                              : t.generalCat}
+                          </span>
+                          {session.visitor_phone && (
+                            <span dir="ltr" className="text-[10px] text-muted-foreground truncate">
+                              {session.visitor_phone}
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-xs text-muted-foreground truncate mt-1 leading-tight">
+                          {session.last_message || "(No messages yet)"}
+                        </p>
+                      </div>
+                    )}
 
                     {/* Unread Counter Badge */}
                     {session.unread_admin > 0 && (
-                      <span className="shrink-0 h-5 min-w-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">
+                      <span className={`shrink-0 h-5 min-w-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse ${sidebarCollapsed ? "absolute top-1 end-1" : ""}`}>
                         {session.unread_admin}
                       </span>
                     )}
@@ -750,13 +787,30 @@ export function AdminChatPage() {
           </div>
         </div>
 
-        {/* Center Pane: Active Chat Conversation (5 cols) */}
-        <div className="lg:col-span-5 bg-card border rounded-2xl flex flex-col overflow-hidden shadow-xs">
+        {/* Center Pane: Active Chat Conversation (5 cols or 8 cols when collapsed) */}
+        <div
+          className={`bg-card border rounded-2xl flex flex-col overflow-hidden shadow-xs transition-all duration-300 ${
+            sidebarCollapsed ? "lg:col-span-8" : "lg:col-span-5"
+          }`}
+        >
           {selectedSession ? (
             <>
               {/* Active Chat Header */}
               <div className="px-4 py-3 border-b flex items-center justify-between gap-3 bg-muted/20">
                 <div className="flex items-center gap-3 min-w-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                    title={sidebarCollapsed ? (isAr ? "إظهار قائمة المحادثات" : "Expand chat list") : (isAr ? "طي قائمة المحادثات" : "Collapse chat list")}
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground shrink-0"
+                  >
+                    {sidebarCollapsed ? (
+                      isAr ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
+                    ) : (
+                      isAr ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />
+                    )}
+                  </Button>
                   <div className="h-9 w-9 rounded-full bg-accent/15 text-accent flex items-center justify-center shrink-0 font-bold text-sm">
                     {selectedSession.visitor_name?.charAt(0)?.toUpperCase()}
                   </div>
@@ -912,7 +966,7 @@ export function AdminChatPage() {
               </div>
 
               {/* Quick Canned Replies Carousel */}
-              <div className="p-2 border-t bg-muted/10 overflow-x-auto flex items-center gap-1.5">
+              <div className={`p-2 border-t bg-muted/10 overflow-x-auto flex items-center gap-1.5 ${selectedSession.status === "closed" ? "opacity-50 pointer-events-none" : ""}`}>
                 <span className="text-[10px] uppercase font-bold text-muted-foreground shrink-0 ps-1 flex items-center gap-1">
                   <Sparkles className="h-3 w-3 text-accent" />
                   <span>{t.canned}:</span>
@@ -923,14 +977,37 @@ export function AdminChatPage() {
                     <button
                       key={idx}
                       onClick={() => handleSendReply(txt)}
-                      disabled={!perms.edit || sending}
-                      className="text-[11px] px-2.5 py-1 rounded-full border bg-card hover:bg-accent/10 hover:border-accent text-muted-foreground hover:text-accent transition-colors whitespace-nowrap shrink-0 shadow-2xs"
+                      disabled={!perms.edit || sending || selectedSession.status === "closed"}
+                      className="text-[11px] px-2.5 py-1 rounded-full border bg-card hover:bg-accent/10 hover:border-accent text-muted-foreground hover:text-accent transition-colors whitespace-nowrap shrink-0 shadow-2xs disabled:opacity-50"
                     >
                       {txt.slice(0, 32)}...
                     </button>
                   );
                 })}
               </div>
+
+              {/* Closed Chat Banner */}
+              {selectedSession.status === "closed" && (
+                <div className="p-3 border-t bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
+                    <span>
+                      {isAr
+                        ? "جلسة المحادثة هذه مغلقة. لا يمكن إرسال رسائل جديدة إلا بعد إعادة فتحها."
+                        : "This chat session is closed. Reopen the session to send new messages."}
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleToggleStatus("active")}
+                    className="h-7 px-2.5 text-xs border-amber-500/40 hover:bg-amber-500/20 text-amber-800 dark:text-amber-200 shrink-0 gap-1 font-semibold"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    <span>{t.reopenChat}</span>
+                  </Button>
+                </div>
+              )}
 
               {/* Message Reply Input */}
               <form
@@ -943,13 +1020,19 @@ export function AdminChatPage() {
                 <Input
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  placeholder={t.typeReply}
-                  disabled={!perms.edit || sending}
-                  className="flex-1 h-10 text-xs"
+                  placeholder={
+                    selectedSession.status === "closed"
+                      ? isAr
+                        ? "المحادثة مغلقة. اضغط 'إعادة فتح المحادثة' للرد..."
+                        : "Chat session is closed. Click 'Reopen Chat' to reply..."
+                      : t.typeReply
+                  }
+                  disabled={!perms.edit || sending || selectedSession.status === "closed"}
+                  className="flex-1 h-10 text-xs disabled:bg-muted/50 disabled:cursor-not-allowed"
                 />
                 <Button
                   type="submit"
-                  disabled={!replyText.trim() || !perms.edit || sending}
+                  disabled={!replyText.trim() || !perms.edit || sending || selectedSession.status === "closed"}
                   className="h-10 px-4 gap-1.5 text-xs font-semibold shadow-xs"
                 >
                   <Send className="h-4 w-4" />

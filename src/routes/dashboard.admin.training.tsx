@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Pencil, Loader2, Upload, Plus } from "lucide-react";
+import { Trash2, Pencil, Loader2, Upload, Plus, Check, X, Award, Download, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -18,10 +18,15 @@ import {
   deleteTraining,
   emptyTraining,
   saveTraining,
+  setRegistrationStatus,
   useRegistrations,
   useTrainings,
+  type RegistrationStatus,
+  type TrainingRegistration,
   type TrainingRow,
 } from "@/lib/trainings";
+import { downloadCertificate } from "@/lib/training-certificate";
+import { notifyTrainingRegistration } from "@/lib/training-notify.functions";
 
 export const Route = createFileRoute("/dashboard/admin/training")({
   head: () => ({ meta: [{ title: "Training — Admin" }] }),
@@ -254,6 +259,7 @@ function RegistrationsPanel({ trainings }: { trainings: TrainingRow[] }) {
   const [filter, setFilter] = useState<string>("all");
   const { items, loading, refresh } = useRegistrations(filter === "all" ? undefined : filter);
   const [q, setQ] = useState("");
+  const [actionBusyId, setActionBusyId] = useState<string | null>(null);
 
   const titleOf = useMemo(() => {
     const map = new Map(trainings.map((t) => [t.id, t.title_en || t.title_ar]));
@@ -264,12 +270,24 @@ function RegistrationsPanel({ trainings }: { trainings: TrainingRow[] }) {
     if (filter === "all" && !trainings.some(t => t.id === r.training_id)) return false;
     const s = q.trim().toLowerCase();
     if (!s) return true;
-    return [r.full_name, r.email, r.phone, r.city, r.district, r.education_field].join(" ").toLowerCase().includes(s);
+    return [r.full_name, r.email, r.phone, r.city, r.district, r.education_field, r.status].join(" ").toLowerCase().includes(s);
   });
 
   const exportCsv = () => {
-    const head = ["Program", "Full name", "Gender", "Email", "Phone", "Education field", "City", "District", "Date"];
-    const body = rows.map((r) => [titleOf(r.training_id), r.full_name, r.gender, r.email, r.phone, r.education_field, r.city, r.district, r.created_at ?? ""]);
+    const head = ["Program", "Full name", "Gender", "Email", "Phone", "Education field", "City", "District", "Status", "Certificate No", "Date"];
+    const body = rows.map((r) => [
+      titleOf(r.training_id),
+      r.full_name,
+      r.gender,
+      r.email,
+      r.phone,
+      r.education_field,
+      r.city,
+      r.district,
+      r.status || "pending",
+      r.certificate_no ?? "",
+      r.created_at ?? "",
+    ]);
     const csv = [head, ...body].map((line) => line.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const a = document.createElement("a");
@@ -277,6 +295,59 @@ function RegistrationsPanel({ trainings }: { trainings: TrainingRow[] }) {
     a.download = "training-registrations.csv";
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleUpdateStatus = async (r: TrainingRegistration, newStatus: RegistrationStatus) => {
+    setActionBusyId(r.id);
+    try {
+      await setRegistrationStatus(r.id, newStatus);
+      if (newStatus === "approved" || newStatus === "rejected") {
+        void notifyTrainingRegistration({ data: { registrationId: r.id, kind: newStatus } }).catch(() => {});
+      }
+      toast.success(`Status updated to ${newStatus}`);
+      await refresh();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Update failed");
+    } finally {
+      setActionBusyId(null);
+    }
+  };
+
+  const handleDownloadCertificate = async (r: TrainingRegistration) => {
+    const tr = trainings.find((t) => t.id === r.training_id);
+    setActionBusyId(r.id);
+    try {
+      await downloadCertificate({
+        learnerName: r.full_name,
+        titleEn: tr?.title_en || "Training Program",
+        titleAr: tr?.title_ar || "",
+        trainer: tr?.trainer || "Integrated Technics",
+        location: tr?.location || "",
+        startDate: tr?.start_date || null,
+        endDate: tr?.end_date || null,
+        completedAt: r.completed_at || new Date().toISOString(),
+        certificateNo: r.certificate_no || `CERT-${r.id.slice(0, 8).toUpperCase()}`,
+      });
+      toast.success("Certificate downloaded");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to generate certificate");
+    } finally {
+      setActionBusyId(null);
+    }
+  };
+
+  const renderStatus = (status?: string) => {
+    switch (status) {
+      case "approved":
+        return <Badge className="bg-blue-600 hover:bg-blue-700">Approved</Badge>;
+      case "rejected":
+        return <Badge variant="destructive">Rejected</Badge>;
+      case "completed":
+        return <Badge className="bg-emerald-600 hover:bg-emerald-700">Completed</Badge>;
+      case "pending":
+      default:
+        return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Pending approval</Badge>;
+    }
   };
 
   return (
@@ -313,40 +384,102 @@ function RegistrationsPanel({ trainings }: { trainings: TrainingRow[] }) {
                   <TableHead>Contact</TableHead>
                   <TableHead>Education</TableHead>
                   <TableHead>City / District</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell className="font-medium">{r.full_name}</TableCell>
-                    <TableCell className="text-xs">{titleOf(r.training_id)}</TableCell>
-                    <TableCell className="text-xs">{r.gender || "—"}</TableCell>
-                    <TableCell className="text-xs" dir="ltr">
-                      <div>{r.email}</div>
-                      <div className="text-muted-foreground">{r.phone}</div>
-                    </TableCell>
-                    <TableCell className="text-xs">{r.education_field || "—"}</TableCell>
-                    <TableCell className="text-xs">{[r.city, r.district].filter(Boolean).join(" / ") || "—"}</TableCell>
-                    <TableCell className="text-end">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={async () => {
-                          try {
-                            await deleteRegistration(r.id);
-                            await refresh();
-                            toast.success("Removed");
-                          } catch (e: any) {
-                            toast.error(e?.message ?? "Delete failed");
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {rows.map((r) => {
+                  const busy = actionBusyId === r.id;
+                  const isCompleted = r.status === "completed" || Boolean(r.certificate_no);
+
+                  return (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-medium">{r.full_name}</TableCell>
+                      <TableCell className="text-xs">{titleOf(r.training_id)}</TableCell>
+                      <TableCell className="text-xs">{r.gender || "—"}</TableCell>
+                      <TableCell className="text-xs" dir="ltr">
+                        <div>{r.email}</div>
+                        <div className="text-muted-foreground">{r.phone}</div>
+                      </TableCell>
+                      <TableCell className="text-xs">{r.education_field || "—"}</TableCell>
+                      <TableCell className="text-xs">{[r.city, r.district].filter(Boolean).join(" / ") || "—"}</TableCell>
+                      <TableCell className="text-xs">{renderStatus(r.status)}</TableCell>
+                      <TableCell className="text-end">
+                        <div className="flex items-center justify-end gap-1">
+                          {r.status !== "approved" && r.status !== "completed" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={busy}
+                              title="Approve registration"
+                              onClick={() => handleUpdateStatus(r, "approved")}
+                              className="h-8 px-2 text-xs"
+                            >
+                              <Check className="h-3.5 w-3.5 text-emerald-600 me-1" /> Approve
+                            </Button>
+                          )}
+
+                          {r.status !== "rejected" && r.status !== "completed" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={busy}
+                              title="Reject registration"
+                              onClick={() => handleUpdateStatus(r, "rejected")}
+                              className="h-8 px-2 text-xs"
+                            >
+                              <X className="h-3.5 w-3.5 text-rose-600 me-1" /> Reject
+                            </Button>
+                          )}
+
+                          {r.status === "approved" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={busy}
+                              title="Mark training completed"
+                              onClick={() => handleUpdateStatus(r, "completed")}
+                              className="h-8 px-2 text-xs"
+                            >
+                              <Award className="h-3.5 w-3.5 text-amber-600 me-1" /> Complete
+                            </Button>
+                          )}
+
+                          {isCompleted && (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              disabled={busy}
+                              title="Download Attendance Certificate PDF"
+                              onClick={() => handleDownloadCertificate(r)}
+                              className="h-8 px-2 text-xs bg-amber-100 text-amber-900 hover:bg-amber-200"
+                            >
+                              <Download className="h-3.5 w-3.5 me-1" /> Certificate
+                            </Button>
+                          )}
+
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            disabled={busy}
+                            onClick={async () => {
+                              try {
+                                await deleteRegistration(r.id);
+                                await refresh();
+                                toast.success("Removed");
+                              } catch (e: any) {
+                                toast.error(e?.message ?? "Delete failed");
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

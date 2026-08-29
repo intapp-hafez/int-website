@@ -122,7 +122,19 @@ function EventCard({ item, isAr }: { item: EventRow; isAr: boolean }) {
             <span className="text-xs text-muted-foreground">
               {item.capacity > 0 ? (isAr ? `السعة: ${item.capacity} مقعد` : `Capacity: ${item.capacity} seats`) : ""}
             </span>
-            <RegisterDialog item={item} isAr={isAr} />
+            {item.accept_registration === false && item.external_registration_url ? (
+              <Button
+                size="sm"
+                disabled={item.status === "Registration Closed" || item.status === "Completed"}
+                onClick={() => window.open(item.external_registration_url, "_blank", "noopener,noreferrer")}
+              >
+                {item.status === "Registration Closed" || item.status === "Completed"
+                  ? (isAr ? "مغلق" : "Closed")
+                  : (isAr ? "سجّل الآن" : "Register now")}
+              </Button>
+            ) : (
+              <RegisterDialog item={item} isAr={isAr} />
+            )}
           </div>
         </div>
       </div>
