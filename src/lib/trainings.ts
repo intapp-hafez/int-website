@@ -118,10 +118,50 @@ export async function deleteTraining(id: string) {
   if (error) throw new Error(error.message);
 }
 
-export async function registerForTraining(input: Omit<TrainingRegistration, "id" | "status" | "created_at">) {
-  const { error } = await db.from("training_registrations").insert({ ...input, status: "new" });
+/** Public registration — always created as `pending` until an admin approves it. */
+export async function registerForTraining(
+  input: Omit<TrainingRegistration, "id" | "status" | "created_at">,
+): Promise<string | null> {
+  const { data, error } = await db
+    .from("training_registrations")
+    .insert({ ...input, status: "pending" })
+    .select("id")
+    .single();
   if (error) throw new Error(error.message);
+  return (data as any)?.id ?? null;
 }
+
+function certificateNo() {
+  const yr = new Date().getFullYear();
+  const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `CERT-${yr}-${rand}`;
+}
+
+/** Admin approval workflow transitions. */
+export async function setRegistrationStatus(
+  id: string,
+  status: RegistrationStatus,
+  note?: string,
+): Promise<TrainingRegistration> {
+  const patch: Record<string, unknown> = { status };
+  if (note !== undefined) patch.admin_note = note;
+  if (status === "approved") {
+    patch.approved_at = new Date().toISOString();
+    patch.completed_at = null;
+  }
+  if (status === "pending" || status === "rejected") {
+    patch.approved_at = status === "rejected" ? new Date().toISOString() : null;
+    patch.completed_at = null;
+  }
+  if (status === "completed") {
+    patch.completed_at = new Date().toISOString();
+    patch.certificate_no = certificateNo();
+  }
+  const { data, error } = await db.from("training_registrations").update(patch).eq("id", id).select().single();
+  if (error) throw new Error(error.message);
+  return data as TrainingRegistration;
+}
+
 
 export function useRegistrations(trainingId?: string) {
   const [items, setItems] = useState<TrainingRegistration[]>([]);
