@@ -5,6 +5,15 @@ const db = supabase as any;
 
 export type TrainingKind = "training" | "event";
 
+export type RegistrationStatus = "pending" | "approved" | "rejected" | "completed";
+
+export const REGISTRATION_STATUS: Record<RegistrationStatus, { en: string; ar: string }> = {
+  pending: { en: "Pending approval", ar: "قيد المراجعة" },
+  approved: { en: "Approved", ar: "معتمد" },
+  rejected: { en: "Rejected", ar: "مرفوض" },
+  completed: { en: "Completed", ar: "مكتمل" },
+};
+
 export type TrainingRow = {
   id: string;
   kind: TrainingKind;
@@ -15,6 +24,8 @@ export type TrainingRow = {
   benefits_en: string;
   benefits_ar: string;
   trainer: string;
+  trainer_email?: string;
+  notify_emails?: string;
   start_date: string | null;
   end_date: string | null;
   location: string;
@@ -34,7 +45,11 @@ export type TrainingRegistration = {
   education_field: string;
   city: string;
   district: string;
-  status: string;
+  status: RegistrationStatus | string;
+  approved_at?: string | null;
+  completed_at?: string | null;
+  certificate_no?: string | null;
+  admin_note?: string | null;
   created_at?: string;
 };
 
@@ -47,6 +62,8 @@ export const emptyTraining: Omit<TrainingRow, "id"> = {
   benefits_en: "",
   benefits_ar: "",
   trainer: "",
+  trainer_email: "",
+  notify_emails: "",
   start_date: null,
   end_date: null,
   location: "",
@@ -54,6 +71,7 @@ export const emptyTraining: Omit<TrainingRow, "id"> = {
   active: true,
   sort_order: 0,
 };
+
 
 /** Public/admin list of trainings. Pass a kind to filter, or omit for all. */
 export function useTrainings(kind?: TrainingKind, activeOnly = false) {
