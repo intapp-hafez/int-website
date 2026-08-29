@@ -10,99 +10,10 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
-      products: {
-        Row: {
-          id: string
-          slug: string
-          sku: string | null
-          name_en: string
-          name_ar: string
-          description_en: string
-          description_ar: string
-          category_en: string
-          category_ar: string
-          price: number | null
-          currency: string | null
-          image_url: string
-          gallery: string[]
-          vendors: Json
-          stock_status: string | null
-          featured: boolean
-          active: boolean
-          sort_order: number
-          meta_title_en: string | null
-          meta_title_ar: string | null
-          meta_description_en: string | null
-          meta_description_ar: string | null
-          meta_keywords: string | null
-          og_image: string | null
-          canonical_url: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          slug: string
-          sku?: string | null
-          name_en?: string
-          name_ar?: string
-          description_en?: string
-          description_ar?: string
-          category_en?: string
-          category_ar?: string
-          price?: number | null
-          currency?: string | null
-          image_url?: string
-          gallery?: string[]
-          vendors?: Json
-          stock_status?: string | null
-          featured?: boolean
-          active?: boolean
-          sort_order?: number
-          meta_title_en?: string | null
-          meta_title_ar?: string | null
-          meta_description_en?: string | null
-          meta_description_ar?: string | null
-          meta_keywords?: string | null
-          og_image?: string | null
-          canonical_url?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          slug?: string
-          sku?: string | null
-          name_en?: string
-          name_ar?: string
-          description_en?: string
-          description_ar?: string
-          category_en?: string
-          category_ar?: string
-          price?: number | null
-          currency?: string | null
-          image_url?: string
-          gallery?: string[]
-          vendors?: Json
-          stock_status?: string | null
-          featured?: boolean
-          active?: boolean
-          sort_order?: number
-          meta_title_en?: string | null
-          meta_title_ar?: string | null
-          meta_description_en?: string | null
-          meta_description_ar?: string | null
-          meta_keywords?: string | null
-          og_image?: string | null
-          canonical_url?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
       about_content: {
         Row: {
           data: Json
@@ -601,6 +512,161 @@ export type Database = {
         }
         Relationships: []
       }
+      event_registrations: {
+        Row: {
+          check_in_details: string
+          check_out_details: string
+          city: string
+          created_at: string
+          dates_to_attend: string
+          district: string
+          education_field: string
+          email: string
+          event_id: string
+          full_name: string
+          gender: string
+          id: string
+          job_title: string
+          number_of_representatives: number
+          organization: string
+          phone: string
+          sector: string
+          special_requests: string
+          status: string
+          transportation_requirement: string
+          updated_at: string
+          willing_to_travel: string
+        }
+        Insert: {
+          check_in_details?: string
+          check_out_details?: string
+          city?: string
+          created_at?: string
+          dates_to_attend?: string
+          district?: string
+          education_field?: string
+          email: string
+          event_id: string
+          full_name: string
+          gender?: string
+          id?: string
+          job_title?: string
+          number_of_representatives?: number
+          organization?: string
+          phone?: string
+          sector?: string
+          special_requests?: string
+          status?: string
+          transportation_requirement?: string
+          updated_at?: string
+          willing_to_travel?: string
+        }
+        Update: {
+          check_in_details?: string
+          check_out_details?: string
+          city?: string
+          created_at?: string
+          dates_to_attend?: string
+          district?: string
+          education_field?: string
+          email?: string
+          event_id?: string
+          full_name?: string
+          gender?: string
+          id?: string
+          job_title?: string
+          number_of_representatives?: number
+          organization?: string
+          phone?: string
+          sector?: string
+          special_requests?: string
+          status?: string
+          transportation_requirement?: string
+          updated_at?: string
+          willing_to_travel?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          active: boolean
+          agenda: Json
+          banner_url: string
+          capacity: number
+          category: string
+          city: string
+          created_at: string
+          end_date: string | null
+          end_time: string
+          id: string
+          map_url: string
+          partners: Json
+          sort_order: number
+          speakers: Json
+          start_date: string | null
+          start_time: string
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          active?: boolean
+          agenda?: Json
+          banner_url?: string
+          capacity?: number
+          category?: string
+          city?: string
+          created_at?: string
+          end_date?: string | null
+          end_time?: string
+          id?: string
+          map_url?: string
+          partners?: Json
+          sort_order?: number
+          speakers?: Json
+          start_date?: string | null
+          start_time?: string
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+          venue?: string
+        }
+        Update: {
+          active?: boolean
+          agenda?: Json
+          banner_url?: string
+          capacity?: number
+          category?: string
+          city?: string
+          created_at?: string
+          end_date?: string | null
+          end_time?: string
+          id?: string
+          map_url?: string
+          partners?: Json
+          sort_order?: number
+          speakers?: Json
+          start_date?: string | null
+          start_time?: string
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+          venue?: string
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           active: boolean
@@ -786,6 +852,116 @@ export type Database = {
         }
         Relationships: []
       }
+      live_chat_messages: {
+        Row: {
+          attachments: Json | null
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          sender_id: string | null
+          sender_name: string
+          sender_type: string
+          session_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          sender_id?: string | null
+          sender_name: string
+          sender_type: string
+          session_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          sender_id?: string | null
+          sender_name?: string
+          sender_type?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_chat_sessions: {
+        Row: {
+          assigned_name: string | null
+          assigned_to: string | null
+          category: string
+          created_at: string
+          id: string
+          lang: string | null
+          last_message: string | null
+          last_message_at: string
+          notes: string | null
+          session_token: string
+          status: string
+          unread_admin: number
+          unread_visitor: number
+          updated_at: string
+          user_agent: string | null
+          visitor_email: string | null
+          visitor_ip: string | null
+          visitor_name: string
+          visitor_phone: string | null
+        }
+        Insert: {
+          assigned_name?: string | null
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          lang?: string | null
+          last_message?: string | null
+          last_message_at?: string
+          notes?: string | null
+          session_token: string
+          status?: string
+          unread_admin?: number
+          unread_visitor?: number
+          updated_at?: string
+          user_agent?: string | null
+          visitor_email?: string | null
+          visitor_ip?: string | null
+          visitor_name: string
+          visitor_phone?: string | null
+        }
+        Update: {
+          assigned_name?: string | null
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          lang?: string | null
+          last_message?: string | null
+          last_message_at?: string
+          notes?: string | null
+          session_token?: string
+          status?: string
+          unread_admin?: number
+          unread_visitor?: number
+          updated_at?: string
+          user_agent?: string | null
+          visitor_email?: string | null
+          visitor_ip?: string | null
+          visitor_name?: string
+          visitor_phone?: string | null
+        }
+        Relationships: []
+      }
       news_posts: {
         Row: {
           active: boolean
@@ -903,6 +1079,48 @@ export type Database = {
         }
         Relationships: []
       }
+      permission_presets: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description_ar: string | null
+          description_en: string | null
+          id: string
+          is_builtin: boolean | null
+          name_ar: string
+          name_en: string
+          perms: Json
+          preset_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          id?: string
+          is_builtin?: boolean | null
+          name_ar: string
+          name_en: string
+          perms?: Json
+          preset_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          id?: string
+          is_builtin?: boolean | null
+          name_ar?: string
+          name_en?: string
+          perms?: Json
+          preset_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           created_at: string
@@ -952,6 +1170,7 @@ export type Database = {
           sort_order: number
           stock_status: string
           updated_at: string
+          vendors: Json
         }
         Insert: {
           active?: boolean
@@ -980,6 +1199,7 @@ export type Database = {
           sort_order?: number
           stock_status?: string
           updated_at?: string
+          vendors?: Json
         }
         Update: {
           active?: boolean
@@ -1008,6 +1228,7 @@ export type Database = {
           sort_order?: number
           stock_status?: string
           updated_at?: string
+          vendors?: Json
         }
         Relationships: []
       }
@@ -1643,6 +1864,54 @@ export type Database = {
         }
         Relationships: []
       }
+      solutions: {
+        Row: {
+          active: boolean
+          bio_ar: string | null
+          bio_en: string | null
+          created_at: string
+          id: string
+          image: string
+          name_ar: string
+          name_en: string
+          related_solutions: Json
+          slug: string
+          sort_order: number
+          updated_at: string
+          vendors: Json
+        }
+        Insert: {
+          active?: boolean
+          bio_ar?: string | null
+          bio_en?: string | null
+          created_at?: string
+          id?: string
+          image?: string
+          name_ar?: string
+          name_en?: string
+          related_solutions?: Json
+          slug: string
+          sort_order?: number
+          updated_at?: string
+          vendors?: Json
+        }
+        Update: {
+          active?: boolean
+          bio_ar?: string | null
+          bio_en?: string | null
+          created_at?: string
+          id?: string
+          image?: string
+          name_ar?: string
+          name_en?: string
+          related_solutions?: Json
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+          vendors?: Json
+        }
+        Relationships: []
+      }
       support_branches: {
         Row: {
           active: boolean
@@ -2158,51 +2427,116 @@ export type Database = {
         }
         Relationships: []
       }
-      solutions: {
+      training_registrations: {
+        Row: {
+          city: string
+          created_at: string
+          district: string
+          education_field: string
+          email: string
+          full_name: string
+          gender: string
+          id: string
+          phone: string
+          status: string
+          training_id: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string
+          created_at?: string
+          district?: string
+          education_field?: string
+          email: string
+          full_name: string
+          gender?: string
+          id?: string
+          phone?: string
+          status?: string
+          training_id: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          district?: string
+          education_field?: string
+          email?: string
+          full_name?: string
+          gender?: string
+          id?: string
+          phone?: string
+          status?: string
+          training_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_registrations_training_id_fkey"
+            columns: ["training_id"]
+            isOneToOne: false
+            referencedRelation: "trainings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trainings: {
         Row: {
           active: boolean
-          bio_ar: string | null
-          bio_en: string | null
+          banner_url: string
+          benefits_ar: string
+          benefits_en: string
           created_at: string
+          details_ar: string
+          details_en: string
+          end_date: string | null
           id: string
-          image: string
-          name_ar: string
-          name_en: string
-          related_solutions: Json
-          slug: string
+          kind: string
+          location: string
           sort_order: number
+          start_date: string | null
+          title_ar: string
+          title_en: string
+          trainer: string
           updated_at: string
-          vendors: Json
         }
         Insert: {
           active?: boolean
-          bio_ar?: string | null
-          bio_en?: string | null
+          banner_url?: string
+          benefits_ar?: string
+          benefits_en?: string
           created_at?: string
+          details_ar?: string
+          details_en?: string
+          end_date?: string | null
           id?: string
-          image?: string
-          name_ar?: string
-          name_en?: string
-          related_solutions?: Json
-          slug: string
+          kind?: string
+          location?: string
           sort_order?: number
+          start_date?: string | null
+          title_ar?: string
+          title_en?: string
+          trainer?: string
           updated_at?: string
-          vendors?: Json
         }
         Update: {
           active?: boolean
-          bio_ar?: string | null
-          bio_en?: string | null
+          banner_url?: string
+          benefits_ar?: string
+          benefits_en?: string
           created_at?: string
+          details_ar?: string
+          details_en?: string
+          end_date?: string | null
           id?: string
-          image?: string
-          name_ar?: string
-          name_en?: string
-          related_solutions?: Json
-          slug?: string
+          kind?: string
+          location?: string
           sort_order?: number
+          start_date?: string | null
+          title_ar?: string
+          title_en?: string
+          trainer?: string
           updated_at?: string
-          vendors?: Json
         }
         Relationships: []
       }
@@ -2211,6 +2545,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          permissions: Json | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
@@ -2218,6 +2553,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          permissions?: Json | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
@@ -2225,6 +2561,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          permissions?: Json | null
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
@@ -2238,6 +2575,17 @@ export type Database = {
       can_manage_access: { Args: { _user_id: string }; Returns: boolean }
       can_manage_tickets: { Args: { _user_id: string }; Returns: boolean }
       expire_access_grants: { Args: never; Returns: number }
+      get_admin_users: {
+        Args: never
+        Returns: {
+          active: boolean
+          email: string
+          id: string
+          last_login: string
+          name: string
+          role: string
+        }[]
+      }
       has_page_access: {
         Args: { _action: string; _page_key: string; _user_id: string }
         Returns: boolean
@@ -2259,6 +2607,11 @@ export type Database = {
         | "helpdesk_manager"
         | "technician"
         | "client_user"
+        | "hr"
+        | "assistant"
+        | "manager"
+        | "agent"
+        | "seo"
       career_app_status:
         | "new"
         | "reviewed"
@@ -2420,6 +2773,11 @@ export const Constants = {
         "helpdesk_manager",
         "technician",
         "client_user",
+        "hr",
+        "assistant",
+        "manager",
+        "agent",
+        "seo",
       ],
       career_app_status: [
         "new",
