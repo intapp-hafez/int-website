@@ -333,8 +333,8 @@ export function Chatbot() {
     let isMounted = true;
     (async () => {
       try {
-        const { data, error } = await (supabase as any)
-          .from("chatbot_qas")
+        const { data, error } = await supabase
+          .from("chatbot_qa")
           .select("*")
           .eq("active", true)
           .order("sort_order", { ascending: true });
