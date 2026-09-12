@@ -25,7 +25,7 @@ export const notifyTrainingRegistration = createServerFn({ method: "POST" })
   .inputValidator(validate)
   .handler(async ({ data }): Promise<TrainingNotifyResult> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { deliverEmail } = await import("@/lib/career-email.server");
+    const { deliverSiteEmail: deliverEmail } = await import("@/lib/site-email.server");
     const { deliverSms } = await import("@/lib/career-sms.server");
     const tpl = await import("@/lib/training-email.server");
 
