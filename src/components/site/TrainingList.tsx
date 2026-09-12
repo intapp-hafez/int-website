@@ -198,7 +198,7 @@ function RegisterDialog({ item, isAr }: { item: TrainingRow; isAr: boolean }) {
         void notifyTrainingRegistration({ data: { registrationId: regId, kind: "received" } }).catch(() => {});
       }
       setDone(true);
-      toast.success(L("Registration received — Pending approval", "تم استلام طلب التسجيل — قيد المراجعة"));
+      toast.success(L("Registration confirmed — see your email", "تم تأكيد تسجيلك — تحقق من بريدك"));
     } catch (err: any) {
       toast.error(err?.message ?? L("Registration failed", "فشل التسجيل"));
     } finally {
@@ -221,12 +221,12 @@ function RegisterDialog({ item, isAr }: { item: TrainingRow; isAr: boolean }) {
           <div className="py-8 text-center space-y-3">
             <CheckCircle2 className="h-10 w-10 mx-auto text-accent" />
             <Badge variant="secondary" className="mx-auto">
-              {L("Pending approval", "قيد المراجعة")}
+              {L("Confirmed", "مؤكد")}
             </Badge>
             <p className={`font-medium text-sm text-muted-foreground ${isAr ? "font-arabic leading-relaxed" : ""}`}>
               {L(
-                "Thank you for registering! Your application is currently pending approval. We will review your details and send you a confirmation email.",
-                "شكراً لتسجيلك! طلبك الآن قيد المراجعة والموافقة. سنقوم بمراجعة بياناتك وإرسال تأكيد عبر البريد الإلكتروني."
+                "Thank you for registering! Your seat is confirmed and a confirmation email is on its way with the full program details.",
+                "شكراً لتسجيلك! تم تأكيد مقعدك وسيصلك بريد إلكتروني بتفاصيل البرنامج."
               )}
             </p>
             <Button variant="outline" onClick={() => setOpen(false)}>{L("Close", "إغلاق")}</Button>

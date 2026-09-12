@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CalendarDays, MapPin, CheckCircle2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { registerForEvent, useEvents, type EventRow } from "@/lib/events";
+import { buildIcs, downloadIcs } from "@/lib/ics";
 import DOMPurify from "dompurify";
 
 function fmt(d: string | null, isAr: boolean) {
@@ -118,10 +119,33 @@ function EventCard({ item, isAr }: { item: EventRow; isAr: boolean }) {
         )}
         
         <div className="mt-auto pt-4 border-t">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-xs text-muted-foreground">
               {item.capacity > 0 ? (isAr ? `السعة: ${item.capacity} مقعد` : `Capacity: ${item.capacity} seats`) : ""}
             </span>
+            {item.start_date && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs"
+                onClick={() => {
+                  const ics = buildIcs({
+                    uid: `event-${item.id}`,
+                    title: item.title,
+                    description: (item.summary || "").replace(/<[^>]*>/g, " ").trim(),
+                    location: [item.venue, item.city].filter(Boolean).join(", "),
+                    organizer: "Integrated Technics",
+                    startDate: item.start_date!,
+                    endDate: item.end_date,
+                  });
+                  downloadIcs(`${item.title.replace(/[\s/]+/g, "-")}.ics`, ics);
+                  toast.success(L("Calendar file downloaded", "تم تحميل ملف التقويم"));
+                }}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                {L("Add to calendar", "أضف إلى التقويم")}
+              </Button>
+            )}
             {item.accept_registration === false && item.external_registration_url ? (
               <Button
                 size="sm"
