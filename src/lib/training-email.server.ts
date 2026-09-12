@@ -45,18 +45,18 @@ function facts(i: TrainingEmailInput, ar: boolean) {
 
 /** Sent to the learner immediately after they submit the form. */
 export function renderRegistrationReceived(i: TrainingEmailInput) {
-  const subject = `Registration received — ${i.titleEn || i.titleAr} | تم استلام تسجيلك`;
+  const subject = `Registration confirmed — ${i.titleEn || i.titleAr} | تم تأكيد تسجيلك`;
   const html = shell(
-    "Registration received",
-    "تم استلام تسجيلك",
+    "Registration confirmed",
+    "تم تأكيد تسجيلك",
     `<p style="margin:0 0 8px">Hi ${esc(i.fullName)},</p>
-     <p style="margin:0 0 12px;line-height:1.6">Thanks for registering for <strong>${esc(i.titleEn || i.titleAr)}</strong>. Your registration is <strong>pending admin approval</strong> — we'll email you once it is confirmed.</p>
+     <p style="margin:0 0 12px;line-height:1.6">Thanks for registering for <strong>${esc(i.titleEn || i.titleAr)}</strong>. Your seat is <strong>confirmed</strong> — no further approval is needed. Details are below.</p>
      ${facts(i, false)}`,
     `<p style="margin:0 0 8px">مرحباً ${esc(i.fullName)}،</p>
-     <p style="margin:0 0 12px;line-height:1.8">شكراً لتسجيلك في <strong>${esc(i.titleAr || i.titleEn)}</strong>. تسجيلك <strong>قيد مراجعة الإدارة</strong> وسنخبرك فور اعتماده.</p>
+     <p style="margin:0 0 12px;line-height:1.8">شكراً لتسجيلك في <strong>${esc(i.titleAr || i.titleEn)}</strong>. تم <strong>تأكيد مقعدك</strong> ولا حاجة لأي موافقة إضافية. التفاصيل بالأسفل.</p>
      ${facts(i, true)}`,
   );
-  const text = `Registration received for ${i.titleEn || i.titleAr}. Pending approval.\n\nتم استلام تسجيلك في ${i.titleAr || i.titleEn}. قيد المراجعة.`;
+  const text = `Registration confirmed for ${i.titleEn || i.titleAr}.\n\nتم تأكيد تسجيلك في ${i.titleAr || i.titleEn}.`;
   return { subject, html, text };
 }
 
@@ -124,7 +124,7 @@ export function renderStaffAlert(i: StaffInput) {
         .filter(([, v]) => v)
         .map(([k, v]) => `<tr><td style="padding:3px 12px 3px 0;color:#64748b">${esc(k)}</td><td style="padding:3px 0"><strong>${esc(v)}</strong></td></tr>`)
         .join("")}</table>
-      <p style="margin:16px 0 0;color:#64748b;font-size:13px">Approve or decline this registration from Admin → Training → Registrations.</p></td></tr>
+      <p style="margin:16px 0 0;color:#64748b;font-size:13px">Review this registration in Admin → Training → Registrations.</p></td></tr>
     </table></td></tr></table></body></html>`;
   const text = rows.filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`).join("\n");
   return { subject, html, text };
@@ -141,8 +141,8 @@ export function renderLearnerSms(i: TrainingEmailInput, kind: "received" | "appr
     ].join("\n");
   }
   return [
-    `Registration received for ${i.titleEn || i.titleAr}. Pending approval — we'll confirm shortly.`,
+    `Registration confirmed for ${i.titleEn || i.titleAr}.${w ? ` Date: ${w}.` : ""}`,
     "",
-    `تم استلام تسجيلك في ${i.titleAr || i.titleEn}. قيد المراجعة وسنؤكده قريباً.`,
+    `تم تأكيد تسجيلك في ${i.titleAr || i.titleEn}.`,
   ].join("\n");
 }

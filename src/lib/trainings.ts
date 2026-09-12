@@ -118,13 +118,13 @@ export async function deleteTraining(id: string) {
   if (error) throw new Error(error.message);
 }
 
-/** Public registration — always created as `pending` until an admin approves it. */
+/** Public registration — confirmed instantly; no admin approval required. */
 export async function registerForTraining(
   input: Omit<TrainingRegistration, "id" | "status" | "created_at">,
 ): Promise<string | null> {
   const { data, error } = await db
     .from("training_registrations")
-    .insert({ ...input, status: "pending" })
+    .insert({ ...input, status: "approved", approved_at: new Date().toISOString() })
     .select("id")
     .single();
   if (error) throw new Error(error.message);
