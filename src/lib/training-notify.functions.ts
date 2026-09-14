@@ -13,8 +13,8 @@ function validate(input: { registrationId: string; kind?: string; note?: string 
   const registrationId = String(input?.registrationId ?? "").trim();
   if (!UUID_RE.test(registrationId)) throw new Error("Invalid registration id");
   const kind = String(input?.kind ?? "received");
-  if (!["received", "approved", "rejected"].includes(kind)) throw new Error("Invalid kind");
-  return { registrationId, kind: kind as "received" | "approved" | "rejected", note: String(input?.note ?? "").slice(0, 500) };
+  if (!["received", "approved", "rejected", "completed"].includes(kind)) throw new Error("Invalid kind");
+  return { registrationId, kind: kind as "received" | "approved" | "rejected" | "completed", note: String(input?.note ?? "").slice(0, 500) };
 }
 
 /**
