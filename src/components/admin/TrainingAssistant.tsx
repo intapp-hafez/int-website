@@ -38,6 +38,10 @@ function isUpcoming(t: TrainingRow) {
 }
 
 /** Answers questions about the published trainings using only database rows. */
+export function answerTrainingQuestion(q: string, trainings: TrainingRow[], regs: TrainingRegistration[] = []): string {
+  return answer(q, trainings, regs);
+}
+
 function answer(q: string, trainings: TrainingRow[], regs: TrainingRegistration[]): string {
   const s = q.toLowerCase().trim();
   if (!s) return "Ask me about dates, trainers, locations or registrations.";
