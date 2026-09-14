@@ -27,6 +27,9 @@ import {
 } from "@/lib/trainings";
 import { downloadCertificate } from "@/lib/training-certificate";
 import { notifyTrainingRegistration } from "@/lib/training-notify.functions";
+import { sendTrainingTestEmails } from "@/lib/training-test.functions";
+import { TrainingCalendar } from "@/components/admin/TrainingCalendar";
+import { TrainingAssistant } from "@/components/admin/TrainingAssistant";
 
 export const Route = createFileRoute("/dashboard/admin/training")({
   head: () => ({ meta: [{ title: "Training — Admin" }] }),
@@ -97,6 +100,9 @@ function TrainingAdminPage() {
           <TabsTrigger value="list">Published ({items.length})</TabsTrigger>
           <TabsTrigger value="form">{draft.id ? "Edit item" : "Add new"}</TabsTrigger>
           <TabsTrigger value="registrations">Registrations</TabsTrigger>
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          <TabsTrigger value="assistant">Assistant</TabsTrigger>
+          <TabsTrigger value="test">Test emails</TabsTrigger>
         </TabsList>
 
         <TabsContent value="list" className="mt-0">
@@ -249,6 +255,18 @@ function TrainingAdminPage() {
 
         <TabsContent value="registrations" className="mt-0">
           <RegistrationsPanel trainings={items} />
+        </TabsContent>
+
+        <TabsContent value="calendar" className="mt-0">
+          <TrainingCalendar items={items} />
+        </TabsContent>
+
+        <TabsContent value="assistant" className="mt-0">
+          <AssistantPanel trainings={items} />
+        </TabsContent>
+
+        <TabsContent value="test" className="mt-0">
+          <TestEmailPanel trainings={items} />
         </TabsContent>
       </Tabs>
     </div>
