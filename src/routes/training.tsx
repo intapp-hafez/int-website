@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { TrainingList } from "@/components/site/TrainingList";
+import { TrainingChatWidget } from "@/components/site/TrainingChatWidget";
 
 export const Route = createFileRoute("/training")({
   head: () => ({
@@ -12,5 +13,14 @@ export const Route = createFileRoute("/training")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => <TrainingList kind="training" />,
+  component: TrainingPage,
 });
+
+function TrainingPage() {
+  return (
+    <>
+      <TrainingList kind="training" />
+      <TrainingChatWidget />
+    </>
+  );
+}
