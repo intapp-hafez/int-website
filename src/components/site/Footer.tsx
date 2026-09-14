@@ -56,6 +56,7 @@ export function Footer() {
               {show("news") && <li><Link to="/news" className="footer-link">{t("nav.news")}</Link></li>}
               {show("events") && <li><Link to="/events" className="footer-link">{lang === "ar" ? "الفعاليات" : "Events"}</Link></li>}
               {show("training") && <li><Link to="/training" className="footer-link">{lang === "ar" ? "التدريب" : "Training"}</Link></li>}
+              {show("training") && <li><Link to="/training-faq" className="footer-link">{lang === "ar" ? "أسئلة التدريب الشائعة" : "Training FAQ"}</Link></li>}
               {show("partners") && <li><Link to="/partners" className="footer-link">{t("nav.partners")}</Link></li>}
             </ul>
           </div>
