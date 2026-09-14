@@ -506,3 +506,86 @@ function RegistrationsPanel({ trainings }: { trainings: TrainingRow[] }) {
     </Card>
   );
 }
+
+/** Chat assistant over the published training rows. */
+function AssistantPanel({ trainings }: { trainings: TrainingRow[] }) {
+  const { items } = useRegistrations();
+  return <TrainingAssistant trainings={trainings} registrations={items} />;
+}
+
+/** Sends a sample learner confirmation + staff alert through the SMTP account. */
+function TestEmailPanel({ trainings }: { trainings: TrainingRow[] }) {
+  const [learnerEmail, setLearnerEmail] = useState("");
+  const [staffEmail, setStaffEmail] = useState("");
+  const [trainingId, setTrainingId] = useState<string>("none");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<{ learner: { to: string; sent: boolean; reason: string | null }; staff: { to: string; sent: boolean; reason: string | null } } | null>(null);
+
+  const run = async () => {
+    setBusy(true);
+    setResult(null);
+    try {
+      const res = await sendTrainingTestEmails({
+        data: { learnerEmail: learnerEmail.trim(), staffEmail: staffEmail.trim(), ...(trainingId !== "none" ? { trainingId } : {}) },
+      });
+      setResult(res);
+      if (res.learner.sent && res.staff.sent) toast.success("Test emails sent");
+      else toast.error("Some emails could not be sent — see details below");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Sending failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const line = (label: string, r: { to: string; sent: boolean; reason: string | null }) => (
+    <div className="flex items-center gap-2 text-sm">
+      {r.sent ? <Check className="h-4 w-4 text-emerald-600" /> : <X className="h-4 w-4 text-destructive" />}
+      <span className="font-medium">{label}</span>
+      <span className="text-muted-foreground" dir="ltr">{r.to}</span>
+      {!r.sent && <span className="text-xs text-destructive">{r.reason}</span>}
+    </div>
+  );
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="font-display text-lg flex items-center gap-2"><Clock className="h-5 w-5 text-accent" /> Send a test registration</CardTitle>
+        <p className="text-sm text-muted-foreground">Uses the mail account configured in Admin → SMTP. Nothing is saved to the registrations list.</p>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="space-y-1.5">
+            <Label>Learner email</Label>
+            <Input type="email" dir="ltr" value={learnerEmail} onChange={(e) => setLearnerEmail(e.target.value)} placeholder="learner@example.com" />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Trainer / manager email</Label>
+            <Input type="email" dir="ltr" value={staffEmail} onChange={(e) => setStaffEmail(e.target.value)} placeholder="trainer@example.com" />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Use a real program (optional)</Label>
+            <Select value={trainingId} onValueChange={setTrainingId}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sample program</SelectItem>
+                {trainings.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>{t.title_en || t.title_ar}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <Button onClick={run} disabled={busy || !learnerEmail.includes("@") || !staffEmail.includes("@")}>
+          {busy ? <><Loader2 className="h-4 w-4 me-2 animate-spin" />Sending…</> : "Send test emails"}
+        </Button>
+        {result && (
+          <div className="rounded-lg border bg-muted/20 p-4 space-y-2">
+            {line("Learner confirmation", result.learner)}
+            {line("Staff alert", result.staff)}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
