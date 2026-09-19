@@ -4,7 +4,7 @@ import { useAuth, type Role, isClientRole } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2, Tag, ArrowRight, ArrowLeft, MessageSquare, Layers } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2, Tag, ArrowRight, ArrowLeft, MessageSquare, Layers, CalendarDays } from "lucide-react";
 import { useCanAccess, usePermissions, resolveAdminPage } from "@/lib/permissions-store";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -73,6 +73,7 @@ const adminGroups: NavGroup[] = [
       { to: "/dashboard/admin/news", en: "News", ar: "الأخبار", icon: Newspaper, role: "admin", pageKey: "news" },
       { to: "/dashboard/admin/events", en: "Events", ar: "الفعاليات", icon: Newspaper, role: "admin", pageKey: "events" },
       { to: "/dashboard/admin/training", en: "Training", ar: "التدريب", icon: GraduationCap, role: "admin", pageKey: "training" },
+      { to: "/dashboard/admin/calendar", en: "Calendar", ar: "التقويم", icon: CalendarDays, role: "admin", pageKey: "training" },
       { to: "/dashboard/admin/about", en: "About Page", ar: "صفحة من نحن", icon: Info, role: "admin", pageKey: "about" },
       { to: "/dashboard/admin/faqs", en: "FAQs", ar: "الأسئلة الشائعة", icon: HelpCircle, role: "admin", pageKey: "faqs" },
       { to: "/dashboard/admin/terms", en: "Terms", ar: "الشروط والأحكام", icon: ScrollText, role: "admin", pageKey: "terms" },

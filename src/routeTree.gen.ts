@@ -83,6 +83,7 @@ import { Route as DashboardAdminClientsRouteImport } from './routes/dashboard.ad
 import { Route as DashboardAdminChatbotRouteImport } from './routes/dashboard.admin.chatbot'
 import { Route as DashboardAdminChatRouteImport } from './routes/dashboard.admin.chat'
 import { Route as DashboardAdminCareersRouteImport } from './routes/dashboard.admin.careers'
+import { Route as DashboardAdminCalendarRouteImport } from './routes/dashboard.admin.calendar'
 import { Route as DashboardAdminAboutRouteImport } from './routes/dashboard.admin.about'
 import { Route as DashboardWorkspaceTicketsIndexRouteImport } from './routes/dashboard.workspace.tickets.index'
 import { Route as DashboardWorkspaceOrdersIndexRouteImport } from './routes/dashboard.workspace.orders.index'
@@ -508,6 +509,11 @@ const DashboardAdminCareersRoute = DashboardAdminCareersRouteImport.update({
   path: '/careers',
   getParentRoute: () => DashboardAdminRoute,
 } as any)
+const DashboardAdminCalendarRoute = DashboardAdminCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => DashboardAdminRoute,
+} as any)
 const DashboardAdminAboutRoute = DashboardAdminAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -802,6 +808,7 @@ export interface FileRoutesByFullPath {
   '/partners/': typeof PartnersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/dashboard/admin/about': typeof DashboardAdminAboutRoute
+  '/dashboard/admin/calendar': typeof DashboardAdminCalendarRoute
   '/dashboard/admin/careers': typeof DashboardAdminCareersRouteWithChildren
   '/dashboard/admin/chat': typeof DashboardAdminChatRoute
   '/dashboard/admin/chatbot': typeof DashboardAdminChatbotRoute
@@ -919,6 +926,7 @@ export interface FileRoutesByTo {
   '/partners': typeof PartnersIndexRoute
   '/products': typeof ProductsIndexRoute
   '/dashboard/admin/about': typeof DashboardAdminAboutRoute
+  '/dashboard/admin/calendar': typeof DashboardAdminCalendarRoute
   '/dashboard/admin/chat': typeof DashboardAdminChatRoute
   '/dashboard/admin/chatbot': typeof DashboardAdminChatbotRoute
   '/dashboard/admin/events': typeof DashboardAdminEventsRoute
@@ -1026,6 +1034,7 @@ export interface FileRoutesById {
   '/partners/': typeof PartnersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/dashboard/admin/about': typeof DashboardAdminAboutRoute
+  '/dashboard/admin/calendar': typeof DashboardAdminCalendarRoute
   '/dashboard/admin/careers': typeof DashboardAdminCareersRouteWithChildren
   '/dashboard/admin/chat': typeof DashboardAdminChatRoute
   '/dashboard/admin/chatbot': typeof DashboardAdminChatbotRoute
@@ -1148,6 +1157,7 @@ export interface FileRouteTypes {
     | '/partners/'
     | '/products/'
     | '/dashboard/admin/about'
+    | '/dashboard/admin/calendar'
     | '/dashboard/admin/careers'
     | '/dashboard/admin/chat'
     | '/dashboard/admin/chatbot'
@@ -1265,6 +1275,7 @@ export interface FileRouteTypes {
     | '/partners'
     | '/products'
     | '/dashboard/admin/about'
+    | '/dashboard/admin/calendar'
     | '/dashboard/admin/chat'
     | '/dashboard/admin/chatbot'
     | '/dashboard/admin/events'
@@ -1371,6 +1382,7 @@ export interface FileRouteTypes {
     | '/partners/'
     | '/products/'
     | '/dashboard/admin/about'
+    | '/dashboard/admin/calendar'
     | '/dashboard/admin/careers'
     | '/dashboard/admin/chat'
     | '/dashboard/admin/chatbot'
@@ -2009,6 +2021,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminCareersRouteImport
       parentRoute: typeof DashboardAdminRoute
     }
+    '/dashboard/admin/calendar': {
+      id: '/dashboard/admin/calendar'
+      path: '/calendar'
+      fullPath: '/dashboard/admin/calendar'
+      preLoaderRoute: typeof DashboardAdminCalendarRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
     '/dashboard/admin/about': {
       id: '/dashboard/admin/about'
       path: '/about'
@@ -2560,6 +2579,7 @@ const DashboardAdminUsersRouteWithChildren =
 
 interface DashboardAdminRouteChildren {
   DashboardAdminAboutRoute: typeof DashboardAdminAboutRoute
+  DashboardAdminCalendarRoute: typeof DashboardAdminCalendarRoute
   DashboardAdminCareersRoute: typeof DashboardAdminCareersRouteWithChildren
   DashboardAdminChatRoute: typeof DashboardAdminChatRoute
   DashboardAdminChatbotRoute: typeof DashboardAdminChatbotRoute
@@ -2600,6 +2620,7 @@ interface DashboardAdminRouteChildren {
 
 const DashboardAdminRouteChildren: DashboardAdminRouteChildren = {
   DashboardAdminAboutRoute: DashboardAdminAboutRoute,
+  DashboardAdminCalendarRoute: DashboardAdminCalendarRoute,
   DashboardAdminCareersRoute: DashboardAdminCareersRouteWithChildren,
   DashboardAdminChatRoute: DashboardAdminChatRoute,
   DashboardAdminChatbotRoute: DashboardAdminChatbotRoute,
