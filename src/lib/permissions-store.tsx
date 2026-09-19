@@ -635,6 +635,7 @@ export function useCanAccess(pageKey: string) {
 /** Nested admin paths that map to a dedicated permission key. */
 export const NESTED_PAGE_KEYS: Array<{ prefix: string; pageKey: string }> = [
   { prefix: "leads/quotes", pageKey: "quotes" },
+  { prefix: "calendar", pageKey: "training" },
   { prefix: "careers/applications", pageKey: "careers_applications" },
   { prefix: "careers/analytics", pageKey: "careers_analytics" },
   { prefix: "helpdesk/tickets", pageKey: "helpdesk_tickets" },

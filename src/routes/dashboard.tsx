@@ -4,7 +4,7 @@ import { useAuth, type Role, isClientRole } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2, Tag, ArrowRight, ArrowLeft, MessageSquare, Layers } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2, Tag, ArrowRight, ArrowLeft, MessageSquare, Layers, CalendarDays } from "lucide-react";
 import { useCanAccess, usePermissions, resolveAdminPage } from "@/lib/permissions-store";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
