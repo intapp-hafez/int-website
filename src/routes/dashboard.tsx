@@ -73,6 +73,7 @@ const adminGroups: NavGroup[] = [
       { to: "/dashboard/admin/news", en: "News", ar: "الأخبار", icon: Newspaper, role: "admin", pageKey: "news" },
       { to: "/dashboard/admin/events", en: "Events", ar: "الفعاليات", icon: Newspaper, role: "admin", pageKey: "events" },
       { to: "/dashboard/admin/training", en: "Training", ar: "التدريب", icon: GraduationCap, role: "admin", pageKey: "training" },
+      { to: "/dashboard/admin/calendar", en: "Calendar", ar: "التقويم", icon: CalendarDays, role: "admin", pageKey: "training" },
       { to: "/dashboard/admin/about", en: "About Page", ar: "صفحة من نحن", icon: Info, role: "admin", pageKey: "about" },
       { to: "/dashboard/admin/faqs", en: "FAQs", ar: "الأسئلة الشائعة", icon: HelpCircle, role: "admin", pageKey: "faqs" },
       { to: "/dashboard/admin/terms", en: "Terms", ar: "الشروط والأحكام", icon: ScrollText, role: "admin", pageKey: "terms" },
