@@ -221,12 +221,12 @@ function RegisterDialog({ item, isAr }: { item: TrainingRow; isAr: boolean }) {
           <div className="py-8 text-center space-y-3">
             <CheckCircle2 className="h-10 w-10 mx-auto text-accent" />
             <Badge variant="secondary" className="mx-auto">
-              {L("Confirmed", "مؤكد")}
+              {L("Received", "تم الاستلام")}
             </Badge>
             <p className={`font-medium text-sm text-muted-foreground ${isAr ? "font-arabic leading-relaxed" : ""}`}>
               {L(
-                "Thank you for registering! Your seat is confirmed and a confirmation email is on its way with the full program details.",
-                "شكراً لتسجيلك! تم تأكيد مقعدك وسيصلك بريد إلكتروني بتفاصيل البرنامج."
+                "Thank you for registering! We have received your request and emailed you the details — our team will confirm your seat shortly.",
+                "شكراً لتسجيلك! تم استلام طلبك وأرسلنا لك التفاصيل بالبريد، وسيقوم فريقنا بتأكيد مقعدك قريباً."
               )}
             </p>
             <Button variant="outline" onClick={() => setOpen(false)}>{L("Close", "إغلاق")}</Button>
