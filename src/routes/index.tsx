@@ -389,7 +389,7 @@ function Home() {
                 const cta = (lang === "ar" ? s.cta_ar : s.cta_en) || s.cta_en || s.cta_ar;
                 return (
                   <CarouselItem key={s.id}>
-                    <div className="container mx-auto px-4 lg:px-8 relative pt-10 pb-12 md:pt-28 md:pb-32 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                    <div className="container mx-auto px-4 lg:px-8 relative pt-8 pb-10 md:pt-16 md:pb-20 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                       <div className="order-2 lg:order-1 text-center lg:text-start">
                         <h2 className={`font-bold mb-4 sm:mb-6 ${isRtl ? "text-[28px] sm:text-4xl md:text-5xl lg:text-[56px] leading-[1.5]" : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.15]"}`}>
                           <span className="gradient-text">{title}</span>
@@ -437,7 +437,7 @@ function Home() {
       <section className="relative overflow-hidden gradient-surface">
         <div className="absolute inset-0 grid-bg opacity-60" />
         <div className={`absolute ${isRtl ? "-left-32" : "-right-32"} -top-32 h-[600px] w-[600px] rounded-full bg-accent/10 blur-3xl`} />
-        <div className="container mx-auto px-4 lg:px-8 relative pt-10 pb-12 md:pt-28 md:pb-32 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="container mx-auto px-4 lg:px-8 relative pt-8 pb-10 md:pt-16 md:pb-20 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div className="animate-fade-in-up order-2 lg:order-1 text-center lg:text-start">
             <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent font-semibold mb-4 sm:mb-6 ${isRtl ? "text-xs sm:text-sm tracking-normal" : "text-[10px] sm:text-xs uppercase tracking-wider"}`}>
               <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" /> {t("hero.eyebrow")}
