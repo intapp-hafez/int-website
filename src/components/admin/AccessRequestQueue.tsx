@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { Input } from "@/components/ui/input";
+import { useAccessQuotes } from "@/lib/access-quotes";
+import { notifyAccessDecision, sweepExpiredGrants } from "@/lib/access-notify.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,9 +37,13 @@ export function AccessRequestQueue() {
   const ar = lang === "ar";
   const { user } = useAuth();
   const { requests, decide } = useAccessRequests();
-  const { grantAccess } = usePermissions();
+  const { grantAccess, refreshGrants } = usePermissions();
+  const { quotes, available: quotesAvailable, saveQuote } = useAccessQuotes();
+  const notifyDecision = useServerFn(notifyAccessDecision);
+  const sweepGrants = useServerFn(sweepExpiredGrants);
   const [showAll, setShowAll] = useState(false);
   const [durations, setDurations] = useState<Record<string, string>>({});
+  const [quoteDraft, setQuoteDraft] = useState<Record<string, { amount: string; currency: string; note: string }>>({});
 
   const canApprove = user?.role === "admin" || user?.role === "manager";
   if (!canApprove) return null;
