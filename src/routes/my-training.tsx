@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { downloadCertificate } from "@/lib/training-certificate";
 import { lookupLearnerTrainings, type LearnerRegistration } from "@/lib/learner-portal.functions";
-import { downloadIcs } from "@/lib/ics";
+import { buildIcs, downloadIcs } from "@/lib/ics";
 
 export const Route = createFileRoute("/my-training")({
   head: () => ({
@@ -110,15 +110,18 @@ function MyTrainingPage() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() =>
-                  downloadIcs({
-                    title: (ar ? t.title_ar : t.title_en) || title,
+                onClick={() => {
+                  const ics = buildIcs({
+                    uid: `training-${r.id}`,
+                    title,
                     description: t.trainer ? `${L("Trainer", "المدرب")}: ${t.trainer}` : "",
                     location: t.location || "",
-                    start: t.start_date!,
-                    end: t.end_date || t.start_date!,
-                  } as any)
-                }
+                    organizer: t.trainer || "Integrated Technics",
+                    startDate: t.start_date!,
+                    endDate: t.end_date,
+                  });
+                  downloadIcs(`${(t.title_en || t.title_ar || "training").replace(/[\s/]+/g, "-")}.ics`, ics);
+                }}
               >
                 <CalendarDays className="h-3.5 w-3.5 me-1" />
                 {L("Add to calendar", "أضف إلى التقويم")}
