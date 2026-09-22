@@ -2,6 +2,12 @@
  * Sends mail through the mail account configured in Admin → SMTP.
  * Delegates to the `send-email` Supabase function, which reads `smtp_settings`
  * and relays through nodemailer. Never throws — always reports a reason.
+ *
+ * This project runs "server functions" in the browser (see src/lib/start-shim.ts),
+ * so private server env vars are unavailable here. The publishable project key is
+ * enough to call the function — the privileged SMTP work happens inside the
+ * function on Supabase's side. Real server runtimes fall back to the
+ * service-role key.
  */
 export async function deliverSiteEmail(
   to: string,
@@ -9,8 +15,12 @@ export async function deliverSiteEmail(
   html: string,
   text: string,
 ): Promise<{ sent: boolean; reason: string | null }> {
-  const url = process.env["SUPABASE_URL"];
-  const key = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+  const proc = typeof process !== "undefined" ? process.env : undefined;
+  const url = import.meta.env?.VITE_SUPABASE_URL ?? proc?.["SUPABASE_URL"];
+  const key =
+    import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY ??
+    proc?.["SUPABASE_PUBLISHABLE_KEY"] ??
+    proc?.["SUPABASE_SERVICE_ROLE_KEY"];
   if (!url || !key) return { sent: false, reason: "supabase_not_configured" };
   if (!to || !to.includes("@")) return { sent: false, reason: "invalid_recipient" };
 
