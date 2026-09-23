@@ -58,7 +58,7 @@ Deno.serve(async (req: Request) => {
       email: email.trim().toLowerCase(),
       password: password.trim(),
       email_confirm: true,
-      user_metadata: { name: name.trim(), role: role.trim() }
+      user_metadata: { name: name.trim() }
     });
 
     if (createUserError) {
@@ -71,7 +71,7 @@ Deno.serve(async (req: Request) => {
       .from("user_roles")
       .upsert({
         user_id: newUserId,
-        role: role.trim()
+        role: requestedRole
       }, { onConflict: "user_id" });
 
     if (insertRoleError) {
