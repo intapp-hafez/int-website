@@ -45,6 +45,7 @@ function MyTrainingPage() {
   const lookup = useServerFn(lookupLearnerTrainings);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [rows, setRows] = useState<LearnerRegistration[] | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -52,7 +53,7 @@ function MyTrainingPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await lookup({ data: { email } });
+      const res = await lookup({ data: { email, phone } });
       setRows(res);
       if (res.length === 0) toast.info(L("No registrations found for that email.", "لا توجد تسجيلات بهذا البريد."));
     } catch (err: any) {
@@ -185,6 +186,15 @@ function MyTrainingPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={L("you@example.com", "بريدك الإلكتروني")}
+          className="flex-1 min-w-[220px]"
+          dir="ltr"
+        />
+        <Input
+          type="tel"
+          required
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder={L("Phone number you registered with", "رقم الهاتف المسجّل")}
           className="flex-1 min-w-[220px]"
           dir="ltr"
         />

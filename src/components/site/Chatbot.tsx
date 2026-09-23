@@ -358,13 +358,9 @@ export function Chatbot() {
       // Fetch existing session status and messages
       (async () => {
         try {
-          const { data: sessionData } = await (supabase as any)
-            .from("live_chat_sessions")
-            .select("status")
-            .eq("id", savedSessionId)
-            .single();
+          const { data: status } = await (supabase as any).rpc("get_live_chat_session_status", { _id: savedSessionId });
 
-          if (sessionData?.status === "closed") {
+          if (status === "closed") {
             setLiveSessionStatus("closed");
           } else {
             setLiveSessionStatus("active");
@@ -575,9 +571,11 @@ export function Chatbot() {
       const token = `live_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
       // 1. Create Live Chat Session in Supabase
-      const { data: sessionData, error: sessionErr } = await (supabase as any)
+      const newId = crypto.randomUUID();
+      const { error: sessionErr } = await (supabase as any)
         .from("live_chat_sessions")
         .insert({
+          id: newId,
           session_token: token,
           visitor_name: liveForm.name.trim().slice(0, 200),
           visitor_phone: liveForm.phone.trim().slice(0, 50) || null,
@@ -586,9 +584,8 @@ export function Chatbot() {
           status: "active",
           last_message: liveForm.message.trim().slice(0, 500) || `Started chat (${liveForm.category})`,
           lang,
-        })
-        .select()
-        .single();
+        });
+      const sessionData = sessionErr ? null : { id: newId };
 
       const newSessionId = sessionData?.id || token;
       setLiveSessionId(newSessionId);

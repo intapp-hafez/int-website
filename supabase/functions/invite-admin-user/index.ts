@@ -45,13 +45,20 @@ Deno.serve(async (req: Request) => {
     if (!email || !password || !name || !role) {
       throw new Error("Missing required fields (email, password, name, role)");
     }
+    const requestedRole = String(role).trim();
+    const ALL_ROLES = ["admin","moderator","user","helpdesk_manager","technician","client_user","hr","assistant","manager","agent","seo"];
+    if (!ALL_ROLES.includes(requestedRole)) throw new Error("Invalid role");
+    // Only admins may create admins or managers; others may only assign lower roles.
+    if (roleData.role !== "admin" && ["admin", "manager"].includes(requestedRole)) {
+      throw new Error("You are not allowed to assign this role");
+    }
 
     // 1. Create User in Auth
     const { data: newAuthUser, error: createUserError } = await supabaseClient.auth.admin.createUser({
       email: email.trim().toLowerCase(),
       password: password.trim(),
       email_confirm: true,
-      user_metadata: { name: name.trim(), role: role.trim() }
+      user_metadata: { name: name.trim() }
     });
 
     if (createUserError) {
@@ -64,7 +71,7 @@ Deno.serve(async (req: Request) => {
       .from("user_roles")
       .upsert({
         user_id: newUserId,
-        role: role.trim()
+        role: requestedRole
       }, { onConflict: "user_id" });
 
     if (insertRoleError) {

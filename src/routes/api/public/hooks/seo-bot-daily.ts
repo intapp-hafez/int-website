@@ -5,7 +5,14 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export const Route = createFileRoute("/api/public/hooks/seo-bot-daily")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const secret = process.env["CRON_SECRET"];
+        const given = request.headers.get("x-cron-secret") ?? "";
+        if (!secret || given !== secret) {
+          return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
+            status: 401, headers: { "content-type": "application/json" },
+          });
+        }
         try {
           const { data: s } = await supabaseAdmin
             .from("seo_bot_settings").select("daily_enabled").eq("id", "main").maybeSingle();

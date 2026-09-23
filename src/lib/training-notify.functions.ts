@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
 
 type ChannelResult = { sent: boolean; reason: string | null };
 export type TrainingNotifyResult = {
@@ -7,7 +8,7 @@ export type TrainingNotifyResult = {
   staffEmails: { to: string; sent: boolean; reason: string | null }[];
 };
 
-const UUID_RE = /^[0-9a-fA-F-]{16,40}$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function validate(input: { registrationId: string; kind?: string; note?: string }) {
   const registrationId = String(input?.registrationId ?? "").trim();
@@ -18,19 +19,41 @@ function validate(input: { registrationId: string; kind?: string; note?: string 
 }
 
 /**
- * Emails + WhatsApps the learner, and emails the trainer/managers.
- * Every channel fails soft so a delivery outage never blocks the registration.
+ * Public "received" confirmations are built server-side by the email function for a
+ * just-created registration. Every other notification requires a staff session and
+ * reads the registration under the staff member's own database permissions.
  */
 export const notifyTrainingRegistration = createServerFn({ method: "POST" })
   .inputValidator(validate)
   .handler(async ({ data }): Promise<TrainingNotifyResult> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { deliverSiteEmail: deliverEmail } = await import("@/lib/site-email.server");
+    const site = await import("@/lib/site-email.server");
+    const result: TrainingNotifyResult = {
+      learnerEmail: { sent: false, reason: "no_email" },
+      learnerWhatsapp: { sent: false, reason: "no_phone" },
+      staffEmails: [],
+    };
+
+    const { data: sess } = await supabase.auth.getSession();
+    let isStaff = false;
+    if (sess?.session) {
+      try {
+        const { requireStaff } = await import("@/lib/staff-guard");
+        await requireStaff();
+        isStaff = true;
+      } catch {
+        isStaff = false;
+      }
+    }
+
+    if (!isStaff) {
+      if (data.kind !== "received") throw new Error("Forbidden");
+      result.learnerEmail = await site.deliverTrainingReceivedEmail(data.registrationId);
+      return result;
+    }
+
     const { deliverSms } = await import("@/lib/career-sms.server");
     const tpl = await import("@/lib/training-email.server");
-
-    const db = supabaseAdmin as any;
-    const { data: reg } = await db
+    const { data: reg } = await (supabase as any)
       .from("training_registrations")
       .select("*, trainings(title_en,title_ar,trainer,trainer_email,notify_emails,location,start_date,end_date)")
       .eq("id", data.registrationId)
@@ -55,20 +78,7 @@ export const notifyTrainingRegistration = createServerFn({ method: "POST" })
           ? tpl.renderRegistrationRejected(base, data.note)
           : tpl.renderRegistrationReceived(base);
 
-    const result: TrainingNotifyResult = {
-      learnerEmail: { sent: false, reason: "no_email" },
-      learnerWhatsapp: { sent: false, reason: "no_phone" },
-      staffEmails: [],
-    };
-
-    if (reg.email) {
-      try {
-        const r = await deliverEmail(reg.email, mail.subject, mail.html, mail.text);
-        result.learnerEmail = { sent: r.sent, reason: r.reason };
-      } catch (e: any) {
-        result.learnerEmail = { sent: false, reason: e?.message ?? "email_error" };
-      }
-    }
+    if (reg.email) result.learnerEmail = await site.deliverSiteEmail(reg.email, mail.subject, mail.html, mail.text);
 
     if (reg.phone && data.kind !== "rejected") {
       try {
@@ -81,11 +91,11 @@ export const notifyTrainingRegistration = createServerFn({ method: "POST" })
     }
 
     if (data.kind === "received") {
-      const recipients = [t.trainer_email ?? "", t.notify_emails ?? "", process.env["TRAINING_NOTIFY_EMAILS"] ?? ""]
+      const recipients = [t.trainer_email ?? "", t.notify_emails ?? ""]
         .join(",")
         .split(/[,;\s]+/)
-        .map((s) => s.trim().toLowerCase())
-        .filter((s) => s.includes("@"));
+        .map((s: string) => s.trim().toLowerCase())
+        .filter((s: string) => s.includes("@"));
       const staff = tpl.renderStaffAlert({
         ...base,
         email: reg.email ?? "",
@@ -95,13 +105,9 @@ export const notifyTrainingRegistration = createServerFn({ method: "POST" })
         district: reg.district ?? "",
         educationField: reg.education_field ?? "",
       });
-      for (const to of Array.from(new Set(recipients))) {
-        try {
-          const r = await deliverEmail(to, staff.subject, staff.html, staff.text);
-          result.staffEmails.push({ to, sent: r.sent, reason: r.reason });
-        } catch (e: any) {
-          result.staffEmails.push({ to, sent: false, reason: e?.message ?? "email_error" });
-        }
+      for (const to of Array.from(new Set<string>(recipients))) {
+        const r = await site.deliverSiteEmail(to, staff.subject, staff.html, staff.text);
+        result.staffEmails.push({ to, ...r });
       }
     }
 

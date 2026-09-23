@@ -16,10 +16,12 @@ export const sendImportSummaryEmail = createServerFn({ method: "POST" })
     };
   })
   .handler(async ({ data }) => {
+    const { requireStaff, escapeHtml } = await import("@/lib/staff-guard");
+    await requireStaff();
     const { deliverEmail } = await import("@/lib/career-email.server");
     const subject = `Bulk CSV import finished — ${data.updated} succeeded, ${data.skipped} failed`;
     const reasonsHtml = data.reasons.length
-      ? `<ul>${data.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>`
+      ? `<ul>${data.reasons.map((r) => `<li>${escapeHtml(r)}</li>`).join("")}</ul>`
       : "";
     const html = `
       <div style="font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:560px">

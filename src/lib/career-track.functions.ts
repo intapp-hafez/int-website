@@ -103,10 +103,14 @@ export const sendApplicationSms = createServerFn({ method: "POST" })
     const { renderApplicationSms, deliverSms } = await import("@/lib/career-sms.server");
     const { data: app } = await supabase
       .from("career_applications")
-      .select("ref,status,full_name,phone,career_jobs(title_en,title_ar)")
-      .ilike("ref", data.ref)
+      .select("ref,status,full_name,phone,created_at,career_jobs(title_en,title_ar)")
+      .eq("ref", data.ref)
       .maybeSingle();
     if (!app) return { sent: false, channel: null, reason: "not_found" as const };
+    // Receipt is only sent right after submission, so it can't be re-triggered later by others.
+    if (Date.now() - new Date((app as any).created_at).getTime() > 15 * 60 * 1000) {
+      return { sent: false, channel: null, reason: "not_found" as const };
+    }
     const phone = (app as any).phone as string;
     if (!phone) return { sent: false, channel: null, reason: "no_phone" as const };
     const job = (app as any).career_jobs ?? {};

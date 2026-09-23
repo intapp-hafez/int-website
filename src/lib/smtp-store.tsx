@@ -1,3 +1,4 @@
+import { escapeHtml } from "@/lib/staff-guard";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -412,17 +413,17 @@ export async function dispatchTicketNotificationEmails(params: {
       const emailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
           <div style="background-color: #0f172a; color: #ffffff; padding: 16px 20px; border-radius: 8px;">
-            <h2 style="margin: 0; font-size: 18px;">New Support Ticket Assigned: #${params.ticketNo}</h2>
+            <h2 style="margin: 0; font-size: 18px;">New Support Ticket Assigned: #${escapeHtml(params.ticketNo)}</h2>
           </div>
           <div style="padding: 20px 0;">
-            <p><strong>Category:</strong> ${params.categoryName}</p>
-            <p><strong>Priority:</strong> <span style="color: ${params.priority === 'urgent' ? '#dc2626' : '#2563eb'}; font-weight: bold; text-transform: uppercase;">${params.priority}</span></p>
-            <p><strong>Client:</strong> ${params.clientName} (${params.clientEmail || 'Portal User'})</p>
-            <p><strong>Subject:</strong> ${params.subject}</p>
+            <p><strong>Category:</strong> ${escapeHtml(params.categoryName)}</p>
+            <p><strong>Priority:</strong> <span style="color: ${params.priority === 'urgent' ? '#dc2626' : '#2563eb'}; font-weight: bold; text-transform: uppercase;">${escapeHtml(params.priority)}</span></p>
+            <p><strong>Client:</strong> ${escapeHtml(params.clientName)} (${escapeHtml(params.clientEmail || 'Portal User')})</p>
+            <p><strong>Subject:</strong> ${escapeHtml(params.subject)}</p>
             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
             <p><strong>Issue Description:</strong></p>
             <div style="background-color: #f8fafc; padding: 12px; border-radius: 6px; font-size: 14px; line-height: 1.6;">
-              ${params.message}
+              ${escapeHtml(params.message)}
             </div>
           </div>
         </div>

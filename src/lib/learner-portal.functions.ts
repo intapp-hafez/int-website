@@ -24,31 +24,20 @@ export type LearnerRegistration = {
  * Returns only that learner's own rows and no other personal data.
  */
 export const lookupLearnerTrainings = createServerFn({ method: "POST" })
-  .inputValidator((input: { email: string }) => {
-    const email = String(input?.email ?? "").trim().toLowerCase();
+  .inputValidator((input: { email: string; phone: string }) => {
+    const email = String(input?.email ?? "").trim().toLowerCase().slice(0, 255);
+    const phone = String(input?.phone ?? "").trim().slice(0, 40);
     if (!email.includes("@") || email.length < 5) throw new Error("Please enter the email you registered with.");
-    return { email };
+    if (phone.replace(/\D/g, "").length < 6) throw new Error("Please enter the phone number you registered with.");
+    return { email, phone };
   })
   .handler(async ({ data }): Promise<LearnerRegistration[]> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await (supabaseAdmin as any)
-      .from("training_registrations")
-      .select(
-        "id,status,created_at,approved_at,completed_at,certificate_no,admin_note,email,trainings(title_en,title_ar,trainer,location,start_date,end_date,kind)",
-      )
-      .ilike("email", data.email)
-      .order("created_at", { ascending: false });
-
-    if (error) throw new Error(error.message);
-
-    return ((rows ?? []) as any[]).map((r) => ({
-      id: r.id,
-      status: r.status,
-      created_at: r.created_at,
-      approved_at: r.approved_at ?? null,
-      completed_at: r.completed_at ?? null,
-      certificate_no: r.certificate_no ?? null,
-      admin_note: r.admin_note ?? null,
-      training: r.trainings ?? null,
-    }));
+    // Requires both email and phone to match; runs under public permissions (no admin key).
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data: rows, error } = await (supabase as any).rpc("lookup_learner_trainings", {
+      _email: data.email,
+      _phone: data.phone,
+    });
+    if (error) throw new Error("Lookup is temporarily unavailable.");
+    return (rows ?? []) as LearnerRegistration[];
   });

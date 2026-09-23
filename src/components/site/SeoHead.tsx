@@ -104,8 +104,16 @@ export function SeoHead() {
   }, []);
 
   // Inject analytics + verification once when global loads
+  const rawGlobal = global;
   useEffect(() => {
-    if (!global) return;
+    if (!rawGlobal) return;
+    // Only accept strictly-formatted tracking IDs so stored values can never inject script/markup.
+    const global = {
+      ...rawGlobal,
+      gtm_id: rawGlobal.gtm_id && /^GTM-[A-Z0-9]{4,12}$/.test(rawGlobal.gtm_id.trim()) ? rawGlobal.gtm_id.trim() : null,
+      ga4_id: rawGlobal.ga4_id && /^G-[A-Z0-9]{4,16}$/.test(rawGlobal.ga4_id.trim()) ? rawGlobal.ga4_id.trim() : null,
+      fb_pixel_id: rawGlobal.fb_pixel_id && /^\d{5,20}$/.test(rawGlobal.fb_pixel_id.trim()) ? rawGlobal.fb_pixel_id.trim() : null,
+    };
     if (global.gtm_id) {
       injectScriptOnce(
         "gtm-script",
@@ -135,7 +143,7 @@ export function SeoHead() {
     setMeta("name", "google-site-verification", global.google_verification);
     setMeta("name", "msvalidate.01", global.bing_verification);
     setMeta("name", "semrush-verification", global.semrush_verification);
-  }, [global]);
+  }, [rawGlobal]);
 
   // Per-route head update
   useEffect(() => {
