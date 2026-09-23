@@ -104,6 +104,7 @@ export function SeoHead() {
   }, []);
 
   // Inject analytics + verification once when global loads
+  const rawGlobal = global;
   useEffect(() => {
     if (!rawGlobal) return;
     // Only accept strictly-formatted tracking IDs so stored values can never inject script/markup.
@@ -142,7 +143,7 @@ export function SeoHead() {
     setMeta("name", "google-site-verification", global.google_verification);
     setMeta("name", "msvalidate.01", global.bing_verification);
     setMeta("name", "semrush-verification", global.semrush_verification);
-  }, [global]);
+  }, [rawGlobal]);
 
   // Per-route head update
   useEffect(() => {
