@@ -29,6 +29,14 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Integrated Technics — Enterprise System Integrator" },
       { name: "description", content: "Turnkey security, ICT, AV and data center integration delivered end-to-end by certified engineers." },
+      { property: "og:title", content: "Integrated Technics — Enterprise System Integrator" },
+      { property: "og:description", content: "Turnkey security, ICT, AV and data center integration delivered end-to-end by certified engineers." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "Organization", name: "Integrated Technics", description: "Enterprise security, ICT, AV and data center system integrator." }) },
+      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "Integrated Technics" }) },
     ],
   }),
   component: Home,
@@ -422,8 +430,8 @@ function Home() {
             </CarouselContent>
             {activeSlides.length > 1 && (
               <>
-                <CarouselPrevious className="left-4 hidden md:flex" />
-                <CarouselNext className="right-4 hidden md:flex" />
+                <CarouselPrevious className="left-4 hidden md:flex" aria-label="Previous hero slide" />
+                <CarouselNext className="right-4 hidden md:flex" aria-label="Next hero slide" />
               </>
             )}
           </Carousel>

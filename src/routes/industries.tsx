@@ -5,7 +5,7 @@ import { useIndustries } from "@/lib/industries-store";
 import { Building2 } from "lucide-react";
 
 export const Route = createFileRoute("/industries")({
-  head: () => ({ meta: [{ title: "Industries — Integrated Technics" }, { name: "description", content: "Solutions tailored for telecom, oil & gas, real estate, hospitality, manufacturing and government." }] }),
+  head: () => ({ meta: [{ title: "Industries — Integrated Technics" }, { name: "description", content: "Solutions tailored for telecom, oil & gas, real estate, hospitality, manufacturing and government." }, { property: "og:title", content: "Industries We Serve — Integrated Technics" }, { property: "og:description", content: "Security and ICT solutions tailored for telecom, oil & gas, real estate, hospitality, manufacturing and government." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: IndustriesPage,
 });
 
@@ -24,7 +24,7 @@ function IndustriesPage() {
           <p className="text-lg text-muted-foreground max-w-2xl">{t("industries.sub")}</p>
         </div>
       </section>
-      <Section>
+      <Section title={lang === "ar" ? "القطاعات التي نخدمها" : "Sectors we serve"}>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {activeIndustries.map((i) => {
             const title = lang === "ar" ? (i.title_ar || i.title_en) : (i.title_en || i.title_ar);
