@@ -11,13 +11,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import DOMPurify from "dompurify";
 
+const humanize = (s: string) => s.split("-").filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+
 export const Route = createFileRoute("/services/$slug")({
-  head: () => ({
-    meta: [
-      { title: "Service Details — Integrated Technics" },
-      { name: "description", content: "End-to-end security, ICT, AV, and data center services." },
-    ],
-  }),
+  head: ({ params }) => {
+    const name = humanize(params.slug);
+    const t = `${name} — Services | Integrated Technics`;
+    const d = `End-to-end ${name} service delivered by certified engineers at Integrated Technics.`;
+    return {
+      meta: [
+        { title: t },
+        { name: "description", content: d },
+        { property: "og:title", content: t },
+        { property: "og:description", content: d },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: `/services/${params.slug}` },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: `/services/${params.slug}` }],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "Service", name, provider: { "@type": "Organization", name: "Integrated Technics" }, description: d }) }],
+    };
+  },
   notFoundComponent: () => (
     <div className="container mx-auto py-32 text-center space-y-4">
       <h1 className="text-3xl font-bold">Service not found</h1>

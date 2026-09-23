@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Countdown } from "@/components/ui/countdown";
 
 export const Route = createFileRoute("/news/")({
-  head: () => ({ meta: [{ title: "News — Integrated Technics" }, { name: "description", content: "Updates from our projects, alliances and recognitions." }] }),
+  head: () => ({ meta: [{ title: "News & Updates — Integrated Technics" }, { name: "description", content: "Updates from our projects, alliances and recognitions." }, { property: "og:title", content: "News & Updates — Integrated Technics" }, { property: "og:description", content: "Updates from our projects, alliances and recognitions." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: NewsPage,
 });
 
@@ -71,7 +71,7 @@ function NewsPage() {
           <p className="text-lg text-muted-foreground max-w-2xl">{t("news.sub")}</p>
         </div>
       </section>
-      <Section className="!pt-8 !md:pt-12">
+      <Section className="!pt-8 !md:pt-12" title={lang === "ar" ? "أحدث الأخبار" : "Latest updates"}>
         {active.length === 0 ? (
           <p className="text-center text-muted-foreground">{lang === "ar" ? "لا توجد أخبار بعد." : "No news yet."}</p>
         ) : (
@@ -103,7 +103,7 @@ function NewsPage() {
                 <Input type="date" value={to} onChange={(e) => { setTo(e.target.value); setVisible(9); }} aria-label={lang === "ar" ? "إلى" : "To"} />
               </div>
               <div className="md:col-span-1 flex">
-                <Button variant="outline" onClick={clearAll} disabled={!anyFilter} className="w-full" title={lang === "ar" ? "مسح" : "Clear"}>
+                <Button variant="outline" onClick={clearAll} disabled={!anyFilter} className="w-full" title={lang === "ar" ? "مسح" : "Clear"} aria-label={lang === "ar" ? "مسح عوامل التصفية" : "Clear filters"}>
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -137,7 +137,7 @@ function NewsPage() {
                         <div className="text-xs text-muted-foreground inline-flex items-center gap-1.5 mb-2"><Calendar className="h-3.5 w-3.5" />{new Date(n.published_at).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}</div>
                         <h3 className="text-lg font-semibold mb-2 line-clamp-2 group-hover:text-accent transition-colors">{lang === "ar" ? n.title_ar : n.title_en}</h3>
                         <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{lang === "ar" ? n.excerpt_ar : n.excerpt_en}</p>
-                        <span className="mt-auto text-sm font-medium text-accent inline-flex items-center gap-1 group-hover:gap-2 transition-all">{lang === "ar" ? "اقرأ المزيد" : "Read more"} <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" /></span>
+                        <span className="mt-auto text-sm font-medium text-accent inline-flex items-center gap-1 group-hover:gap-2 transition-all">{lang === "ar" ? "اقرأ المقال كاملاً" : "Read full article"} <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" /></span>
                       </div>
                     </Link>
                   ))}

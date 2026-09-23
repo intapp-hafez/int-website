@@ -150,6 +150,8 @@ export function SeoHead() {
     if (!global) return;
     const isAr = lang === "ar";
     const page = pages.find((p) => p.path === pathname);
+    // Route head() owns metadata; only apply admin overrides for pages configured in SEO Control.
+    if (!page) return;
 
     const title = page
       ? (isAr ? page.title_ar : page.title_en) || page.title_en || global.default_title_en

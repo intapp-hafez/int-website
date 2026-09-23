@@ -9,8 +9,27 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { Countdown } from "@/components/ui/countdown";
 import DOMPurify from "dompurify";
 
+const humanize = (s: string) => s.split("-").filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+
 export const Route = createFileRoute("/news/$slug")({
-  head: () => ({ meta: [{ title: "News — Integrated Technics" }] }),
+  head: ({ params }) => {
+    const name = humanize(params.slug);
+    const t = `${name} — News | Integrated Technics`;
+    const d = `${name}: latest update from Integrated Technics.`;
+    return {
+      meta: [
+        { title: t },
+        { name: "description", content: d },
+        { property: "og:title", content: t },
+        { property: "og:description", content: d },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: `/news/${params.slug}` },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: `/news/${params.slug}` }],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "NewsArticle", headline: name, publisher: { "@type": "Organization", name: "Integrated Technics" } }) }],
+    };
+  },
   component: NewsDetailsPage,
 });
 

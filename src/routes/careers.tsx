@@ -20,6 +20,10 @@ export const Route = createFileRoute("/careers")({
   head: () => ({ meta: [
     { title: "Careers — Integrated Technics" },
     { name: "description", content: "Join a team of certified engineers building mission-critical systems across the region." },
+    { property: "og:title", content: "Careers at Integrated Technics" },
+    { property: "og:description", content: "Open engineering roles in security, ICT, AV and data center integration. Apply online." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
   ]}),
   component: CareersPage,
 });

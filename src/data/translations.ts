@@ -16,7 +16,7 @@ export const translations = {
     "cta.proposal": "Request Proposal",
     "cta.consult": "Book Consultation",
     "cta.contact": "Contact Us",
-    "cta.learn": "Learn more",
+    "cta.learn": "Explore service details",
     "cta.explore": "Explore services",
     "hero.eyebrow": "Enterprise System Integration",
     "hero.title": "Integrated Security & ICT Solutions for Enterprise Excellence",

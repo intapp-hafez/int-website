@@ -15,13 +15,27 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import DOMPurify from "dompurify";
 
+const humanize = (s: string) => s.split("-").filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+
 export const Route = createFileRoute("/solutions/$slug")({
-  head: () => ({
-    meta: [
-      { title: "Solution Details — Integrated Technics" },
-      { name: "description", content: "End-to-end engineered ICT and security enterprise solutions." },
-    ],
-  }),
+  head: ({ params }) => {
+    const name = humanize(params.slug);
+    const t = `${name} — Solutions | Integrated Technics`;
+    const d = `Engineered ${name} solution for enterprises from Integrated Technics.`;
+    return {
+      meta: [
+        { title: t },
+        { name: "description", content: d },
+        { property: "og:title", content: t },
+        { property: "og:description", content: d },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: `/solutions/${params.slug}` },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: `/solutions/${params.slug}` }],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "Service", name, provider: { "@type": "Organization", name: "Integrated Technics" }, description: d }) }],
+    };
+  },
   notFoundComponent: () => (
     <div className="container mx-auto py-32 text-center space-y-4">
       <h1 className="text-3xl font-bold">Solution not found</h1>
