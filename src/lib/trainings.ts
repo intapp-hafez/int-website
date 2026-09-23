@@ -122,13 +122,11 @@ export async function deleteTraining(id: string) {
 export async function registerForTraining(
   input: Omit<TrainingRegistration, "id" | "status" | "created_at">,
 ): Promise<string | null> {
-  const { data, error } = await db
-    .from("training_registrations")
-    .insert({ ...input, status: "pending" })
-    .select("id")
-    .single();
+  // Client-generated id: visitors may add a registration but not read registrations back.
+  const id = crypto.randomUUID();
+  const { error } = await db.from("training_registrations").insert({ ...input, id, status: "pending" });
   if (error) throw new Error(error.message);
-  return (data as any)?.id ?? null;
+  return id;
 }
 
 function certificateNo() {

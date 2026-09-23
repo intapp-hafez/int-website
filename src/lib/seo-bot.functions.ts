@@ -38,8 +38,13 @@ export const getSeoBotState = createServerFn({ method: "GET" }).handler(async ()
 });
 
 export const updateSeoBotSettings = createServerFn({ method: "POST" })
-  .inputValidator((d: { daily_enabled?: boolean; schedule_cron?: string }) => d)
+  .inputValidator((d: { daily_enabled?: boolean; schedule_cron?: string }) => ({
+    daily_enabled: typeof d?.daily_enabled === "boolean" ? d.daily_enabled : undefined,
+    schedule_cron: typeof d?.schedule_cron === "string" && /^[\d*\/,\- ]{9,60}$/.test(d.schedule_cron) ? d.schedule_cron : undefined,
+  }))
   .handler(async ({ data }) => {
+    const { requireStaff } = await import("@/lib/staff-guard");
+    await requireStaff();
     const patch = {
       ...(typeof data.daily_enabled === "boolean" ? { daily_enabled: data.daily_enabled } : {}),
       ...(typeof data.schedule_cron === "string" ? { schedule_cron: data.schedule_cron } : {}),
@@ -50,8 +55,14 @@ export const updateSeoBotSettings = createServerFn({ method: "POST" })
   });
 
 export const applyFindingSuggestion = createServerFn({ method: "POST" })
-  .inputValidator((d: { finding_id: string }) => d)
+  .inputValidator((d: { finding_id: string }) => {
+    const finding_id = String(d?.finding_id ?? "");
+    if (!/^[0-9a-f-]{36}$/i.test(finding_id)) throw new Error("Invalid finding id");
+    return { finding_id };
+  })
   .handler(async ({ data }) => {
+    const { requireStaff } = await import("@/lib/staff-guard");
+    await requireStaff();
     const { data: f, error } = await supabase
       .from("seo_bot_findings").select("*").eq("id", data.finding_id).maybeSingle();
     if (error || !f) throw new Error(error?.message || "Finding not found");
