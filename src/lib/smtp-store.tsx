@@ -406,7 +406,7 @@ export async function dispatchTicketNotificationEmails(params: {
       ? rawEmails.split(",").map((e) => e.trim()).filter(Boolean)
       : ["helpdesk@integratedtechnics.com"];
 
-    console.log(`[SMTP Notification] Dispatched new ticket #${escapeHtml(params.ticketNo)} to:`, recipients);
+    console.log(`[SMTP Notification] Dispatched new ticket #${params.ticketNo} to:`, recipients);
 
     // 1. Try sending physical email via Supabase Edge Function relay
     try {
@@ -432,7 +432,7 @@ export async function dispatchTicketNotificationEmails(params: {
       await supabase.functions.invoke("send-email", {
         body: {
           to: recipients,
-          subject: `[Support Ticket #${escapeHtml(params.ticketNo)}] ${escapeHtml(params.subject)} (${params.priority.toUpperCase()})`,
+          subject: `[Support Ticket #${params.ticketNo}] ${params.subject} (${params.priority.toUpperCase()})`,
           html: emailHtml,
           text: `Ticket #${params.ticketNo}\nCategory: ${params.categoryName}\nPriority: ${params.priority}\nClient: ${params.clientName}\n\n${params.message}`,
         },
