@@ -97,6 +97,50 @@ export type Database = {
           },
         ]
       }
+      access_quotes: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          note: string
+          request_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          note?: string
+          request_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          note?: string
+          request_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_quotes_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "access_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       access_requests: {
         Row: {
           actions: string[]
@@ -2613,6 +2657,7 @@ export type Database = {
           role: string
         }[]
       }
+      get_live_chat_session_status: { Args: { _id: string }; Returns: string }
       has_page_access: {
         Args: { _action: string; _page_key: string; _user_id: string }
         Returns: boolean
@@ -2623,6 +2668,11 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
+      lookup_learner_trainings: {
+        Args: { _email: string; _phone: string }
+        Returns: Json
       }
     }
     Enums: {
