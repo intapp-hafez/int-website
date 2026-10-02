@@ -224,10 +224,10 @@ export function InteractiveHeroWheel() {
             // Only reduce font size for NETWORK INFRASTRUCTURE, keep all other sectors at their original full size
             const textStyle =
               s.id === "network"
-                ? "text-[9px] sm:text-[9.5px] md:text-[10px] font-extrabold tracking-tighter"
+                ? "text-[10px] sm:text-[9.5px] md:text-[10px] font-extrabold tracking-tighter"
                 : s.id === "security"
-                ? "text-[11.5px] sm:text-[12px] md:text-[12.5px] font-extrabold tracking-normal"
-                : "text-[12px] sm:text-[12.5px] md:text-[13px] font-extrabold tracking-wide";
+                ? "text-[12.5px] sm:text-[12px] md:text-[12.5px] font-extrabold tracking-normal"
+                : "text-[13px] sm:text-[12.5px] md:text-[13px] font-extrabold tracking-wide";
 
             return (
               <g
@@ -249,7 +249,6 @@ export function InteractiveHeroWheel() {
                   {/* Curved Text Label - only NETWORK INFRASTRUCTURE size is reduced */}
                   <text
                     className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]`}
-                    {...(s.id === "network" ? { fontSize: isAr ? 8.5 : 7.4 } : {})}
                   >
                     <textPath
                       href={`#sector-arc-${s.id}`}
@@ -277,7 +276,7 @@ export function InteractiveHeroWheel() {
         {/* Central Core: LOGO (Clickable -> Home) */}
         <Link
           to="/"
-          className="absolute z-20 w-[190px] h-[190px] sm:w-[210px] sm:h-[210px] md:w-[230px] md:h-[230px] rounded-full bg-white dark:bg-card border-[3px] border-border/80 shadow-2xl flex items-center justify-center p-6 sm:p-7 md:p-8 hover:scale-105 active:scale-95 transition-transform duration-300 group cursor-pointer"
+          className="absolute z-20 w-[36%] aspect-square rounded-full bg-white dark:bg-card border-[3px] border-border/80 shadow-2xl flex items-center justify-center p-[7%] hover:scale-105 active:scale-95 transition-transform duration-300 group cursor-pointer"
           title={lang === "ar" ? "الصفحة الرئيسية — إنتجريتد تكنيكس" : "Home — Integrated Technics"}
         >
           <div className="relative w-full h-full flex items-center justify-center">
