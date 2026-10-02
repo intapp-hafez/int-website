@@ -707,6 +707,8 @@ export function Chatbot() {
       : `Hello Integrated Technics, I am ${liveForm.name || "a client"} and would like to follow up regarding: ${labels.categories[liveForm.category as keyof typeof labels.categories] || "enquiry"}.`
   );
 
+  if (inDashboard) return null;
+
   return (
     <>
       {!open && (

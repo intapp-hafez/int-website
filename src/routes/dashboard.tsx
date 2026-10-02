@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2, Tag, ArrowRight, ArrowLeft, MessageSquare, Layers, CalendarDays } from "lucide-react";
 import { useCanAccess, usePermissions, resolveAdminPage } from "@/lib/permissions-store";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Integrated Technics" }] }),
@@ -61,6 +62,8 @@ const adminGroups: NavGroup[] = [
     en: "Career", ar: "الوظائف", icon: GraduationCap,
     items: [
       { to: "/dashboard/admin/careers", en: "Careers", ar: "الوظائف", icon: GraduationCap, role: "admin", pageKey: "careers" },
+      { to: "/dashboard/admin/careers/applications", en: "Applications", ar: "طلبات التوظيف", icon: Users, role: "admin", pageKey: "careers_applications" },
+      { to: "/dashboard/admin/careers/analytics", en: "Analytics", ar: "تحليلات التوظيف", icon: BarChart3, role: "admin", pageKey: "careers_analytics" },
     ],
   },
   {
@@ -116,7 +119,7 @@ const adminGroups: NavGroup[] = [
 function DashboardLayout() {
   const { user, ready, signOut } = useAuth();
   const { getUserPerms } = usePermissions();
-  const { lang } = useI18n();
+  const { lang, setLang } = useI18n();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -180,42 +183,111 @@ function DashboardLayout() {
     : (user.role === "seo" ? "SEO Specialist" : user.role === "hr" ? "HR" : user.role === "assistant" ? "Assistant" : isClient ? "Client" : user.role);
 
   return (
-    <div className={`${isAdminPath ? "w-full px-6" : "container mx-auto px-4"} py-8 grid lg:grid-cols-[260px_1fr] gap-6 overflow-x-clip ${isClient ? "pb-28 lg:pb-8" : ""}`}>
-      <aside className={`bg-card border rounded-xl p-4 h-fit lg:sticky lg:top-28 ${isClient ? "block" : ""}`}>
-        <div className="flex items-center gap-2 mb-4 pb-4 border-b">
-          <div className="h-9 w-9 rounded-md bg-accent/10 text-accent flex items-center justify-center">
-            {user.role === "admin" ? <ShieldCheck className="h-4 w-4" /> : <User className="h-4 w-4" />}
-          </div>
-          <div className="min-w-0">
-            <div className="text-sm font-medium truncate">{user.name || user.email}</div>
-            <div className="text-xs text-muted-foreground capitalize">{roleLabel}</div>
-          </div>
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Admin Panel Header */}
+      <header className="sticky top-0 z-30 w-full border-b bg-card/95 backdrop-blur px-4 lg:px-6 h-16 flex items-center justify-between gap-4">
+        {/* Brand / Logo */}
+        <div className="flex items-center gap-3 min-w-0">
+          <Link to="/dashboard" className="flex items-center gap-2.5">
+            <img src={logo} alt="Integrated Technics" className="h-8 w-auto object-contain" />
+            <div className="hidden sm:flex flex-col">
+              <span className="font-display font-bold text-sm tracking-tight text-foreground">
+                {lang === "ar" ? "لوحة الإدارة" : "Admin Portal"}
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                Integrated Technics
+              </span>
+            </div>
+          </Link>
+          <Badge variant="outline" className="hidden md:inline-flex text-[11px] font-medium border-accent/30 text-accent bg-accent/5">
+            {roleLabel}
+          </Badge>
         </div>
-        <nav className="flex flex-col gap-0.5">
-          {isClient ? (
-            workspaceItems.map((l) => (
-              <NavLinkItem key={l.to} item={l} lang={lang} />
-            ))
+
+        {/* Header Controls: Main Website, Language Switcher, User & Sign Out */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-foreground gap-1.5 h-9 px-3"
+          >
+            <Link to="/">
+              <Globe className="h-4 w-4" />
+              <span className="hidden sm:inline">{lang === "ar" ? "الموقع الرئيسي" : "Main Website"}</span>
+            </Link>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs px-3 h-9 font-medium"
+            onClick={() => setLang(lang === "en" ? "ar" : "en")}
+            title={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+          >
+            {lang === "en" ? "العربية" : "EN"}
+          </Button>
+
+          <div className="h-5 w-px bg-border mx-1 hidden sm:block" />
+
+          <div className="hidden md:flex items-center gap-2 ps-1">
+            <div className="h-8 w-8 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-semibold">
+              {user.role === "admin" ? <ShieldCheck className="h-4 w-4" /> : <User className="h-4 w-4" />}
+            </div>
+            <div className="text-start leading-tight">
+              <div className="text-xs font-medium text-foreground max-w-[120px] truncate">{user.name || user.email?.split("@")[0]}</div>
+              <div className="text-[10px] text-muted-foreground capitalize">{roleLabel}</div>
+            </div>
+          </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 gap-1.5 h-9 px-2.5 sm:px-3"
+            onClick={() => { signOut(); navigate({ to: "/signin", search: { redirect: undefined } }); }}
+            title={lang === "ar" ? "تسجيل الخروج" : "Sign out"}
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">{lang === "ar" ? "تسجيل الخروج" : "Sign out"}</span>
+          </Button>
+        </div>
+      </header>
+
+      {/* Main Layout */}
+      <div className={`${isAdminPath ? "w-full px-6" : "container mx-auto px-4"} py-6 grid lg:grid-cols-[260px_1fr] gap-6 overflow-x-clip flex-1 ${isClient ? "pb-28 lg:pb-8" : ""}`}>
+        <aside className={`bg-card border rounded-xl p-4 h-fit lg:sticky lg:top-20 ${isClient ? "block" : ""}`}>
+          <div className="flex items-center gap-2 mb-4 pb-4 border-b">
+            <div className="h-9 w-9 rounded-md bg-accent/10 text-accent flex items-center justify-center">
+              {user.role === "admin" ? <ShieldCheck className="h-4 w-4" /> : <User className="h-4 w-4" />}
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-medium truncate">{user.name || user.email}</div>
+              <div className="text-xs text-muted-foreground capitalize">{roleLabel}</div>
+            </div>
+          </div>
+          <nav className="flex flex-col gap-0.5">
+            {isClient ? (
+              workspaceItems.map((l) => (
+                <NavLinkItem key={l.to} item={l} lang={lang} />
+              ))
+            ) : (
+              <>
+                <NavLinkItem item={adminTopItem} lang={lang} />
+                {adminGroups.map((g) => (
+                  <NavGroupSection key={g.en} group={g} lang={lang} pathname={pathname} />
+                ))}
+              </>
+            )}
+          </nav>
+        </aside>
+        <section className="min-w-0">
+          {denied || workspaceDenied || helpdeskDenied || permDenied ? (
+            <WelcomeGreeting reason={workspaceDenied ? "workspace" : permDenied ? "perm" : "role"} isClient={isClient} />
           ) : (
-            <>
-              <NavLinkItem item={adminTopItem} lang={lang} />
-              {adminGroups.map((g) => (
-                <NavGroupSection key={g.en} group={g} lang={lang} pathname={pathname} />
-              ))}
-            </>
+            <Outlet />
           )}
-        </nav>
-        <Button variant="outline" size="sm" className="w-full mt-4" onClick={() => { signOut(); navigate({ to: "/signin", search: { redirect: undefined } }); }}>
-          <LogOut className="h-4 w-4 me-2" /> {lang === "ar" ? "تسجيل الخروج" : "Sign out"}
-        </Button>
-      </aside>
-      <section className="min-w-0">
-        {denied || workspaceDenied || helpdeskDenied || permDenied ? (
-          <WelcomeGreeting reason={workspaceDenied ? "workspace" : permDenied ? "perm" : "role"} isClient={isClient} />
-        ) : (
-          <Outlet />
-        )}
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
@@ -403,9 +475,11 @@ function NavLinkItem({ item, lang }: { item: NavItem; lang: "en" | "ar" | string
   }
   const Icon = item.icon;
   const label = lang === "ar" ? item.ar : item.en;
+  const isExact = item.to === "/dashboard/admin/careers" || item.to === "/dashboard/admin";
   return (
     <Link
       to={item.to}
+      activeOptions={{ exact: isExact }}
       className="px-3 py-2 rounded-md text-sm hover:bg-muted inline-flex items-center gap-2"
       activeProps={{ className: "bg-muted text-accent font-medium" }}
     >

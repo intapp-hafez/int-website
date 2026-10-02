@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useFaqs, type FaqItem, DEFAULT_FAQS } from "@/lib/faqs-store";
+import { Paginator } from "@/components/admin/Paginator";
+import { paginate } from "@/lib/list-utils";
 import {
   Plus,
   Trash2,
@@ -35,6 +37,8 @@ import { useCanAccess } from "@/lib/permissions-store";
 import { useAdminT } from "@/lib/admin-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import * as XLSX from "xlsx";
+
+const PAGE_SIZE = 25;
 
 export const Route = createFileRoute("/dashboard/admin/faqs")({
   head: () => ({ meta: [{ title: "FAQs — Admin" }] }),
@@ -103,6 +107,14 @@ function FaqsAdminPage() {
       return matchSearch && matchCategory;
     });
   }, [faqs, searchQuery, selectedCategory]);
+
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, selectedCategory]);
+
+  const pg = useMemo(() => paginate(filtered, page, PAGE_SIZE), [filtered, page]);
 
   const handleOpenAdd = () => {
     setCurrentItem({
@@ -612,10 +624,10 @@ function FaqsAdminPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((f, idx) => (
+                  pg.items.map((f, idx) => (
                     <tr key={f.id} className="hover:bg-muted/30 transition-colors">
                       <td className="py-3 px-4 text-center font-mono text-xs text-muted-foreground">
-                        {idx + 1}
+                        {pg.start + idx + 1}
                       </td>
 
                       <td className="py-3 px-4 max-w-md">
@@ -651,7 +663,7 @@ function FaqsAdminPage() {
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7"
-                            disabled={idx === 0}
+                            disabled={pg.start + idx === 0}
                             onClick={() => void move(f.id, -1)}
                             title="Move up"
                           >
@@ -661,7 +673,7 @@ function FaqsAdminPage() {
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7"
-                            disabled={idx === filtered.length - 1}
+                            disabled={pg.start + idx === filtered.length - 1}
                             onClick={() => void move(f.id, 1)}
                             title="Move down"
                           >
@@ -706,13 +718,13 @@ function FaqsAdminPage() {
       {/* 2. CARDS VIEW */}
       {viewMode === "cards" && (
         <div className="space-y-3">
-          {filtered.map((f, idx) => (
+          {pg.items.map((f, idx) => (
             <Card key={f.id} className="hover:border-accent/50 transition-colors shadow-xs">
               <CardContent className="p-4 sm:p-5 space-y-3">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">#{idx + 1}</span>
+                      <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">#{pg.start + idx + 1}</span>
                       <Badge variant="outline" className="text-xs">
                         {ar ? f.category_ar : f.category_en}
                       </Badge>
@@ -744,7 +756,7 @@ function FaqsAdminPage() {
                       variant="ghost"
                       size="sm"
                       className="h-7 text-xs"
-                      disabled={idx === 0}
+                      disabled={pg.start + idx === 0}
                       onClick={() => void move(f.id, -1)}
                     >
                       <ArrowUp className="h-3 w-3 me-1" />
@@ -754,7 +766,7 @@ function FaqsAdminPage() {
                       variant="ghost"
                       size="sm"
                       className="h-7 text-xs"
-                      disabled={idx === filtered.length - 1}
+                      disabled={pg.start + idx === filtered.length - 1}
                       onClick={() => void move(f.id, 1)}
                     >
                       <ArrowDown className="h-3 w-3 me-1" />
@@ -789,6 +801,16 @@ function FaqsAdminPage() {
           ))}
         </div>
       )}
+
+      {/* Pagination (25 items per page) */}
+      <Paginator
+        page={pg.page}
+        pageCount={pg.pageCount}
+        total={pg.total}
+        start={pg.start}
+        end={pg.end}
+        onPageChange={setPage}
+      />
 
       {/* Add / Edit FAQ Modal Dialog */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>

@@ -1,9 +1,12 @@
+import { useRouterState } from "@tanstack/react-router";
 import { useSettings } from "@/lib/settings-store";
 import { useI18n } from "@/lib/i18n";
 
 export function WhatsAppFloat() {
   const { settings } = useSettings();
   const { lang } = useI18n();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  if (pathname.startsWith("/dashboard")) return null;
   const cfg = settings.sticky.whatsapp;
   if (!cfg.enabled) return null;
   const num = settings.whatsapp.replace(/[^\d]/g, "");

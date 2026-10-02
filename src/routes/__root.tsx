@@ -141,6 +141,8 @@ import { SecurityProvider } from "@/lib/security-store";
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useHashScroll();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const inDashboard = pathname.startsWith("/dashboard");
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -162,13 +164,13 @@ function RootComponent() {
           <NotificationsProvider>
           <SolutionsProvider>
           <NewsProvider>
-            <Navbar />
-            <main className="min-h-screen pt-[104px] md:pt-[100px] pb-20 lg:pb-0">
+            {!inDashboard && <Navbar />}
+            <main className={inDashboard ? "min-h-screen" : "min-h-screen pt-[104px] md:pt-[100px] pb-20 lg:pb-0"}>
               <VisibilityGuard>
                 <Outlet />
               </VisibilityGuard>
             </main>
-            <ConditionalFooter />
+            {!inDashboard && <Footer />}
             <WhatsAppFloat />
             <MobileBottomNav />
             <Chatbot />
@@ -196,16 +198,6 @@ function RootComponent() {
         </SettingsProvider>
       </I18nProvider>
     </QueryClientProvider>
-  );
-}
-
-function ConditionalFooter() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const inDashboard = pathname.startsWith("/dashboard");
-  return (
-    <div className={inDashboard ? "hidden lg:block" : "hidden lg:block"}>
-      <Footer />
-    </div>
   );
 }
 
