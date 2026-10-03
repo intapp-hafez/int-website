@@ -18,7 +18,7 @@ export function Footer() {
     { Icon: Youtube, href: settings.social.youtube, label: "YouTube" },
   ].filter((s) => s.href && s.href.trim().length > 0);
   return (
-    <footer className="bg-primary text-primary-foreground mt-10 sm:mt-12">
+    <footer className="hidden lg:block bg-primary text-primary-foreground mt-10 sm:mt-12">
       <div className="container mx-auto px-4 lg:px-8 pt-8 pb-20 lg:py-10 grid md:grid-cols-2 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2 font-display font-bold text-lg mb-3">
