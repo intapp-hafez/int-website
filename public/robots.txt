@@ -3,4 +3,4 @@ Allow: /
 Disallow: /dashboard/
 Disallow: /signin
 
-Sitemap: /sitemap.xml
+Sitemap: https://nexus-solution-craft.lovable.app/sitemap.xml
