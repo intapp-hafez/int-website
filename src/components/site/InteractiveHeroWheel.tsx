@@ -255,18 +255,21 @@ export function InteractiveHeroWheel() {
                     stroke="rgba(255,255,255,0.4)"
                     strokeWidth="1.5"
                   />
-                  {/* Curved Text Label - only NETWORK INFRASTRUCTURE size is reduced */}
-                  <text
-                    className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]`}
-                  >
-                    <textPath
-                      href={`#sector-arc-${s.id}`}
-                      startOffset="50%"
-                      textAnchor="middle"
+                  {/* Curved Text Label — sectors with titleLines render one arc per line */}
+                  {(s.titleLines ? s.titleLines[lang] : [s.title[lang]]).map((line, i) => (
+                    <text
+                      key={`${s.id}-line-${i}`}
+                      className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]`}
                     >
-                      {s.title[lang]}
-                    </textPath>
-                  </text>
+                      <textPath
+                        href={`#sector-arc-${s.id}-${i}`}
+                        startOffset="50%"
+                        textAnchor="middle"
+                      >
+                        {line}
+                      </textPath>
+                    </text>
+                  ))}
                 </Link>
               </g>
             );
