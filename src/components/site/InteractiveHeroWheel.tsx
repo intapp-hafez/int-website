@@ -233,7 +233,7 @@ export function InteractiveHeroWheel() {
             // Only reduce font size for NETWORK INFRASTRUCTURE, keep all other sectors at their original full size
             const textStyle =
               s.id === "network"
-                ? "text-[10px] sm:text-[9.5px] md:text-[10px] font-extrabold tracking-tighter"
+                ? "text-[11.5px] sm:text-[11px] md:text-[11.5px] font-extrabold tracking-tight"
                 : s.id === "security"
                 ? "text-[12.5px] sm:text-[12px] md:text-[12.5px] font-extrabold tracking-normal"
                 : "text-[13px] sm:text-[12.5px] md:text-[13px] font-extrabold tracking-wide";
