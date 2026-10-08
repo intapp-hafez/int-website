@@ -184,11 +184,14 @@ export function InteractiveHeroWheel() {
               // Adjust text arc orientation based on quadrant midpoint so tops of letters always face outward
               const midAngle = (s.startAngle + s.endAngle) / 2;
               const isBottom = midAngle >= 90 && midAngle < 270;
-              const r = 142;
-              const pathD = isBottom
-                ? describeTextArc(250, 250, r, s.endAngle - 2, s.startAngle + 2, 0)
-                : describeTextArc(250, 250, r, s.startAngle + 2, s.endAngle - 2, 1);
-              return <path key={`textpath-${s.id}`} id={`sector-arc-${s.id}`} d={pathD} fill="none" />;
+              // Multi-line labels get one arc per line (outer line first); single-line labels stay mid-band
+              const radii = s.titleLines ? [151, 131] : [142];
+              return radii.map((r, i) => {
+                const pathD = isBottom
+                  ? describeTextArc(250, 250, r, s.endAngle - 2, s.startAngle + 2, 0)
+                  : describeTextArc(250, 250, r, s.startAngle + 2, s.endAngle - 2, 1);
+                return <path key={`textpath-${s.id}-${i}`} id={`sector-arc-${s.id}-${i}`} d={pathD} fill="none" />;
+              });
             })}
 
             {/* Gradient patterns */}
