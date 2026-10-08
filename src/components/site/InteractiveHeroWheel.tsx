@@ -40,6 +40,8 @@ interface SubServiceNode {
 interface SectorInfo {
   id: string;
   title: { en: string; ar: string };
+  // Optional: render the label as multiple curved lines (one arc per line, outer line first)
+  titleLines?: { en: string[]; ar: string[] };
   href: string;
   startAngle: number;
   endAngle: number;
