@@ -40,6 +40,8 @@ interface SubServiceNode {
 interface SectorInfo {
   id: string;
   title: { en: string; ar: string };
+  // Optional: render the label as multiple curved lines (one arc per line, outer line first)
+  titleLines?: { en: string[]; ar: string[] };
   href: string;
   startAngle: number;
   endAngle: number;
@@ -112,6 +114,10 @@ export function InteractiveHeroWheel() {
     {
       id: "network",
       title: { en: "NETWORK INFRASTRUCTURE", ar: "البنية التحتية للشبكات" },
+      titleLines: {
+        en: ["NETWORK", "INFRASTRUCTURE"],
+        ar: ["البنية التحتية", "للشبكات"],
+      },
       href: "/services/network",
       startAngle: 265,
       endAngle: 335,
@@ -178,11 +184,14 @@ export function InteractiveHeroWheel() {
               // Adjust text arc orientation based on quadrant midpoint so tops of letters always face outward
               const midAngle = (s.startAngle + s.endAngle) / 2;
               const isBottom = midAngle >= 90 && midAngle < 270;
-              const r = 142;
-              const pathD = isBottom
-                ? describeTextArc(250, 250, r, s.endAngle - 2, s.startAngle + 2, 0)
-                : describeTextArc(250, 250, r, s.startAngle + 2, s.endAngle - 2, 1);
-              return <path key={`textpath-${s.id}`} id={`sector-arc-${s.id}`} d={pathD} fill="none" />;
+              // Multi-line labels get one arc per line (outer line first); single-line labels stay mid-band
+              const radii = s.titleLines ? [151, 131] : [142];
+              return radii.map((r, i) => {
+                const pathD = isBottom
+                  ? describeTextArc(250, 250, r, s.endAngle - 2, s.startAngle + 2, 0)
+                  : describeTextArc(250, 250, r, s.startAngle + 2, s.endAngle - 2, 1);
+                return <path key={`textpath-${s.id}-${i}`} id={`sector-arc-${s.id}-${i}`} d={pathD} fill="none" />;
+              });
             })}
 
             {/* Gradient patterns */}
@@ -224,7 +233,7 @@ export function InteractiveHeroWheel() {
             // Only reduce font size for NETWORK INFRASTRUCTURE, keep all other sectors at their original full size
             const textStyle =
               s.id === "network"
-                ? "text-[10px] sm:text-[9.5px] md:text-[10px] font-extrabold tracking-tighter"
+                ? "text-[11.5px] sm:text-[11px] md:text-[11.5px] font-extrabold tracking-tight"
                 : s.id === "security"
                 ? "text-[12.5px] sm:text-[12px] md:text-[12.5px] font-extrabold tracking-normal"
                 : "text-[13px] sm:text-[12.5px] md:text-[13px] font-extrabold tracking-wide";
@@ -246,18 +255,21 @@ export function InteractiveHeroWheel() {
                     stroke="rgba(255,255,255,0.4)"
                     strokeWidth="1.5"
                   />
-                  {/* Curved Text Label - only NETWORK INFRASTRUCTURE size is reduced */}
-                  <text
-                    className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]`}
-                  >
-                    <textPath
-                      href={`#sector-arc-${s.id}`}
-                      startOffset="50%"
-                      textAnchor="middle"
+                  {/* Curved Text Label — sectors with titleLines render one arc per line */}
+                  {(s.titleLines ? s.titleLines[lang] : [s.title[lang]]).map((line, i) => (
+                    <text
+                      key={`${s.id}-line-${i}`}
+                      className={`${textStyle} fill-white select-none pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]`}
                     >
-                      {s.title[lang]}
-                    </textPath>
-                  </text>
+                      <textPath
+                        href={`#sector-arc-${s.id}-${i}`}
+                        startOffset="50%"
+                        textAnchor="middle"
+                      >
+                        {line}
+                      </textPath>
+                    </text>
+                  ))}
                 </Link>
               </g>
             );
