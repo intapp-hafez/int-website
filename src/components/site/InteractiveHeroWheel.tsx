@@ -114,6 +114,10 @@ export function InteractiveHeroWheel() {
     {
       id: "network",
       title: { en: "NETWORK INFRASTRUCTURE", ar: "البنية التحتية للشبكات" },
+      titleLines: {
+        en: ["NETWORK", "INFRASTRUCTURE"],
+        ar: ["البنية التحتية", "للشبكات"],
+      },
       href: "/services/network",
       startAngle: 265,
       endAngle: 335,
