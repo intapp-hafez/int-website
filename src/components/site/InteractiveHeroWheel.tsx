@@ -281,7 +281,7 @@ export function InteractiveHeroWheel() {
         >
           <div className="relative w-full h-full flex items-center justify-center">
             <img
-              src="/ht-logo.svg"
+              src="/logo.svg"
               alt="Integrated Technics"
               className="w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300 select-none"
               draggable={false}
