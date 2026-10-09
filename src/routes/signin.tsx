@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
+import { getTurnstileConfig, verifyTurnstile } from "@/lib/turnstile.functions";
 import { useAuth, isClientRole } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,11 +35,15 @@ function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [siteKey, setSiteKey] = useState<string | null>(null);
+  useEffect(() => { getTurnstileConfig().then((c) => setSiteKey(c.siteKey)).catch(() => {}); }, []);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(""); setLoading(true);
     try {
+      const check = await verifyTurnstile({ data: { token: turnstileToken } });
+      if (!check.ok) throw new Error("Please complete the security check and try again.");
       const u = await signIn(email, password);
       const isClient = isClientRole(u.role);
       const dest = redirect || (isClient ? "/dashboard/workspace" : "/dashboard/admin");
@@ -97,6 +102,8 @@ function SignInPage() {
           {/* Cloudflare Turnstile Bot Defense */}
           <div className="pt-1 flex justify-center">
             <TurnstileWidget
+              key={siteKey ?? "test"}
+              siteKey={siteKey}
               onSuccess={(token) => setTurnstileToken(token)}
               onExpire={() => setTurnstileToken(null)}
               theme="auto"

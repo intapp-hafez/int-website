@@ -25,6 +25,7 @@ declare global {
 const DEFAULT_TEST_SITE_KEY = "1x00000000000000000000AA";
 
 export interface TurnstileWidgetProps {
+  siteKey?: string | null;
   onSuccess: (token: string) => void;
   onError?: (err?: any) => void;
   onExpire?: () => void;
@@ -34,6 +35,7 @@ export interface TurnstileWidgetProps {
 }
 
 export function TurnstileWidget({
+  siteKey: siteKeyProp,
   onSuccess,
   onError,
   onExpire,
@@ -46,7 +48,7 @@ export function TurnstileWidget({
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
   const siteKey =
-    import.meta.env.VITE_TURNSTILE_SITE_KEY || DEFAULT_TEST_SITE_KEY;
+    siteKeyProp || import.meta.env.VITE_TURNSTILE_SITE_KEY || DEFAULT_TEST_SITE_KEY;
 
   useEffect(() => {
     // 1. Check if turnstile script is already present

@@ -14,6 +14,7 @@ import { useRef } from "react";
 import { ChevronDown, Menu as MenuIcon, Home, Info, Briefcase, Layers as LayersIcon, Phone, ShoppingCart, Search } from "lucide-react";
 import { services as servicesData } from "@/data/site";
 import { useI18n } from "@/lib/i18n";
+import { TurnstileSettingsCard } from "@/components/admin/TurnstileSettingsCard";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -164,6 +165,7 @@ function SettingsPage() {
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6">
+        <TurnstileSettingsCard />
         <Card>
           <CardHeader><CardTitle className="font-display text-lg">Contact</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-4">
