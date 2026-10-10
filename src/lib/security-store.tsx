@@ -1173,49 +1173,33 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
     }, 45);
 
     try {
-      await new Promise((res) => setTimeout(res, rules.length * 120 + 300));
+      const { runLiveSecurityChecks } = await import("./security-scan.functions");
+      const live = await runLiveSecurityChecks();
       clearInterval(progressInterval);
       setScanProgress(100);
 
       const generatedFindings: Finding[] = [];
-      // Realistic security evaluation:
-      // Enterprise baseline is hardened. Flag realistic actionable advisories (e.g. CSP, DNS DMARC, Rate Limiting, CAPTCHA)
-      // unless already mitigated in remediations.
-      const TARGET_ADVISORY_RULES: RuleId[] = ["csp", "dns", "headers", "rate-limit", "captcha-missing", "cookies"];
-
+      // Real results only: a rule is flagged when its live check fails.
+      // Rules with no live check are not reported.
       rules.forEach((rule, idx) => {
         const meta = RULE_META[rule];
-        if (!meta) return;
-
-        // Check if all steps of this rule are marked fixed in remediations
-        const steps = REMEDIATION[rule] || [];
-        const isFullyRemediated =
-          steps.length > 0 &&
-          steps.every((_, stepIdx) => Boolean(remediations[`${rule}:${stepIdx}`]));
-
-        if (!isFullyRemediated) {
-          const isTargetAdvisory = TARGET_ADVISORY_RULES.includes(rule);
-          // Only flag target advisories or rules specific to targeted template audits
-          const shouldFlag = isTargetAdvisory || (templateId !== "owasp" && idx === 0);
-
-          if (shouldFlag) {
-            generatedFindings.push({
-              id: `${templateId}-${rule}-${idx}`,
-              rule,
-              title_en: meta.en,
-              title_ar: meta.ar,
-              severity: meta.severity,
-              page: meta.page,
-              cve: meta.cve,
-              cvss: meta.cvss,
-              evidence_en: meta.evidence_en,
-              evidence_ar: meta.evidence_ar,
-              impact_en: meta.impact_en,
-              impact_ar: meta.impact_ar,
-              is_fixed: false,
-            });
-          }
-        }
+        const check = live.checks.find((c) => c.rule === rule);
+        if (!meta || !check || check.ok) return;
+        generatedFindings.push({
+          id: `${templateId}-${rule}-${idx}`,
+          rule,
+          title_en: meta.en,
+          title_ar: meta.ar,
+          severity: meta.severity,
+          page: meta.page,
+          cve: meta.cve,
+          cvss: meta.cvss,
+          evidence_en: `${check.evidence} (${live.target})`,
+          evidence_ar: `${check.evidence} (${live.target})`,
+          impact_en: meta.impact_en,
+          impact_ar: meta.impact_ar,
+          is_fixed: false,
+        });
       });
 
       const critical = generatedFindings.filter((f) => f.severity === "critical").length;
@@ -1244,7 +1228,7 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
 
       // Score formula: 100 - (crit * 15 + high * 4 + med * 2)
       const calculatedScore = Math.max(
-        60,
+        0,
         Math.min(100, 100 - (critical * 15 + high * 4 + medium * 2))
       );
 
