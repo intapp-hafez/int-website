@@ -1228,7 +1228,7 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
 
       // Score formula: 100 - (crit * 15 + high * 4 + med * 2)
       const calculatedScore = Math.max(
-        60,
+        0,
         Math.min(100, 100 - (critical * 15 + high * 4 + medium * 2))
       );
 
