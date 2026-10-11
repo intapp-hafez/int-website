@@ -143,6 +143,8 @@ function SettingsPage() {
     }
   };
 
+  const [tab, setTab] = useState<"security"|"contact"|"company"|"home"|"site"|"backup">("security");
+
   const onReset = async () => {
     if (confirm("Reset all settings to default values?")) {
       setSaving(true);
@@ -164,8 +166,18 @@ function SettingsPage() {
         <p className="text-sm text-muted-foreground mt-1">Update the contact information and social links shown across the website header and footer.</p>
       </div>
 
+      <div role="tablist" aria-label="Settings sections" className="flex flex-wrap gap-1 rounded-lg border bg-muted/40 p-1">
+        {([["security","Security"],["contact","Contact"],["company","Company & Invoice"],["home","Homepage"],["site","Site & Navigation"],["backup","Backup"]] as const).map(([k,l]) => (
+          <button key={k} type="button" role="tab" aria-selected={tab===k} onClick={() => setTab(k)}
+            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${tab===k?"bg-background shadow font-semibold text-foreground":"text-muted-foreground hover:text-foreground"}`}>{l}</button>
+        ))}
+      </div>
+
       <form onSubmit={onSubmit} className="space-y-6">
+<div className={tab==="security"?"space-y-6":"hidden"}>
         <TurnstileSettingsCard />
+</div>
+<div className={tab==="contact"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader><CardTitle className="font-display text-lg">Contact</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-4">
@@ -178,8 +190,10 @@ function SettingsPage() {
             <Field label="العنوان (عربي)" id="address_ar" value={form.address.ar} onChange={(v) => setForm({ ...form, address: { ...form.address, ar: v } })} dir="rtl" />
           </CardContent>
         </Card>
+</div>
 
         {/* Contact Page Hero Header & Working Hours */}
+<div className={tab==="contact"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Contact Page Content & Working Hours</CardTitle>
@@ -295,7 +309,9 @@ function SettingsPage() {
             />
           </CardContent>
         </Card>
+</div>
 
+<div className={tab==="company"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader><CardTitle className="font-display text-lg">About & Location</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-4">
@@ -375,7 +391,9 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+</div>
 
+<div className={tab==="company"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader><CardTitle className="font-display text-lg">Social Links</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-4">
@@ -386,7 +404,9 @@ function SettingsPage() {
             <Field label="YouTube URL" id="yt" type="url" value={form.social.youtube} onChange={(v) => setForm({ ...form, social: { ...form.social, youtube: v } })} />
           </CardContent>
         </Card>
+</div>
 
+<div className={tab==="contact"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader><CardTitle className="font-display text-lg">Contact Page SEO</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-4">
@@ -405,7 +425,9 @@ function SettingsPage() {
             <Field label="صورة Open Graph (عربي)" id="cseo_og_ar" type="url" value={form.contactSeo.ogImage.ar} onChange={(v) => setForm({ ...form, contactSeo: { ...form.contactSeo, ogImage: { ...form.contactSeo.ogImage, ar: v } } })} dir="rtl" />
           </CardContent>
         </Card>
+</div>
 
+<div className={tab==="company"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader><CardTitle className="font-display text-lg">Invoice</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-4">
@@ -426,7 +448,9 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+</div>
 
+<div className={tab==="home"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Homepage Stats</CardTitle>
@@ -532,7 +556,9 @@ function SettingsPage() {
             </Button>
           </CardContent>
         </Card>
+</div>
 
+<div className={tab==="home"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Homepage Testimonials</CardTitle>
@@ -659,7 +685,9 @@ function SettingsPage() {
             </Button>
           </CardContent>
         </Card>
+</div>
 
+<div className={tab==="site"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Page Visibility</CardTitle>
@@ -694,8 +722,10 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+</div>
 
         {/* Header & Navigation Icons Toggle Card */}
+<div className={tab==="site"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Header & Navigation Icons</CardTitle>
@@ -735,13 +765,16 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+</div>
 
+<div className={tab==="site"?"space-y-6":"hidden"}>
         <VisibilityPreview
           visibility={form.visibility}
           headerIcons={form.headerIcons}
           lang={lang}
         />
-
+</div>
+<div className={tab==="site"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Sticky Contact Buttons</CardTitle>
@@ -830,6 +863,7 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+</div>
 
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" disabled={saving}>
@@ -847,6 +881,7 @@ function SettingsPage() {
         </div>
       </form>
 
+<div className={tab==="backup"?"space-y-6":"hidden"}>
       <Card>
         <CardHeader><CardTitle className="font-display text-lg">{at("backupRestore")}</CardTitle></CardHeader>
         <CardContent className="space-y-3">
@@ -872,7 +907,9 @@ function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+</div>
 
+<div className={tab==="backup"?"space-y-6":"hidden"}>
       <Card>
         <CardHeader>
           <CardTitle className="font-display text-lg inline-flex items-center gap-2">
@@ -904,6 +941,7 @@ function SettingsPage() {
           )}
         </CardContent>
       </Card>
+</div>
 
       <AlertDialog open={!!pending} onOpenChange={(o) => !o && setPending(null)}>
         <AlertDialogContent>
