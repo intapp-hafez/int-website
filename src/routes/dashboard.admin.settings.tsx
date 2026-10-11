@@ -767,13 +767,12 @@ function SettingsPage() {
         </Card>
 </div>
 
-        <VisibilityPreview
 <div className={tab==="site"?"space-y-6":"hidden"}>
+        <VisibilityPreview
           visibility={form.visibility}
           headerIcons={form.headerIcons}
           lang={lang}
         />
-
 </div>
 <div className={tab==="site"?"space-y-6":"hidden"}>
         <Card>
