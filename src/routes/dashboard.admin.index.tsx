@@ -868,7 +868,7 @@ function AdminOverview() {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                 </span>
                 <div>
-                  <div className="font-semibold text-foreground">PostgreSQL & Supabase API</div>
+                  <div className="font-semibold text-foreground">{isAr ? "قاعدة البيانات والخادم يعملان" : "Database and Server is live"}</div>
                   <div className="text-[11px] text-muted-foreground">{isAr ? "متصل ويعمل بكفاءة عالية" : "Operational · latency < 45ms"}</div>
                 </div>
               </div>
