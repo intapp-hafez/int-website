@@ -1232,6 +1232,39 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
         Math.min(100, 100 - (critical * 15 + high * 4 + medium * 2))
       );
 
+      // Real alert email for critical (and optionally high) findings.
+      const alertable = generatedFindings.filter(
+        (f) =>
+          (f.severity === "critical" && settings.alert_on_critical) ||
+          (f.severity === "high" && settings.alert_on_high)
+      );
+      const recipients = String(settings.alert_email || "")
+        .split(/[,;\s]+/)
+        .map((s) => s.trim())
+        .filter((s) => s.includes("@"));
+      if (alertable.length && recipients.length) {
+        const esc = (s: unknown) =>
+          String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+        const subject = `Security alert: ${critical} critical, ${high} high issue(s) found — ${templateName}`;
+        const rows = alertable
+          .map((f) => `<li><strong>[${f.severity.toUpperCase()}]</strong> ${esc(f.title_en)}<br/><span style="color:#475569">${esc(f.evidence_en)}</span></li>`)
+          .join("");
+        const html = `<div style="font-family:Arial,sans-serif;max-width:600px;color:#0f172a"><h2 style="color:#dc2626">Security scan alert</h2><p>Scan "${esc(templateName)}" on ${esc(live.target)} found ${alertable.length} issue(s) needing attention:</p><ul>${rows}</ul><p>Health score: <strong>${calculatedScore}</strong>. Open Admin → Security Command Center for fix steps.</p><p dir="rtl">تنبيه أمني: تم رصد ${critical} مشكلة حرجة.</p></div>`;
+        const text = `${subject}\n\n${alertable.map((f) => `[${f.severity}] ${f.title_en}: ${f.evidence_en}`).join("\n")}`;
+        try {
+          const { data, error } = await supabase.functions.invoke("send-email", {
+            body: { to: recipients, subject, html, text },
+          });
+          if (error || data?.success === false) {
+            toast.error(`Alert email not sent: ${error?.message ?? data?.error ?? "unknown error"}`);
+          } else {
+            toast.success(`Alert email sent to ${recipients.join(", ")}`);
+          }
+        } catch (e: any) {
+          toast.error(`Alert email not sent: ${e?.message ?? "error"}`);
+        }
+      }
+
       const nextScans = [newScan, ...scans.slice(0, 24)];
       setScans(nextScans);
       try {
