@@ -1184,8 +1184,8 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
       // Rules with no live check are not reported.
       rules.forEach((rule, idx) => {
         const meta = RULE_META[rule];
-        const check = live.checks.find((c) => c.rule === rule);
-        if (!meta || !check || check.ok) return;
+        const check = live.checks.find((c) => c.rule === rule && c.ok === false);
+        if (!meta || !check) return;
         generatedFindings.push({
           id: `${templateId}-${rule}-${idx}`,
           rule,

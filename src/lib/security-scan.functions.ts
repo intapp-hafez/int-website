@@ -5,7 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 const SITE = "https://nexus-solution-craft.lovable.app";
 const HOST = new URL(SITE).hostname;
 
-export type LiveCheck = { rule: string; ok: boolean; evidence: string };
+export type LiveCheck = { rule: string; ok: boolean | null; evidence: string };
 
 async function dnsTxt(name: string): Promise<string[]> {
   try {
@@ -60,11 +60,14 @@ export const runLiveSecurityChecks = createServerFn({ method: "POST" }).handler(
     ok: spf && dmarc,
     evidence: `SPF ${spf ? "found" : "missing"}, DMARC ${dmarc ? "found" : "missing"} for ${HOST}.`,
   });
-  const turnstile = Boolean(process.env.TURNSTILE_SITE_KEY && process.env.TURNSTILE_SECRET_KEY);
+  // This configuration currently executes through a browser shim; never
+  // read private environment values here or infer server enforcement.
   checks.push({
     rule: "captcha-missing",
-    ok: turnstile,
-    evidence: turnstile ? "Turnstile bot check is configured." : "Turnstile keys not set — sign-in uses the test key.",
+    ok: null,
+    evidence: "Server-side Turnstile configuration and enforcement have not been verified.",
   });
+  const { runIdentitySecurityChecks } = await import("./identity-security-checks");
+  checks.push(...await runIdentitySecurityChecks());
   return { target: SITE, checks };
 });
