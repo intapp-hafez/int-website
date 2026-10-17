@@ -90,9 +90,17 @@ import {
 } from "@/lib/security-store";
 import { useCanAccess } from "@/lib/permissions-store";
 import { toast } from "sonner";
+import { IdentitySecurityChecks } from "@/components/admin/IdentitySecurityChecks";
 
 export const Route = createFileRoute("/dashboard/admin/security")({
-  head: () => ({ meta: [{ title: "Security Command Center — Admin" }] }),
+  head: () => ({ meta: [
+    { title: "Security Command Center — INT Admin" },
+    { name: "description", content: "INT security audits, API authorization, session and token verification." },
+    { property: "og:title", content: "Security Command Center — INT Admin" },
+    { property: "og:description", content: "INT security audits, API authorization, session and token verification." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SecurityCenterPage,
 });
 
@@ -663,6 +671,8 @@ function SecurityCenterPage() {
           </div>
         </button>
       </div>
+
+      <IdentitySecurityChecks />
 
       {/* 3. SEGMENTED NAVIGATION COMMAND TABS */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-6">
