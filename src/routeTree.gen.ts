@@ -87,6 +87,7 @@ import { Route as DashboardWorkspaceProfileRouteImport } from './routes/dashboar
 import { Route as DashboardWorkspaceTicketsRouteImport } from './routes/dashboard.workspace.tickets'
 import { Route as DashboardWorkspaceTrackRouteImport } from './routes/dashboard.workspace.track'
 import { Route as ApiPublicHooksSeoBotDailyRouteImport } from './routes/api/public/hooks/seo-bot-daily'
+import { Route as ApiPublicSecuritySessionRouteImport } from './routes/api/public/security/session'
 import { Route as DashboardAdminCareersIndexRouteImport } from './routes/dashboard.admin.careers.index'
 import { Route as DashboardAdminCareersAnalyticsRouteImport } from './routes/dashboard.admin.careers.analytics'
 import { Route as DashboardAdminClientsIndexRouteImport } from './routes/dashboard.admin.clients.index'
@@ -531,6 +532,12 @@ const ApiPublicHooksSeoBotDailyRoute =
     path: '/api/public/hooks/seo-bot-daily',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicSecuritySessionRoute =
+  ApiPublicSecuritySessionRouteImport.update({
+    id: '/api/public/security/session',
+    path: '/api/public/security/session',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardAdminCareersIndexRoute =
   DashboardAdminCareersIndexRouteImport.update({
     id: '/',
@@ -858,6 +865,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/workspace/': typeof DashboardWorkspaceIndexRoute
   '/api/public/hooks/seo-bot-daily': typeof ApiPublicHooksSeoBotDailyRoute
+  '/api/public/security/session': typeof ApiPublicSecuritySessionRoute
   '/dashboard/admin/careers/analytics': typeof DashboardAdminCareersAnalyticsRoute
   '/dashboard/admin/clients/$id': typeof DashboardAdminClientsIdRoute
   '/dashboard/admin/helpdesk/branches': typeof DashboardAdminHelpdeskBranchesRoute
@@ -965,6 +973,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin': typeof DashboardAdminIndexRoute
   '/dashboard/workspace': typeof DashboardWorkspaceIndexRoute
   '/api/public/hooks/seo-bot-daily': typeof ApiPublicHooksSeoBotDailyRoute
+  '/api/public/security/session': typeof ApiPublicSecuritySessionRoute
   '/dashboard/admin/careers/analytics': typeof DashboardAdminCareersAnalyticsRoute
   '/dashboard/admin/clients/$id': typeof DashboardAdminClientsIdRoute
   '/dashboard/admin/helpdesk/branches': typeof DashboardAdminHelpdeskBranchesRoute
@@ -1086,6 +1095,7 @@ export interface FileRoutesById {
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/workspace/': typeof DashboardWorkspaceIndexRoute
   '/api/public/hooks/seo-bot-daily': typeof ApiPublicHooksSeoBotDailyRoute
+  '/api/public/security/session': typeof ApiPublicSecuritySessionRoute
   '/dashboard/admin/careers/analytics': typeof DashboardAdminCareersAnalyticsRoute
   '/dashboard/admin/clients/$id': typeof DashboardAdminClientsIdRoute
   '/dashboard/admin/helpdesk/branches': typeof DashboardAdminHelpdeskBranchesRoute
@@ -1210,6 +1220,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/'
     | '/dashboard/workspace/'
     | '/api/public/hooks/seo-bot-daily'
+    | '/api/public/security/session'
     | '/dashboard/admin/careers/analytics'
     | '/dashboard/admin/clients/$id'
     | '/dashboard/admin/helpdesk/branches'
@@ -1317,6 +1328,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/workspace'
     | '/api/public/hooks/seo-bot-daily'
+    | '/api/public/security/session'
     | '/dashboard/admin/careers/analytics'
     | '/dashboard/admin/clients/$id'
     | '/dashboard/admin/helpdesk/branches'
@@ -1437,6 +1449,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/'
     | '/dashboard/workspace/'
     | '/api/public/hooks/seo-bot-daily'
+    | '/api/public/security/session'
     | '/dashboard/admin/careers/analytics'
     | '/dashboard/admin/clients/$id'
     | '/dashboard/admin/helpdesk/branches'
@@ -1512,6 +1525,7 @@ export interface RootRouteChildren {
   PartnersIndexRoute: typeof PartnersIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   ApiPublicHooksSeoBotDailyRoute: typeof ApiPublicHooksSeoBotDailyRoute
+  ApiPublicSecuritySessionRoute: typeof ApiPublicSecuritySessionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2060,6 +2074,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/hooks/seo-bot-daily'
       fullPath: '/api/public/hooks/seo-bot-daily'
       preLoaderRoute: typeof ApiPublicHooksSeoBotDailyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/security/session': {
+      id: '/api/public/security/session'
+      path: '/api/public/security/session'
+      fullPath: '/api/public/security/session'
+      preLoaderRoute: typeof ApiPublicSecuritySessionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/admin/careers/': {
@@ -2810,6 +2831,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnersIndexRoute: PartnersIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   ApiPublicHooksSeoBotDailyRoute: ApiPublicHooksSeoBotDailyRoute,
+  ApiPublicSecuritySessionRoute: ApiPublicSecuritySessionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
