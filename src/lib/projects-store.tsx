@@ -83,53 +83,64 @@ export function ProjectsProvider({ children }: { children: ReactNode }) {
       if (error) {
         console.warn("[projects] load failed, using fallback:", error.message);
       } else if (data && data.length > 0) {
-        const mapped: Project[] = data.map((d: any, idx: number) => {
-          let titleEn = "";
-          let titleAr = "";
-          if (typeof d.title === "object" && d.title !== null) {
-            titleEn = d.title.en || "";
-            titleAr = d.title.ar || "";
-          } else if (typeof d.title === "string") {
-            titleEn = d.title;
-            titleAr = d.title;
-          }
-          if (d.title_en) titleEn = d.title_en;
-          if (d.title_ar) titleAr = d.title_ar;
+        // Detect whether the DB still has the old 6 generic placeholder rows
+        const hasLegacyDummyData = data.some((d: any) =>
+          (d.title_en || "").includes("Tier-III Data Center") ||
+          (d.title_en || "").includes("Industrial IoT & Surveillance")
+        );
 
-          let descEn = "";
-          let descAr = "";
-          if (typeof d.desc === "object" && d.desc !== null) {
-            descEn = d.desc.en || "";
-            descAr = d.desc.ar || "";
-          } else if (typeof d.desc === "string") {
-            descEn = d.desc;
-            descAr = d.desc;
-          }
-          if (d.desc_en) descEn = d.desc_en;
-          if (d.desc_ar) descAr = d.desc_ar;
+        if (hasLegacyDummyData && data.length < 15) {
+          // Keep authentic default reference projects
+          setItems(getInitialFallback());
+        } else {
+          const mapped: Project[] = data.map((d: any, idx: number) => {
+            let titleEn = "";
+            let titleAr = "";
+            if (typeof d.title === "object" && d.title !== null) {
+              titleEn = d.title.en || "";
+              titleAr = d.title.ar || "";
+            } else if (typeof d.title === "string") {
+              titleEn = d.title;
+              titleAr = d.title;
+            }
+            if (d.title_en) titleEn = d.title_en;
+            if (d.title_ar) titleAr = d.title_ar;
 
-          const id = Number(d.id) || (idx + 1);
-          const active = localMap[id] !== undefined
-            ? localMap[id]
-            : (d.active !== false && d.active !== 'false' && d.active !== 0);
+            let descEn = "";
+            let descAr = "";
+            if (typeof d.desc === "object" && d.desc !== null) {
+              descEn = d.desc.en || "";
+              descAr = d.desc.ar || "";
+            } else if (typeof d.desc === "string") {
+              descEn = d.desc;
+              descAr = d.desc;
+            }
+            if (d.desc_en) descEn = d.desc_en;
+            if (d.desc_ar) descAr = d.desc_ar;
 
-          return {
-            id,
-            image: d.image || "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80",
-            title: { en: titleEn || "Untitled Project", ar: titleAr || titleEn || "مشروع بدون عنوان" },
-            industry: d.industry || "General",
-            desc: { en: descEn || "", ar: descAr || "" },
-            active,
-            seo: {
-              metaTitle: { en: d.meta_title_en || d.seo?.metaTitle?.en || "", ar: d.meta_title_ar || d.seo?.metaTitle?.ar || "" },
-              metaDescription: { en: d.meta_description_en || d.seo?.metaDescription?.en || "", ar: d.meta_description_ar || d.seo?.metaDescription?.ar || "" },
-              keywords: d.meta_keywords || d.seo?.keywords || "",
-              ogImage: d.og_image || d.seo?.ogImage || "",
-              canonicalUrl: d.canonical_url || d.seo?.canonicalUrl || "",
-            },
-          };
-        });
-        setItems(mapped);
+            const id = Number(d.id) || (idx + 1);
+            const active = localMap[id] !== undefined
+              ? localMap[id]
+              : (d.active !== false && d.active !== 'false' && d.active !== 0);
+
+            return {
+              id,
+              image: d.image || "/projects/alamein.jpg",
+              title: { en: titleEn || "Untitled Project", ar: titleAr || titleEn || "مشروع بدون عنوان" },
+              industry: d.industry || "General",
+              desc: { en: descEn || "", ar: descAr || "" },
+              active,
+              seo: {
+                metaTitle: { en: d.meta_title_en || d.seo?.metaTitle?.en || "", ar: d.meta_title_ar || d.seo?.metaTitle?.ar || "" },
+                metaDescription: { en: d.meta_description_en || d.seo?.metaDescription?.en || "", ar: d.meta_description_ar || d.seo?.metaDescription?.ar || "" },
+                keywords: d.meta_keywords || d.seo?.keywords || "",
+                ogImage: d.og_image || d.seo?.ogImage || "",
+                canonicalUrl: d.canonical_url || d.seo?.canonicalUrl || "",
+              },
+            };
+          });
+          setItems(mapped);
+        }
       }
     } catch (err) {
       console.warn("[projects] fetch exception", err);

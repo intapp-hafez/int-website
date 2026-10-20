@@ -25,5 +25,5 @@ export function StatCounter({ value, suffix = "" }: { value: number; suffix?: st
     return () => obs.disconnect();
   }, [value]);
 
-  return <div ref={ref} className="font-display text-4xl md:text-5xl font-bold gradient-text">{n}{suffix}</div>;
+  return <div ref={ref} className="font-display text-4xl md:text-5xl font-bold text-accent">{n}{suffix}</div>;
 }

@@ -72,26 +72,28 @@ export function Navbar() {
     <header
       className={cn(
         "fixed top-0 inset-x-0 z-50 transition-all duration-300",
-        scrolled ? "bg-background/90 backdrop-blur-lg border-b shadow-sm" : "bg-background/70 backdrop-blur"
+        scrolled
+          ? "bg-[#18181b]/95 backdrop-blur-lg border-b border-white/10 shadow-xl shadow-black/25"
+          : "bg-[#1c1c1f]/95 backdrop-blur-md border-b border-white/5"
       )}
     >
       <TopHeader />
       <div className="container mx-auto px-3 sm:px-4 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-2">
-        <Link to="/" className="flex items-center gap-2 font-display font-bold min-w-0">
-          <img src={logo} alt="Integrated Technics" className="h-8 md:h-9 w-auto shrink-0" />
-          <span className="text-sm md:text-base truncate">
-            Integrated<span className="text-accent">Technics</span>
+        <Link to="/" className="flex items-center gap-2 font-display font-bold min-w-0 group">
+          <img src={logo} alt="Integrated Technics" className="h-8 md:h-9 w-auto shrink-0 brightness-110 drop-shadow" />
+          <span className="text-sm md:text-base truncate text-white">
+            Integrated<span className="text-accent font-extrabold">Technics</span>
           </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1.5">
           {links.slice(0, 2).map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className="px-3 py-2 text-sm font-medium rounded-md hover:bg-muted transition-colors"
-              activeProps={{ className: "text-accent" }}
+              className="px-3.5 py-1.5 text-sm font-medium rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+              activeProps={{ className: "bg-accent text-white font-semibold shadow-md shadow-accent/25 hover:bg-accent" }}
               activeOptions={{ exact: true }}
             >
               {t(l.key)}
@@ -107,14 +109,14 @@ export function Navbar() {
             >
               <Link
                 to="/services"
-                className="px-3 py-2 text-sm font-medium rounded-md hover:bg-muted transition-colors inline-flex items-center gap-1"
-                activeProps={{ className: "text-accent" }}
+                className="px-3.5 py-1.5 text-sm font-medium rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 transition-all duration-200 inline-flex items-center gap-1"
+                activeProps={{ className: "bg-accent text-white font-semibold shadow-md shadow-accent/25 hover:bg-accent" }}
               >
-                {t("nav.services")} <ChevronDown className="h-3.5 w-3.5" />
+                {t("nav.services")} <ChevronDown className="h-3.5 w-3.5 opacity-80" />
               </Link>
               {servicesMega && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[640px] animate-fade-in z-50">
-                  <div className="bg-popover border rounded-xl shadow-elegant p-4 grid grid-cols-2 gap-2">
+                  <div className="bg-[#1c1c1f] border border-white/10 rounded-2xl shadow-2xl p-4 grid grid-cols-2 gap-2 text-white">
                     {services.map((s) => {
                       const Icon = s.icon;
                       return (
@@ -122,14 +124,14 @@ export function Navbar() {
                           key={s.slug}
                           to="/services/$slug"
                           params={{ slug: s.slug }}
-                          className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors group"
+                          className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-all group"
                         >
-                          <div className="h-9 w-9 rounded-md gradient-hero flex items-center justify-center text-primary-foreground shrink-0 group-hover:scale-105 transition-transform">
+                          <div className="h-9 w-9 rounded-lg bg-accent/20 border border-accent/30 flex items-center justify-center text-accent shrink-0 group-hover:scale-105 group-hover:bg-accent group-hover:text-white transition-all">
                             <Icon className="h-4 w-4" />
                           </div>
                           <div>
-                            <div className="font-medium text-sm group-hover:text-accent transition-colors">{s.title[lang]}</div>
-                            <div className="text-xs text-muted-foreground line-clamp-2">{stripHtml(s.desc[lang])}</div>
+                            <div className="font-medium text-sm text-zinc-100 group-hover:text-accent transition-colors">{s.title[lang]}</div>
+                            <div className="text-xs text-zinc-400 line-clamp-2 mt-0.5">{stripHtml(s.desc[lang])}</div>
                           </div>
                         </Link>
                       );
@@ -149,14 +151,14 @@ export function Navbar() {
             >
               <Link
                 to="/solutions"
-                className="px-3 py-2 text-sm font-medium rounded-md hover:bg-muted transition-colors inline-flex items-center gap-1"
-                activeProps={{ className: "text-accent" }}
+                className="px-3.5 py-1.5 text-sm font-medium rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 transition-all duration-200 inline-flex items-center gap-1"
+                activeProps={{ className: "bg-accent text-white font-semibold shadow-md shadow-accent/25 hover:bg-accent" }}
               >
-                {t("nav.solutions")} <ChevronDown className="h-3.5 w-3.5" />
+                {t("nav.solutions")} <ChevronDown className="h-3.5 w-3.5 opacity-80" />
               </Link>
               {solutionsMega && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[680px] animate-fade-in z-50">
-                  <div className="bg-popover border rounded-xl shadow-elegant p-4 space-y-3">
+                  <div className="bg-[#1c1c1f] border border-white/10 rounded-2xl shadow-2xl p-4 space-y-3 text-white">
                     <div className="grid grid-cols-2 gap-2">
                       {activeSolutions.map((s) => {
                         const firstIcon = s.related_solutions?.[0]?.icon || "Layers";
@@ -166,16 +168,16 @@ export function Navbar() {
                             key={s.slug}
                             to="/solutions/$slug"
                             params={{ slug: s.slug }}
-                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors group"
+                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-all group"
                           >
-                            <div className="h-9 w-9 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0 group-hover:scale-105 transition-transform">
+                            <div className="h-9 w-9 rounded-lg bg-accent/20 border border-accent/30 flex items-center justify-center text-accent shrink-0 group-hover:scale-105 group-hover:bg-accent group-hover:text-white transition-all">
                               <Icon className="h-4 w-4" />
                             </div>
                             <div className="min-w-0">
-                              <div className="font-medium text-sm truncate group-hover:text-accent transition-colors">
+                              <div className="font-medium text-sm truncate text-zinc-100 group-hover:text-accent transition-colors">
                                 {lang === "ar" ? s.name_ar || s.name_en : s.name_en}
                               </div>
-                              <div className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                              <div className="text-xs text-zinc-400 line-clamp-2 mt-0.5">
                                 {stripHtml(lang === "ar" ? s.bio_ar || s.bio_en : s.bio_en)}
                               </div>
                             </div>
@@ -183,8 +185,8 @@ export function Navbar() {
                         );
                       })}
                     </div>
-                    <div className="pt-2.5 border-t flex items-center justify-between text-xs px-1">
-                      <span className="text-muted-foreground">
+                    <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-xs px-1">
+                      <span className="text-zinc-400">
                         {lang === "ar" ? "منظومات وتقنيات متكاملة للمؤسسات" : "Engineered systems & architectures"}
                       </span>
                       <Link to="/solutions" className="text-accent font-semibold hover:underline flex items-center gap-1">
@@ -201,8 +203,8 @@ export function Navbar() {
             <Link
               key={l.to}
               to={l.to}
-              className="px-3 py-2 text-sm font-medium rounded-md hover:bg-muted transition-colors"
-              activeProps={{ className: "text-accent" }}
+              className="px-3.5 py-1.5 text-sm font-medium rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+              activeProps={{ className: "bg-accent text-white font-semibold shadow-md shadow-accent/25 hover:bg-accent" }}
             >
               {t(l.key)}
             </Link>
@@ -212,12 +214,12 @@ export function Navbar() {
         {/* CTA & Mobile Hamburger */}
         <div className="flex items-center gap-1 sm:gap-2">
           {contactVisible && (
-            <Button asChild variant="default" size="sm" className="hidden md:inline-flex">
+            <Button asChild variant="default" size="sm" className="hidden md:inline-flex bg-accent text-white hover:bg-accent/90 shadow-md shadow-accent/20 font-semibold">
               <Link to="/contact">{t("cta.contact")}</Link>
             </Button>
           )}
           <button
-            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-muted"
+            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg text-zinc-200 hover:text-white hover:bg-white/10 transition-colors"
             onClick={() => setOpen((o) => !o)}
             aria-label="Menu"
             aria-expanded={open}
@@ -229,10 +231,10 @@ export function Navbar() {
 
       {/* Mobile Menu Drawer */}
       {open && (
-        <div className="lg:hidden bg-background border-t animate-fade-in max-h-[calc(100vh-100px)] overflow-y-auto">
+        <div className="lg:hidden bg-[#18181b] text-white border-t border-white/10 animate-fade-in max-h-[calc(100vh-100px)] overflow-y-auto shadow-2xl">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-2">
-              <Button asChild size="lg" className="h-12 text-sm font-semibold" onClick={() => setOpen(false)}>
+              <Button asChild size="lg" className="h-12 text-sm font-semibold bg-accent text-white hover:bg-accent/90 shadow-md shadow-accent/25" onClick={() => setOpen(false)}>
                 <Link to="/contact">
                   <FileText className="h-4 w-4 me-1.5" />
                   {lang === "ar" ? "طلب عرض" : "Request Proposal"}
@@ -242,7 +244,7 @@ export function Navbar() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="h-12 text-sm font-semibold"
+                className="h-12 text-sm font-semibold border-white/20 bg-transparent text-white hover:bg-white/10"
                 onClick={() => setOpen(false)}
               >
                 <Link to="/contact">
@@ -253,16 +255,16 @@ export function Navbar() {
             </div>
 
             <div>
-              <div className="px-3 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+              <div className="px-3 pb-2 text-[10px] uppercase tracking-wider text-zinc-400 font-semibold">
                 {lang === "ar" ? "التنقل" : "Navigate"}
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-1">
                 {/* Home */}
                 <Link
                   to="/"
                   onClick={() => setOpen(false)}
-                  className="px-3 py-3 rounded-md hover:bg-muted text-base font-medium min-h-[48px] flex items-center border-b border-border/50"
-                  activeProps={{ className: "bg-muted text-accent" }}
+                  className="px-3.5 py-3 rounded-lg text-zinc-200 hover:text-white hover:bg-white/5 text-base font-medium min-h-[48px] flex items-center transition-colors"
+                  activeProps={{ className: "bg-accent text-white font-semibold shadow-sm hover:bg-accent" }}
                 >
                   {t("nav.home")}
                 </Link>
@@ -271,41 +273,42 @@ export function Navbar() {
                 <Link
                   to="/about"
                   onClick={() => setOpen(false)}
-                  className="px-3 py-3 rounded-md hover:bg-muted text-base font-medium min-h-[48px] flex items-center border-b border-border/50"
-                  activeProps={{ className: "bg-muted text-accent" }}
+                  className="px-3.5 py-3 rounded-lg text-zinc-200 hover:text-white hover:bg-white/5 text-base font-medium min-h-[48px] flex items-center transition-colors"
+                  activeProps={{ className: "bg-accent text-white font-semibold shadow-sm hover:bg-accent" }}
                 >
                   {t("nav.about")}
                 </Link>
 
                 {/* Services with Mobile Accordion */}
                 {servicesVisible && (
-                  <div className="border-b border-border/50">
-                    <div className="flex items-center justify-between min-h-[48px] hover:bg-muted rounded-md px-3">
+                  <div className="rounded-lg overflow-hidden">
+                    <div className="flex items-center justify-between min-h-[48px] hover:bg-white/5 rounded-lg px-3.5">
                       <Link
                         to="/services"
                         onClick={() => setOpen(false)}
-                        className="text-base font-medium flex-1 py-3"
+                        className="text-base font-medium flex-1 py-3 text-zinc-200 hover:text-white"
+                        activeProps={{ className: "text-accent font-semibold" }}
                       >
                         {t("nav.services")}
                       </Link>
                       <button
                         type="button"
                         onClick={() => setMobileServicesOpen((o) => !o)}
-                        className="p-2 text-muted-foreground hover:text-foreground"
+                        className="p-2 text-zinc-400 hover:text-white"
                         aria-label="Toggle services list"
                       >
                         <ChevronDown className={cn("h-4 w-4 transition-transform", mobileServicesOpen && "rotate-180")} />
                       </button>
                     </div>
                     {mobileServicesOpen && (
-                      <div className="ps-4 pb-2 space-y-1 bg-muted/30 rounded-lg mb-2">
+                      <div className="ps-4 pb-2 space-y-1 bg-[#222226] border border-white/5 rounded-lg mb-2 p-2">
                         {services.map((s) => (
                           <Link
                             key={s.slug}
                             to="/services/$slug"
                             params={{ slug: s.slug }}
                             onClick={() => setOpen(false)}
-                            className="px-3 py-2 text-sm text-muted-foreground hover:text-accent flex items-center gap-2"
+                            className="px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-md flex items-center gap-2"
                           >
                             <ChevronRight className="h-3 w-3 rtl:rotate-180 text-accent" />
                             <span>{s.title[lang]}</span>
@@ -318,33 +321,34 @@ export function Navbar() {
 
                 {/* Solutions with Mobile Accordion */}
                 {solutionsVisible && (
-                  <div className="border-b border-border/50">
-                    <div className="flex items-center justify-between min-h-[48px] hover:bg-muted rounded-md px-3">
+                  <div className="rounded-lg overflow-hidden">
+                    <div className="flex items-center justify-between min-h-[48px] hover:bg-white/5 rounded-lg px-3.5">
                       <Link
                         to="/solutions"
                         onClick={() => setOpen(false)}
-                        className="text-base font-medium flex-1 py-3"
+                        className="text-base font-medium flex-1 py-3 text-zinc-200 hover:text-white"
+                        activeProps={{ className: "text-accent font-semibold" }}
                       >
                         {t("nav.solutions")}
                       </Link>
                       <button
                         type="button"
                         onClick={() => setMobileSolutionsOpen((o) => !o)}
-                        className="p-2 text-muted-foreground hover:text-foreground"
+                        className="p-2 text-zinc-400 hover:text-white"
                         aria-label="Toggle solutions list"
                       >
                         <ChevronDown className={cn("h-4 w-4 transition-transform", mobileSolutionsOpen && "rotate-180")} />
                       </button>
                     </div>
                     {mobileSolutionsOpen && (
-                      <div className="ps-4 pb-2 space-y-1 bg-muted/30 rounded-lg mb-2">
+                      <div className="ps-4 pb-2 space-y-1 bg-[#222226] border border-white/5 rounded-lg mb-2 p-2">
                         {activeSolutions.map((s) => (
                           <Link
                             key={s.slug}
                             to="/solutions/$slug"
                             params={{ slug: s.slug }}
                             onClick={() => setOpen(false)}
-                            className="px-3 py-2 text-sm text-muted-foreground hover:text-accent flex items-center gap-2"
+                            className="px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-md flex items-center gap-2"
                           >
                             <ChevronRight className="h-3 w-3 rtl:rotate-180 text-accent" />
                             <span>{lang === "ar" ? s.name_ar || s.name_en : s.name_en}</span>
@@ -360,8 +364,8 @@ export function Navbar() {
                   <Link
                     to="/products"
                     onClick={() => setOpen(false)}
-                    className="px-3 py-3 rounded-md hover:bg-muted text-base font-medium min-h-[48px] flex items-center border-b border-border/50"
-                    activeProps={{ className: "bg-muted text-accent" }}
+                    className="px-3.5 py-3 rounded-lg text-zinc-200 hover:text-white hover:bg-white/5 text-base font-medium min-h-[48px] flex items-center transition-colors"
+                    activeProps={{ className: "bg-accent text-white font-semibold shadow-sm hover:bg-accent" }}
                   >
                     {t("nav.products")}
                   </Link>
@@ -372,8 +376,8 @@ export function Navbar() {
                   <Link
                     to="/projects"
                     onClick={() => setOpen(false)}
-                    className="px-3 py-3 rounded-md hover:bg-muted text-base font-medium min-h-[48px] flex items-center border-b border-border/50"
-                    activeProps={{ className: "bg-muted text-accent" }}
+                    className="px-3.5 py-3 rounded-lg text-zinc-200 hover:text-white hover:bg-white/5 text-base font-medium min-h-[48px] flex items-center transition-colors"
+                    activeProps={{ className: "bg-accent text-white font-semibold shadow-sm hover:bg-accent" }}
                   >
                     {t("nav.projects")}
                   </Link>
@@ -384,8 +388,8 @@ export function Navbar() {
                   <Link
                     to="/contact"
                     onClick={() => setOpen(false)}
-                    className="px-3 py-3 rounded-md hover:bg-muted text-base font-medium min-h-[48px] flex items-center"
-                    activeProps={{ className: "bg-muted text-accent" }}
+                    className="px-3.5 py-3 rounded-lg text-zinc-200 hover:text-white hover:bg-white/5 text-base font-medium min-h-[48px] flex items-center transition-colors"
+                    activeProps={{ className: "bg-accent text-white font-semibold shadow-sm hover:bg-accent" }}
                   >
                     {t("nav.contact")}
                   </Link>
@@ -394,83 +398,85 @@ export function Navbar() {
             </div>
 
             {/* Account / Actions */}
-            <div>
-              <div className="px-3 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+            <div className="pt-2 border-t border-white/10">
+              <div className="px-3 pb-2 text-[10px] uppercase tracking-wider text-zinc-400 font-semibold">
                 {lang === "ar" ? "الحساب" : "Account"}
               </div>
-              {settings.headerIcons?.tracking !== false && (
-                <Link
-                  to="/track-quote"
-                  onClick={() => setOpen(false)}
-                  className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2"
-                >
-                  <Search className="h-4 w-4" /> {lang === "ar" ? "تتبع العرض" : "Track Quote"}
-                </Link>
-              )}
-              {user ? (
-                <>
-                  <div className="flex items-center gap-3 px-3 py-3 border-b border-border/50">
-                    <div className="h-8 w-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-sm font-bold shrink-0">
-                      {(user.name || user.email).slice(0, 2).toUpperCase()}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium truncate">{user.name || user.email.split("@")[0]}</div>
-                      <div className="text-xs text-muted-foreground capitalize">{user.role}</div>
-                    </div>
-                  </div>
+              <div className="flex flex-col gap-1">
+                {settings.headerIcons?.tracking !== false && (
                   <Link
-                    to={
-                      isClientRole(user.role)
-                        ? "/dashboard/workspace"
-                        : user.role === "hr"
-                        ? "/dashboard/admin/careers"
-                        : "/dashboard/admin"
-                    }
+                    to="/track-quote"
                     onClick={() => setOpen(false)}
-                    className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2"
+                    className="px-3.5 py-3 rounded-lg hover:bg-white/5 text-zinc-200 hover:text-white text-sm font-medium min-h-[48px] flex items-center gap-2"
                   >
-                    <LayoutDashboard className="h-4 w-4" /> {lang === "ar" ? "لوحة التحكم" : "Dashboard"}
+                    <Search className="h-4 w-4 text-accent" /> {lang === "ar" ? "تتبع العرض" : "Track Quote"}
                   </Link>
-                  {isClientRole(user.role) && (
+                )}
+                {user ? (
+                  <>
+                    <div className="flex items-center gap-3 px-3.5 py-3 bg-[#222226] border border-white/5 rounded-xl">
+                      <div className="h-8 w-8 rounded-full bg-accent text-white flex items-center justify-center text-sm font-bold shrink-0">
+                        {(user.name || user.email).slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium truncate text-white">{user.name || user.email.split("@")[0]}</div>
+                        <div className="text-xs text-zinc-400 capitalize">{user.role}</div>
+                      </div>
+                    </div>
                     <Link
-                      to="/dashboard/workspace/profile"
+                      to={
+                        isClientRole(user.role)
+                          ? "/dashboard/workspace"
+                          : user.role === "hr"
+                          ? "/dashboard/admin/careers"
+                          : "/dashboard/admin"
+                      }
                       onClick={() => setOpen(false)}
-                      className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2"
+                      className="px-3.5 py-3 rounded-lg hover:bg-white/5 text-zinc-200 hover:text-white text-sm font-medium min-h-[48px] flex items-center gap-2"
                     >
-                      <User className="h-4 w-4" /> {lang === "ar" ? "الملف الشخصي" : "My Profile"}
+                      <LayoutDashboard className="h-4 w-4 text-accent" /> {lang === "ar" ? "لوحة التحكم" : "Dashboard"}
                     </Link>
-                  )}
-                  {user.role === "admin" && (
-                    <Link
-                      to="/dashboard/admin/settings"
-                      onClick={() => setOpen(false)}
-                      className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2"
+                    {isClientRole(user.role) && (
+                      <Link
+                        to="/dashboard/workspace/profile"
+                        onClick={() => setOpen(false)}
+                        className="px-3.5 py-3 rounded-lg hover:bg-white/5 text-zinc-200 hover:text-white text-sm font-medium min-h-[48px] flex items-center gap-2"
+                      >
+                        <User className="h-4 w-4 text-accent" /> {lang === "ar" ? "الملف الشخصي" : "My Profile"}
+                      </Link>
+                    )}
+                    {user.role === "admin" && (
+                      <Link
+                        to="/dashboard/admin/settings"
+                        onClick={() => setOpen(false)}
+                        className="px-3.5 py-3 rounded-lg hover:bg-white/5 text-zinc-200 hover:text-white text-sm font-medium min-h-[48px] flex items-center gap-2"
+                      >
+                        <Settings className="h-4 w-4 text-accent" /> {lang === "ar" ? "إعدادات الموقع" : "Site Settings"}
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-start px-3.5 py-3 rounded-lg hover:bg-red-500/10 text-red-400 text-sm font-medium min-h-[48px] flex items-center gap-2 transition-colors"
                     >
-                      <Settings className="h-4 w-4" /> {lang === "ar" ? "إعدادات الموقع" : "Site Settings"}
-                    </Link>
-                  )}
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full text-start px-3 py-3 rounded-md hover:bg-destructive/10 text-destructive text-sm font-medium min-h-[48px] flex items-center gap-2"
+                      <LogOut className="h-4 w-4" /> {lang === "ar" ? "تسجيل الخروج" : "Sign out"}
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/signin"
+                    onClick={() => setOpen(false)}
+                    className="px-3.5 py-3 rounded-lg hover:bg-white/5 text-zinc-200 hover:text-white text-sm font-medium min-h-[48px] flex items-center gap-2"
                   >
-                    <LogOut className="h-4 w-4" /> {lang === "ar" ? "تسجيل الخروج" : "Sign out"}
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/signin"
-                  onClick={() => setOpen(false)}
-                  className="px-3 py-3 rounded-md hover:bg-muted text-sm font-medium min-h-[48px] flex items-center gap-2"
+                    <LogIn className="h-4 w-4 text-accent" /> {t("cta.signin")}
+                  </Link>
+                )}
+                <button
+                  onClick={() => setLang(lang === "en" ? "ar" : "en")}
+                  className="text-start px-3.5 py-3 rounded-lg hover:bg-white/5 text-zinc-200 hover:text-white text-sm font-medium inline-flex items-center gap-2 min-h-[48px] w-full"
                 >
-                  <LogIn className="h-4 w-4" /> {t("cta.signin")}
-                </Link>
-              )}
-              <button
-                onClick={() => setLang(lang === "en" ? "ar" : "en")}
-                className="text-start px-3 py-3 rounded-md hover:bg-muted text-sm font-medium inline-flex items-center gap-2 min-h-[48px] w-full"
-              >
-                <Globe className="h-4 w-4" /> {lang === "en" ? "العربية" : "English"}
-              </button>
+                  <Globe className="h-4 w-4 text-accent" /> {lang === "en" ? "العربية" : "English"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

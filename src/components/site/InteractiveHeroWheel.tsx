@@ -288,14 +288,14 @@ export function InteractiveHeroWheel() {
         {/* Central Core: LOGO (Clickable -> Home) */}
         <Link
           to="/"
-          className="absolute z-20 w-[36%] aspect-square rounded-full bg-white dark:bg-card border-[3px] border-border/80 shadow-2xl flex items-center justify-center p-[4%] hover:scale-105 active:scale-95 transition-transform duration-300 group cursor-pointer"
+          className="absolute z-20 w-[41.5%] aspect-square rounded-full bg-white border-2 border-[#E8722C]/50 hover:border-[#E8722C] shadow-[0_4px_28px_rgba(232,114,44,0.22)] flex items-center justify-center p-1 hover:scale-105 active:scale-95 transition-all duration-300 group cursor-pointer"
           title={lang === "ar" ? "الصفحة الرئيسية — إنتجريتد تكنيكس" : "Home — Integrated Technics"}
         >
           <div className="relative w-full h-full flex items-center justify-center">
             <img
-              src="/logo.svg"
+              src="/logo-512x512.png"
               alt="Integrated Technics"
-              className="w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300 select-none"
+              className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-300 select-none scale-120"
               draggable={false}
             />
           </div>

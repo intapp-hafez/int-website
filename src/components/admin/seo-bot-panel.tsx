@@ -395,7 +395,7 @@ export function SeoBotPanel() {
         <CardHeader className="pb-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl gradient-hero flex items-center justify-center text-primary-foreground shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-accent text-white flex items-center justify-center shadow-md shadow-accent/20">
                 <Bot className="h-5 w-5" />
               </div>
               <div>

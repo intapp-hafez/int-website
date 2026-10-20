@@ -77,7 +77,7 @@ export function FeaturedProducts() {
         />
       </Carousel>
       <div className="text-center mt-8">
-        <Button asChild variant="outline"><Link to="/products">{lang === "ar" ? "زر المتجر" : "Visit shop"} <ArrowRight className="h-4 w-4 ms-2 rtl:rotate-180" /></Link></Button>
+        <Button asChild variant="outline"><Link to="/products">{lang === "ar" ? "زر المتجر" : "View More"} <ArrowRight className="h-4 w-4 ms-2 rtl:rotate-180" /></Link></Button>
       </div>
     </Section>
   );

@@ -114,7 +114,7 @@ function ServiceDetail() {
                 alt={serviceName}
                 className="w-full h-auto aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute top-4 left-4 h-12 w-12 rounded-xl gradient-hero text-primary-foreground flex items-center justify-center shadow-lg">
+              <div className="absolute top-4 left-4 h-12 w-12 rounded-xl bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/25">
                 <Icon className="h-6 w-6" />
               </div>
             </div>

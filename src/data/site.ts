@@ -30,12 +30,156 @@ export const industries = [
 ];
 
 export const projects = [
-  { id: 1, image: datacenterImg, title: { en: "Tier-III Data Center Build-out", ar: "بناء مركز بيانات من الفئة الثالثة" }, industry: "Telecom", desc: { en: "1,200 m² Tier-III facility for a regional carrier.", ar: "مرفق 1200 م² من الفئة الثالثة لشركة اتصالات إقليمية." } },
-  { id: 2, image: securityImg, title: { en: "Smart City Surveillance", ar: "مراقبة المدن الذكية" }, industry: "Government", desc: { en: "2,500-camera command & control deployment.", ar: "نشر منظومة تحكم بـ 2,500 كاميرا." } },
-  { id: 3, image: networkImg, title: { en: "Enterprise Network Refresh", ar: "تحديث شبكة مؤسسية" }, industry: "Oil & Gas", desc: { en: "Multi-site SDN backbone with zero downtime cutover.", ar: "شبكة موحدة متعددة المواقع بدون انقطاع." } },
-  { id: 4, image: datacenterImg, title: { en: "Hyperscale Edge Node", ar: "عقدة حافة عالية الأداء" }, industry: "Telecom", desc: { en: "Edge compute infrastructure for low-latency services.", ar: "بنية حوسبة طرفية للخدمات منخفضة الاستجابة." } },
-  { id: 5, image: securityImg, title: { en: "Hospitality Group Roll-out", ar: "تنفيذ لمجموعة فندقية" }, industry: "Hospitality", desc: { en: "Integrated AV, IPTV and security across 14 properties.", ar: "أنظمة متكاملة لـ 14 عقارًا فندقيًا." } },
-  { id: 6, image: networkImg, title: { en: "Manufacturing OT/IT Convergence", ar: "دمج OT/IT في التصنيع" }, industry: "Manufacturing", desc: { en: "Segmented OT network with industrial firewalls.", ar: "شبكة تشغيل مقسمة بجدران حماية صناعية." } },
+  {
+    id: 1,
+    image: "/projects/alamein.jpg",
+    title: { en: "New Alamein City", ar: "مدينة العلمين الجديدة" },
+    industry: "Smart Cities",
+    desc: {
+      en: "The largest outdoor video wall screening in MEA • Infrastructure cabling system • Information network devices • All light current systems • Automatic fire alarm • Closed Circuit TV System (CCTV) • Security system screening and inspection through (X-Ray) • Parking guidance system • Car parking management system • Automatic access control systems • Building management systems (BMS) • Internet Protocol Television System (IPTV) • Digital signage system • Music paging system • Hotel Electronic Card Key System (HOKCS) • Room Management System (RMS)",
+      ar: "توريد و تركيب أكبر شاشات عرض خارجية فى الشرق الأوسط • نظام كابلات شبكات المعلومات • أجهزة شبكة المعلومات • جميع أنظمة التيار الخفيف • الإنذار الآلي ضد الحريق • كاميرات مراقبة • جهاز ماسح بالأشعة السينية للأفراد • نظام إرشادي لمواقف السيارات • نظام التحكم بمواقف السيارات • أنظمة التحكم بالدخول والخروج أوتوماتيكياً • أنظمة إدارة المباني • نظام الدش التلفزيوني المركزي • نظام اللافتات الرقمية • نظام النداء الآلي الموسيقي • نظام البطاقات الإلكترونية والمفاتيح للفنادق • نظام إدارة الغرف الفندقية"
+    }
+  },
+  {
+    id: 2,
+    image: "/projects/new-capital.jpg",
+    title: { en: "New Administrative Capital", ar: "العاصمة الإدارية الجديدة" },
+    industry: "Government",
+    desc: {
+      en: "Governmental district - Access Control system and Security gates • Gate Barriers and Bollards system • Parking management and parking guidance systems • Supply and installation of surveillance system and radars • Car Scanners • Body scanners • Baggage scanners • Closed Circuit TV System (CCTV)",
+      ar: "أنظمة التحكم الإلكترونية بالدخول والخروج والبوابات بمبنى سيادي • توريد وتركيب بوابات أمنية • نظام محاسبي ونظام إرشادي للتحكم في دخول ومواقف السيارات • توريد وتركيب منظومة المراقبة والرادارات • نظام التفتيش الذاتي للسيارات بالأشعة السينية • نظام التفتيش الذاتي للأفراد بالأشعة السينية • نظام التفتيش وفحص الحقائب بالأشعة السينية • تركيب أنظمة المراقبة التلفزيونية بالكاميرات"
+    }
+  },
+  {
+    id: 3,
+    image: "/projects/bdc.png",
+    title: { en: "Banque du Caire (BDC)", ar: "بنك القاهرة" },
+    industry: "Banking",
+    desc: {
+      en: "Closed Circuit TV System (CCTV) • Access control system • Fire alarm system • Intrusion system • Management & integrated software • Complete network for light current systems",
+      ar: "تركيب أنظمة المراقبة التلفزيونية بالكاميرات • أنظمة التحكم الإلكترونية بالدخول والخروج • نظام الإنذار الآلي ضد الحريق • نظام كشف الاختراقات والاقتحام • نظام إدارة وبرمجة متكامل بين الأنظمة • تركيب شبكة متكاملة لجميع أنظمة التيار الخفيف"
+    }
+  },
+  {
+    id: 4,
+    image: "/projects/cbe.jpg",
+    title: { en: "Central Bank of Egypt (CBE)", ar: "البنك المركزى المصري" },
+    industry: "Banking",
+    desc: {
+      en: "Wedge barriers • Gate barriers • Bollard blockers • Under Vehicle Scanning System (UVSS) • ANPR System",
+      ar: "حواجز وتدية مانعة للاقتحام • بوابات تنظيم مرور السيارات • حواجز أسطوانية مانعة للاقتحام • نظام فحص وتصوير أسفل السيارات (UVSS) • النظام الرقمي للتعرف على لوحات السيارات (ANPR)"
+    }
+  },
+  {
+    id: 5,
+    image: "/projects/tawila.jpg",
+    title: { en: "Gouna Hotel – Tawila Island – Red Sea Governorate", ar: "فندق الجونة – جزيرة الطويلة – محافظة البحر الأحمر" },
+    industry: "Hospitality",
+    desc: {
+      en: "Fire Alarm Systems • Access Control System • Closed Circuit TV System (CCTV) • Car Parking Management System • Data Communication Network System • Audio/video system • Building Management System (BMS) • Internet Protocol television (IPTV)",
+      ar: "أنظمة إنذار الحريق • نظام التحكم الإلكتروني في الدخول والخروج • نظام المراقبة التلفزيونية بالكاميرات • نظام مواقف السيارات • نظام شبكة اتصالات البيانات • نظام الصوت / الفيديو • نظام إدارة المباني • نظام البث التلفزيوني"
+    }
+  },
+  {
+    id: 6,
+    image: "/projects/rafah.png",
+    title: { en: "Rafah Border Project", ar: "مشروع معبر رفح" },
+    industry: "Government",
+    desc: {
+      en: "DTP Screening Solution \"Car & Truck scanner\" • Gate Barriers system • ANPR system",
+      ar: "نظام الكشف بالأشعة السينية على المركبات والشاحنات • نظام تأمين البوابات • نظام المراقبة الرقمي للكشف عن السيارات"
+    }
+  },
+  {
+    id: 7,
+    image: "/projects/sharm.jpg",
+    title: { en: "Sharm El-Sheikh – South Sinai Governorate", ar: "مدينة شرم الشيخ – محافظة جنوب سيناء" },
+    industry: "Smart Cities",
+    desc: {
+      en: "Closed Circuit TV System (CCTV) • Car Scanners • Truck scanners • Baggage scanners",
+      ar: "تركيب أنظمة المراقبة التلفزيونية بالكاميرات • نظام التفتيش الذاتي للسيارات بالأشعة السينية • نظام التفتيش الذاتي للشاحنات بالأشعة السينية • نظام التفتيش وفحص الحقائب بالأشعة السينية"
+    }
+  },
+  {
+    id: 8,
+    image: "/projects/october-city.png",
+    title: { en: "Sixth of October City", ar: "مدينة السادس من أكتوبر" },
+    industry: "Smart Cities",
+    desc: {
+      en: "Supplying and installing a full video surveillance system with cameras to secure the perimeter of the City (CCTV)",
+      ar: "توريد وتركيب نظام المراقبة التليفزيونية بالكاميرات لتأمين محيط المدينة"
+    }
+  },
+  {
+    id: 9,
+    image: "/projects/airport.jpg",
+    title: { en: "Cairo International Airport", ar: "مطار القاهرة الدولي" },
+    industry: "Aviation & Transport",
+    desc: {
+      en: "Parking management system • Closed Circuit TV System (CCTV) • Baggage Scanner • Internet Protocol Television (IPTV) • Fire alarm system (FAS) • Access Control System (ACS) • Public Address System (PAS)",
+      ar: "نظام التحكم بمواقف السيارات • نظام المراقبة التلفزيونية بالكاميرات • نظام التفتيش وفحص الحقائب بالأشعة السينية • نظام البث التلفزيوني • أنظمة إنذار الحريق • نظام التحكم الإلكتروني في الدخول والخروج • أنظمة الصوتيات والمرئيات"
+    }
+  },
+  {
+    id: 10,
+    image: "/projects/transport-planning.png",
+    title: { en: "General Authority For Transportation Projects Planning", ar: "الهيئة العامة لتخطيط مشروعات النقل" },
+    industry: "Aviation & Transport",
+    desc: {
+      en: "Closed Circuit TV System (CCTV) • Fire alarm and Firefighting system • Integration software between all systems",
+      ar: "تركيب أنظمة المراقبة التلفزيونية بالكاميرات • نظام الإنذار الآلي ونظام مكافحة الحريق • برنامج متكامل يربط جميع الأنظمة"
+    }
+  },
+  {
+    id: 11,
+    image: "/projects/seaview.jpg",
+    title: { en: "Sea View Compound – North Coast", ar: "كومباوند السى فيو بالساحل الشمالى" },
+    industry: "Residential",
+    desc: {
+      en: "Automatic access control systems • Car parking and guidance control systems",
+      ar: "أنظمة التحكم بالدخول والخروج أوتوماتيكياً • نظام محاسبي ونظام إرشادي للتحكم في دخول ومواقف السيارات"
+    }
+  },
+  {
+    id: 12,
+    image: "/projects/dyar-5th.png",
+    title: { en: "Residential Compounds in 5th Settlement (Dyar)", ar: "مجمعات سكنية بالتجمع الخامس (ديار)" },
+    industry: "Residential",
+    desc: {
+      en: "Closed Circuit TV System (CCTV) • Mobile application for visitor management system",
+      ar: "تركيب أنظمة المراقبة التلفزيونية بالكاميرات • تطبيق الهاتف المحمول لنظام إدارة الزوار"
+    }
+  },
+  {
+    id: 13,
+    image: "/projects/gov-offices.png",
+    title: { en: "Governmental Offices & Ministries", ar: "مكاتب ومجمعات حكومية" },
+    industry: "Government",
+    desc: {
+      en: "Closed Circuit TV System (CCTV) • Access control system • Fire alarm system • Intrusion system",
+      ar: "نظام المراقبة التلفزيونية بالكاميرات • نظام التحكم الإلكتروني في الدخول والخروج • أنظمة إنذار الحريق • نظام كشف الاختراقات والاقتحام"
+    }
+  },
+  {
+    id: 14,
+    image: "/projects/sohag.png",
+    title: { en: "Sohag Governorate General Office", ar: "مبنى ديوان عام محافظة سوهاج" },
+    industry: "Government",
+    desc: {
+      en: "Closed Circuit TV System (CCTV) perimeter surveillance and access security",
+      ar: "أنظمة المراقبة التلفزيونية بالكاميرات وتأمين محيط المبنى"
+    }
+  },
+  {
+    id: 15,
+    image: "/projects/metallurgical.png",
+    title: { en: "Metallurgical Development Research Center", ar: "مركز بحوث وتطوير الفلزات" },
+    industry: "Research & Education",
+    desc: {
+      en: "Closed Circuit TV System (CCTV) campus monitoring and security infrastructure",
+      ar: "أنظمة المراقبة التلفزيونية بالكاميرات وتأمين المقر والمختبرات البحثية"
+    }
+  }
 ];
 
 export const partners: { name: string; logo: string }[] = [

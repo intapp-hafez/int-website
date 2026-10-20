@@ -61,6 +61,18 @@ export function ProjectDetailDialog({
                 className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(desc) }}
               />
+            ) : desc.includes("•") || desc.includes(" - ") ? (
+              <div className="space-y-2 mt-3">
+                {(desc.includes("•") ? desc.split("•") : desc.split(" - "))
+                  .map((item) => item.trim())
+                  .filter(Boolean)
+                  .map((item, i) => (
+                    <div key={i} className="flex items-start gap-2.5 text-sm sm:text-base text-foreground/90">
+                      <span className="mt-1 h-2 w-2 rounded-full bg-[#E8722C] shrink-0" />
+                      <span className="leading-relaxed">{item}</span>
+                    </div>
+                  ))}
+              </div>
             ) : (
               <p className="text-sm sm:text-base text-muted-foreground whitespace-pre-wrap leading-relaxed">
                 {desc}

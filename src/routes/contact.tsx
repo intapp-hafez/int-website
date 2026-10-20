@@ -438,7 +438,7 @@ function ContactPage() {
             {/* Headquarters Card */}
             <div className="p-6 rounded-2xl border bg-card shadow-xs space-y-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl gradient-hero text-primary-foreground flex items-center justify-center shrink-0">
+                <div className="h-10 w-10 rounded-xl bg-accent text-white flex items-center justify-center shrink-0 shadow-sm shadow-accent/20">
                   <Building className="h-5 w-5" />
                 </div>
                 <div>

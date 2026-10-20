@@ -1,5 +1,4 @@
-@import "tailwindcss" source(none);
-@source "../src";
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -151,7 +150,7 @@
     background: linear-gradient(135deg, oklch(0.45 0.01 270) 0%, oklch(0.6 0.12 50) 55%, oklch(0.68 0.18 45) 100%);
   }
   .gradient-text {
-    background: linear-gradient(135deg, var(--navy), var(--electric));
+    background: linear-gradient(135deg, var(--electric), var(--highlight));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -209,6 +208,15 @@
 .animate-fade-in { animation: fade-in 0.6s ease-out both; }
 .animate-fade-in-up { animation: fade-in-up 0.8s ease-out both; }
 .animate-scale-in { animation: scale-in 0.4s ease-out both; }
+
+@keyframes border-beam-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-border-beam {
+  animation: border-beam-spin 2.6s linear infinite;
+  will-change: transform;
+}
 
 /* Custom Leaflet contact map marker */
 .custom-pin .pin-wrap { position: relative; width: 40px; height: 50px; }

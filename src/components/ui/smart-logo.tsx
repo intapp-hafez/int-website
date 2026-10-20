@@ -1,14 +1,29 @@
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
-export function SmartLogo({ src, alt, name, align = "center" }: { src: string; alt: string; name: string; align?: "center" | "start" }) {
+export function SmartLogo({
+  src,
+  alt,
+  name,
+  align = "center",
+  className,
+  containerClassName,
+}: {
+  src: string;
+  alt: string;
+  name: string;
+  align?: "center" | "start";
+  className?: string;
+  containerClassName?: string;
+}) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   return (
-    <div className={`relative flex items-center h-10 w-full ${align === "start" ? "justify-start" : "justify-center"}`}>
-      {!loaded && !failed && <Skeleton className="absolute inset-0 h-full w-full" />}
+    <div className={cn("relative flex items-center h-full w-full", align === "start" ? "justify-start" : "justify-center", containerClassName)}>
+      {!loaded && !failed && <Skeleton className="absolute inset-0 h-full w-full rounded-lg" />}
       {failed ? (
-        <div className={`h-10 w-10 rounded-md bg-accent/10 text-accent font-bold grid place-items-center text-sm ${align === "start" ? "mr-auto rtl:ml-auto rtl:mr-0" : ""}`}>
+        <div className={cn("h-12 w-12 rounded-lg bg-accent/10 text-accent font-bold grid place-items-center text-sm", align === "start" ? "mr-auto rtl:ml-auto rtl:mr-0" : "")}>
           {name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
         </div>
       ) : (
@@ -25,7 +40,12 @@ export function SmartLogo({ src, alt, name, align = "center" }: { src: string; a
             if (fallback && img.src !== fallback) { img.src = fallback; return; }
             setFailed(true);
           }}
-          className={`max-h-10 max-w-[80%] object-contain transition-opacity duration-300 drop-shadow-sm ${loaded ? "opacity-100" : "opacity-0"} ${align === "start" ? "mr-auto rtl:ml-auto rtl:mr-0" : ""}`}
+          className={cn(
+            "w-full h-full object-contain transition-opacity duration-300 drop-shadow-sm",
+            loaded ? "opacity-100" : "opacity-0",
+            align === "start" ? "mr-auto rtl:ml-auto rtl:mr-0" : "",
+            className
+          )}
         />
       )}
     </div>

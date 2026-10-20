@@ -29,41 +29,41 @@ export function TopHeader() {
   };
 
   return (
-    <div className="bg-primary text-primary-foreground text-[11px] sm:text-xs">
+    <div className="bg-[#141416] text-zinc-300 border-b border-white/5 text-[11px] sm:text-xs">
       <div className="container mx-auto px-3 sm:px-4 lg:px-8 min-h-9 py-1.5 flex items-center justify-between gap-x-2 sm:gap-x-3">
         <div className="flex items-center gap-2 sm:gap-5 min-w-0 shrink-0">
-          <a href={`mailto:${settings.email}`} className="hidden sm:inline-flex items-center gap-1.5 hover:text-accent transition-colors min-h-[32px]">
-            <Mail className="h-3.5 w-3.5 shrink-0" />
+          <a href={`mailto:${settings.email}`} className="hidden sm:inline-flex items-center gap-1.5 hover:text-white text-zinc-300 transition-colors min-h-[32px]">
+            <Mail className="h-3.5 w-3.5 shrink-0 text-accent" />
             <span className="truncate max-w-[140px] lg:max-w-none">{settings.email}</span>
           </a>
-          <a href={telHref} className="inline-flex items-center gap-1.5 hover:text-accent transition-colors min-h-[32px]">
-            <Phone className="h-3.5 w-3.5 shrink-0" />
+          <a href={telHref} className="inline-flex items-center gap-1.5 hover:text-white text-zinc-300 transition-colors min-h-[32px]">
+            <Phone className="h-3.5 w-3.5 shrink-0 text-accent" />
             <span dir="ltr">{settings.phone}</span>
           </a>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-3 ms-auto shrink-0">
           {settings.headerIcons?.tracking !== false && (
-            <Link to="/track-quote" className="inline-flex items-center gap-1 hover:text-accent transition-colors min-h-[32px] px-1">
-              <Search className="h-3.5 w-3.5" />
+            <Link to="/track-quote" className="inline-flex items-center gap-1 text-zinc-300 hover:text-white transition-colors min-h-[32px] px-1">
+              <Search className="h-3.5 w-3.5 text-accent" />
               <span className="hidden md:inline">{lang === "ar" ? "تتبع العرض" : "Track Quote"}</span>
             </Link>
           )}
 
-          <div role="group" aria-label="Language switcher" className="inline-flex items-center rounded-md border border-primary-foreground/30 overflow-hidden">
-            <Globe className="h-3.5 w-3.5 mx-1 opacity-80 hidden sm:inline" aria-hidden="true" />
+          <div role="group" aria-label="Language switcher" className="inline-flex items-center rounded-md border border-white/10 bg-white/5 overflow-hidden">
+            <Globe className="h-3.5 w-3.5 mx-1 opacity-80 hidden sm:inline text-zinc-400" aria-hidden="true" />
             <button
               type="button"
               onClick={() => setLang("en")}
               aria-pressed={lang === "en"}
               aria-label="Switch to English"
-              className={cn("px-1.5 sm:px-2 py-0.5 text-[11px] font-semibold transition-colors min-h-[24px]", lang === "en" ? "bg-accent text-accent-foreground" : "hover:bg-primary-foreground/10")}
+              className={cn("px-1.5 sm:px-2 py-0.5 text-[11px] font-semibold transition-colors min-h-[24px]", lang === "en" ? "bg-accent text-white" : "hover:bg-white/10 text-zinc-300")}
             >EN</button>
             <button
               type="button"
               onClick={() => setLang("ar")}
               aria-pressed={lang === "ar"}
               aria-label="التبديل إلى العربية"
-              className={cn("px-1.5 sm:px-2 py-0.5 text-[11px] font-semibold transition-colors min-h-[24px]", lang === "ar" ? "bg-accent text-accent-foreground" : "hover:bg-primary-foreground/10")}
+              className={cn("px-1.5 sm:px-2 py-0.5 text-[11px] font-semibold transition-colors min-h-[24px]", lang === "ar" ? "bg-accent text-white" : "hover:bg-white/10 text-zinc-300")}
             >AR</button>
           </div>
 
@@ -77,10 +77,10 @@ export function TopHeader() {
                 aria-label={user.name || user.email}
                 aria-expanded={avatarOpen}
               >
-                <div className="h-6 w-6 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-[10px] font-bold shrink-0 ring-2 ring-primary-foreground/30">
+                <div className="h-6 w-6 rounded-full bg-accent text-white flex items-center justify-center text-[10px] font-bold shrink-0 ring-2 ring-white/20">
                   {initials}
                 </div>
-                <span className="hidden md:inline max-w-[96px] truncate font-semibold text-[11px]">
+                <span className="hidden md:inline max-w-[96px] truncate font-semibold text-[11px] text-zinc-200">
                   {user.name || user.email.split("@")[0]}
                 </span>
               </button>
@@ -88,27 +88,27 @@ export function TopHeader() {
               {avatarOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setAvatarOpen(false)} />
-                  <div className="absolute end-0 top-full mt-2 z-50 min-w-[180px] rounded-xl border bg-popover text-popover-foreground shadow-lg py-1.5 animate-fade-in">
-                    <div className="px-3 py-2 border-b">
-                      <div className="font-semibold text-xs truncate">{user.name || user.email.split("@")[0]}</div>
-                      <div className="text-[10px] text-muted-foreground truncate">{user.email}</div>
+                  <div className="absolute end-0 top-full mt-2 z-50 min-w-[180px] rounded-xl border border-white/10 bg-[#1c1c1f] text-zinc-100 shadow-2xl py-1.5 animate-fade-in">
+                    <div className="px-3 py-2 border-b border-white/10">
+                      <div className="font-semibold text-xs truncate text-white">{user.name || user.email.split("@")[0]}</div>
+                      <div className="text-[10px] text-zinc-400 truncate">{user.email}</div>
                       <div className="text-[10px] text-accent capitalize mt-0.5">{user.role}</div>
                     </div>
                     <Link
                       to={isClientRole(user.role) ? "/dashboard/workspace" : (user.role === "hr" ? "/dashboard/admin/careers" : "/dashboard/admin")}
                       onClick={() => setAvatarOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-200 hover:text-white hover:bg-white/10 transition-colors"
                     >
-                      <LayoutDashboard className="h-3.5 w-3.5" />
+                      <LayoutDashboard className="h-3.5 w-3.5 text-accent" />
                       {lang === "ar" ? "لوحة التحكم" : "Dashboard"}
                     </Link>
                     {isClientRole(user.role) && (
                       <Link
                         to="/dashboard/workspace/profile"
                         onClick={() => setAvatarOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-200 hover:text-white hover:bg-white/10 transition-colors"
                       >
-                        <User className="h-3.5 w-3.5" />
+                        <User className="h-3.5 w-3.5 text-accent" />
                         {lang === "ar" ? "الملف الشخصي" : "My Profile"}
                       </Link>
                     )}
@@ -116,16 +116,16 @@ export function TopHeader() {
                       <Link
                         to="/dashboard/admin/settings"
                         onClick={() => setAvatarOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-200 hover:text-white hover:bg-white/10 transition-colors"
                       >
-                        <Settings className="h-3.5 w-3.5" />
+                        <Settings className="h-3.5 w-3.5 text-accent" />
                         {lang === "ar" ? "إعدادات الموقع" : "Site Settings"}
                       </Link>
                     )}
                     <button
                       type="button"
                       onClick={handleSignOut}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 transition-colors"
                     >
                       <LogOut className="h-3.5 w-3.5" />
                       {lang === "ar" ? "تسجيل الخروج" : "Sign out"}
@@ -135,8 +135,8 @@ export function TopHeader() {
               )}
             </div>
           ) : (
-            <Link to="/signin" className="hidden sm:inline-flex items-center gap-1 hover:text-accent transition-colors min-h-[32px] px-1">
-              <LogIn className="h-3.5 w-3.5" />
+            <Link to="/signin" className="hidden sm:inline-flex items-center gap-1 text-zinc-300 hover:text-white transition-colors min-h-[32px] px-1">
+              <LogIn className="h-3.5 w-3.5 text-accent" />
               <span className="hidden sm:inline">{t("cta.signin")}</span>
             </Link>
           )}

@@ -19,7 +19,7 @@ export const translations = {
     "cta.learn": "Explore service details",
     "cta.explore": "Explore services",
     "hero.eyebrow": "Enterprise System Integration",
-    "hero.title": "Integrated Security & ICT Solutions for Enterprise Excellence",
+    "hero.title": "Integrated Technics for Enterprise Excellence",
     "hero.sub":
       "Turnkey integration across security, networks, audio-visual and data centers — delivered end-to-end by certified engineers.",
     "stats.clients": "Clients Served",

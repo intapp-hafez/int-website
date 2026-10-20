@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, Shield, Users, Award, Clock, Star, Quote, ExternalLink } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CheckCircle2, Shield, Users, Award, Clock, Star, Quote, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SmartLogo } from "@/components/ui/smart-logo";
 import { Section } from "@/components/site/Section";
@@ -138,6 +138,8 @@ function ServicesCarouselSection() {
             const title = s.title?.[lang] || s.title?.en || "Service";
             const rawDesc = s.desc?.[lang] || s.desc?.en || "";
             const plainDesc = rawDesc.replace(/<[^>]*>?/gm, "").trim();
+            const firstFeature = s.features?.[0]?.[lang] || s.features?.[0]?.en;
+            const indexNumber = String(idx + 1).padStart(2, "0");
 
             return (
               <CarouselItem
@@ -148,18 +150,57 @@ function ServicesCarouselSection() {
                 <Link
                   to="/services/$slug"
                   params={{ slug: s.slug }}
-                  className="group h-full p-4 sm:p-6 rounded-2xl border bg-card glow-on-hover flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-accent/60"
+                  className="group relative h-full p-5 sm:p-6 rounded-2xl border border-border/80 bg-card hover:bg-card/95 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-accent/10 hover:border-accent/50 overflow-hidden"
                 >
+                  {/* Subtle top accent gradient line on hover */}
+                  <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
                   <div>
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl gradient-hero flex items-center justify-center text-primary-foreground mb-3 sm:mb-5 shadow-sm group-hover:scale-105 transition-transform">
-                      <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                    {/* Header: Solid Orange Icon + Index + Arrow Action */}
+                    <div className="flex items-center justify-between mb-4 sm:mb-5">
+                      <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-accent text-white flex items-center justify-center shadow-md shadow-accent/25 group-hover:scale-105 group-hover:rotate-1 transition-all duration-300">
+                        <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-semibold text-muted-foreground/60 tracking-wider">
+                          {indexNumber}
+                        </span>
+                        <div className="h-8 w-8 rounded-full border border-border/70 bg-muted/30 group-hover:bg-accent group-hover:border-accent text-muted-foreground group-hover:text-white flex items-center justify-center transition-all duration-300 group-hover:scale-105">
+                          <ArrowUpRight className="h-4 w-4 rtl:rotate-[-90deg] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="text-base sm:text-xl font-semibold mb-1.5 sm:mb-2 group-hover:text-accent transition-colors">{title}</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-3 sm:mb-4 line-clamp-3 flex-1">{plainDesc}</p>
+
+                    {/* Title */}
+                    <h3 className="text-base sm:text-lg font-bold mb-2 group-hover:text-accent transition-colors duration-200 line-clamp-1">
+                      {title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">
+                      {plainDesc}
+                    </p>
                   </div>
-                  <span className="text-xs sm:text-sm font-medium text-accent inline-flex items-center gap-1 group-hover:gap-2 transition-all pt-2 border-t">
-                    {t("cta.learn")} <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
-                  </span>
+
+                  {/* Footer: Feature tag or Explore Link */}
+                  <div className="pt-3.5 border-t border-border/60 flex items-center justify-between text-xs mt-auto gap-2">
+                    {firstFeature ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/10 text-accent font-medium text-[11px] truncate max-w-[150px] sm:max-w-[170px]">
+                        <span className="h-1 w-1 rounded-full bg-accent shrink-0" />
+                        <span className="truncate">{firstFeature}</span>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground font-medium text-[11px]">
+                        {lang === "ar" ? "حلول متكاملة" : "Enterprise System"}
+                      </span>
+                    )}
+
+                    <span className="font-semibold text-accent inline-flex items-center gap-1 group-hover:gap-1.5 transition-all text-xs shrink-0">
+                      <span>{t("cta.learn")}</span>
+                      <ArrowRight className="h-3 w-3 rtl:rotate-180 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+                    </span>
+                  </div>
                 </Link>
               </CarouselItem>
             );
@@ -193,15 +234,6 @@ function PartnersSlider() {
     );
   }
 
-  const partnerBgs = [
-    "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
-    "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80",
-    "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80",
-    "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
-    "https://images.unsplash.com/photo-1531297172864-459c7bac36ea?w=800&q=80",
-  ];
-
   const firstRow = partners.slice(0, Math.ceil(partners.length / 2));
   const secondRow = partners.slice(Math.ceil(partners.length / 2));
 
@@ -211,30 +243,44 @@ function PartnersSlider() {
 
   return (
     <div className="flex flex-col gap-6 relative py-4">
+      {/* Row 1 */}
       <div className="flex w-full overflow-hidden group">
         <div className="flex w-max min-w-full animate-marquee group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3">
           {firstRowRepeated.map((p, idx) => {
             const displayName = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en || p.name_ar;
-            const bgImage = partnerBgs[idx % partnerBgs.length];
             return (
               <Link key={`${p.id}-${idx}`} to="/partners/$id" params={{ id: p.id }} className="block">
-                <div className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex flex-col items-center justify-center p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-pointer group/item">
-                  <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110 opacity-75" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
-                  
-                  {/* View Details Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-500 bg-black/20 backdrop-blur-[2px] z-20">
-                    <span className="text-white font-medium bg-white/20 px-4 py-2 rounded-full backdrop-blur-md border border-white/30 text-xs sm:text-sm shadow-xl flex items-center gap-2 transition-transform duration-300 translate-y-4 group-hover/item:translate-y-0">
-                      {lang === 'ar' ? 'عرض التفاصيل' : 'View Details'}
-                    </span>
-                  </div>
-                  
-                  <div className="relative z-10 flex flex-row items-center justify-start mt-auto w-full gap-3 pb-2 transition-transform duration-500 group-hover/item:-translate-y-1">
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 bg-white rounded-xl border-2 border-white flex items-center justify-center p-1.5 shadow-md">
-                      <SmartLogo src={p.logo} alt={displayName} name={displayName} />
+                <div className="group/item relative w-52 sm:w-64 shrink-0 rounded-2xl p-[2px] bg-accent transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent/25 overflow-hidden">
+                  {/* Live Animated Border Beam on hover */}
+                  <div className="absolute inset-[-150%] bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0deg,transparent_200deg,rgba(255,255,255,0.95)_300deg,#FFA066_335deg,var(--electric)_360deg)] opacity-0 group-hover/item:opacity-100 group-hover/item:animate-border-beam transition-opacity duration-300 pointer-events-none" />
+
+                  {/* Card Inner Content */}
+                  <div className="relative z-10 w-full h-full rounded-[14px] bg-card p-4 sm:p-5 flex flex-col items-center justify-between text-center">
+                    {/* Logo Container (no inside border) */}
+                    <div className="w-full h-24 sm:h-28 rounded-xl bg-white dark:bg-white/5 px-2.5 sm:px-3 py-2 flex items-center justify-center transition-all duration-300">
+                      <SmartLogo
+                        src={p.logo}
+                        alt={displayName}
+                        name={displayName}
+                        className="w-full h-full object-contain"
+                      />
                     </div>
-                    <div className="text-sm font-display font-bold text-white drop-shadow-md text-start line-clamp-2">
-                      {displayName}
+
+                    {/* Partner Info */}
+                    <div className="mt-3.5 w-full flex flex-col items-center">
+                      <div className="text-sm sm:text-base font-display font-bold text-foreground group-hover/item:text-accent transition-colors line-clamp-1">
+                        {displayName}
+                      </div>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent/10 text-accent text-[11px] font-semibold mt-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+                        <span>{p.featured ? (lang === "ar" ? "شريك استراتيجي" : "Strategic Partner") : (lang === "ar" ? "شريك معتمد" : "Authorized Partner")}</span>
+                      </div>
+                    </div>
+
+                    {/* Action Link */}
+                    <div className="mt-3 pt-3 border-t border-border/50 w-full flex items-center justify-center text-xs font-semibold text-muted-foreground group-hover/item:text-accent transition-colors gap-1">
+                      <span>{lang === "ar" ? "تفاصيل الشراكة" : "View Partnership"}</span>
+                      <ArrowRight className="h-3 w-3 rtl:rotate-180 transition-transform group-hover/item:translate-x-1 rtl:group-hover/item:-translate-x-1" />
                     </div>
                   </div>
                 </div>
@@ -243,30 +289,45 @@ function PartnersSlider() {
           })}
         </div>
       </div>
+
+      {/* Row 2 (Reverse Marquee) */}
       <div className="flex w-full overflow-hidden group">
         <div className="flex w-max min-w-full animate-marquee-reverse group-hover:[animation-play-state:paused] gap-4 sm:gap-6 px-2 sm:px-3">
           {secondRowRepeated.map((p, idx) => {
             const displayName = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en || p.name_ar;
-            const bgImage = partnerBgs[(idx + 3) % partnerBgs.length]; // Offset so rows look slightly different
             return (
               <Link key={`${p.id}-${idx}`} to="/partners/$id" params={{ id: p.id }} className="block">
-                <div className="relative w-40 sm:w-56 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden border border-border/50 bg-card flex flex-col items-center justify-center p-4 sm:p-6 hover:border-accent hover:shadow-xl hover:shadow-accent/10 transition-all cursor-pointer group/item">
-                  <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110 opacity-75" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 group-hover/item:from-accent/90 group-hover/item:via-accent/40 transition-colors duration-500" />
-                  
-                  {/* View Details Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-500 bg-black/20 backdrop-blur-[2px] z-20">
-                    <span className="text-white font-medium bg-white/20 px-4 py-2 rounded-full backdrop-blur-md border border-white/30 text-xs sm:text-sm shadow-xl flex items-center gap-2 transition-transform duration-300 translate-y-4 group-hover/item:translate-y-0">
-                      {lang === 'ar' ? 'عرض التفاصيل' : 'View Details'}
-                    </span>
-                  </div>
-                  
-                  <div className="relative z-10 flex flex-row items-center justify-start mt-auto w-full gap-3 pb-2 transition-transform duration-500 group-hover/item:-translate-y-1">
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 bg-white rounded-xl border-2 border-white flex items-center justify-center p-1.5 shadow-md">
-                      <SmartLogo src={p.logo} alt={displayName} name={displayName} />
+                <div className="group/item relative w-52 sm:w-64 shrink-0 rounded-2xl p-[2px] bg-accent transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent/25 overflow-hidden">
+                  {/* Live Animated Border Beam on hover */}
+                  <div className="absolute inset-[-150%] bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0deg,transparent_200deg,rgba(255,255,255,0.95)_300deg,#FFA066_335deg,var(--electric)_360deg)] opacity-0 group-hover/item:opacity-100 group-hover/item:animate-border-beam transition-opacity duration-300 pointer-events-none" />
+
+                  {/* Card Inner Content */}
+                  <div className="relative z-10 w-full h-full rounded-[14px] bg-card p-4 sm:p-5 flex flex-col items-center justify-between text-center">
+                    {/* Logo Container (no inside border) */}
+                    <div className="w-full h-24 sm:h-28 rounded-xl bg-white dark:bg-white/5 px-2.5 sm:px-3 py-2 flex items-center justify-center transition-all duration-300">
+                      <SmartLogo
+                        src={p.logo}
+                        alt={displayName}
+                        name={displayName}
+                        className="w-full h-full object-contain"
+                      />
                     </div>
-                    <div className="text-sm font-display font-bold text-white drop-shadow-md text-start line-clamp-2">
-                      {displayName}
+
+                    {/* Partner Info */}
+                    <div className="mt-3.5 w-full flex flex-col items-center">
+                      <div className="text-sm sm:text-base font-display font-bold text-foreground group-hover/item:text-accent transition-colors line-clamp-1">
+                        {displayName}
+                      </div>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent/10 text-accent text-[11px] font-semibold mt-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+                        <span>{p.featured ? (lang === "ar" ? "شريك استراتيجي" : "Strategic Partner") : (lang === "ar" ? "شريك معتمد" : "Authorized Partner")}</span>
+                      </div>
+                    </div>
+
+                    {/* Action Link */}
+                    <div className="mt-3 pt-3 border-t border-border/50 w-full flex items-center justify-center text-xs font-semibold text-muted-foreground group-hover/item:text-accent transition-colors gap-1">
+                      <span>{lang === "ar" ? "تفاصيل الشراكة" : "View Partnership"}</span>
+                      <ArrowRight className="h-3 w-3 rtl:rotate-180 transition-transform group-hover/item:translate-x-1 rtl:group-hover/item:-translate-x-1" />
                     </div>
                   </div>
                 </div>
@@ -330,15 +391,53 @@ function ProjectsCarouselSection() {
             >
               <article
                 onClick={() => setSelectedProject(p)}
-                className="group h-full rounded-2xl overflow-hidden border bg-card glow-on-hover flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:border-accent/60"
+                className="group relative h-full rounded-2xl overflow-hidden bg-card flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-1 border-2 border-[#E8722C] shadow-[0_4px_24px_rgba(232,114,44,0.12)] hover:shadow-[0_8px_32px_rgba(232,114,44,0.22)]"
               >
+                {/* Live animated border beam on hover */}
+                <div className="absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden z-20">
+                  <span className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#E8722C_85%,transparent_100%)] opacity-80" />
+                </div>
+
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                   <ImageWithSkeleton src={p.image} alt={p.title[lang]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
                 </div>
-                <div className="p-3 sm:p-6 flex flex-col flex-1">
-                  <div className="text-[10px] sm:text-xs font-semibold text-accent uppercase tracking-wider mb-1 sm:mb-2">{p.industry}</div>
-                  <h3 className="text-sm sm:text-lg font-semibold mb-1 sm:mb-2 line-clamp-2 group-hover:text-accent transition-colors">{p.title[lang]}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-none">{p.desc[lang]}</p>
+                <div className="p-4 sm:p-5 flex flex-col flex-1 relative z-10">
+                  <div className="text-[10px] sm:text-xs font-bold text-[#E8722C] uppercase tracking-wider mb-1.5">{p.industry}</div>
+                  <h3 className="text-sm sm:text-base font-bold mb-2 line-clamp-1 group-hover:text-[#E8722C] transition-colors">{p.title[lang]}</h3>
+                  
+                  {(() => {
+                    const descText = p.desc[lang] || p.desc.en || "";
+                    const items = descText.includes("•")
+                      ? descText.split("•").map((s) => s.trim()).filter(Boolean)
+                      : descText.includes(" - ")
+                      ? descText.split(" - ").map((s) => s.trim()).filter(Boolean)
+                      : [descText];
+
+                    if (items.length > 1) {
+                      return (
+                        <div className="space-y-1.5 mt-1 flex-1">
+                          {items.slice(0, 3).map((item, i) => (
+                            <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
+                              <span className="h-1.5 w-1.5 rounded-full bg-[#E8722C] shrink-0 mt-1.5" />
+                              <span className="line-clamp-1">{item}</span>
+                            </div>
+                          ))}
+                          {items.length > 3 && (
+                            <div className="text-[11px] font-semibold text-[#E8722C] pt-1">
+                              +{items.length - 3} {lang === "ar" ? "أنظمة وتقنيات إضافية" : "more systems"}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                        {descText}
+                      </p>
+                    );
+                  })()}
                 </div>
               </article>
             </CarouselItem>
@@ -397,7 +496,7 @@ function Home() {
                 const cta = (lang === "ar" ? s.cta_ar : s.cta_en) || s.cta_en || s.cta_ar;
                 return (
                   <CarouselItem key={s.id}>
-                    <div className="container mx-auto px-4 lg:px-8 relative pt-8 pb-10 md:pt-16 md:pb-20 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                    <div className="container mx-auto px-4 lg:px-8 relative pt-3 pb-8 md:pt-5 md:pb-16 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                       <div className="order-2 lg:order-1 text-center lg:text-start">
                         <h2 className={`font-bold mb-4 sm:mb-6 ${isRtl ? "text-[28px] sm:text-4xl md:text-5xl lg:text-[56px] leading-[1.5]" : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.15]"}`}>
                           <span className="gradient-text">{title}</span>
@@ -445,7 +544,7 @@ function Home() {
       <section className="relative overflow-hidden gradient-surface">
         <div className="absolute inset-0 grid-bg opacity-60" />
         <div className={`absolute ${isRtl ? "-left-32" : "-right-32"} -top-32 h-[600px] w-[600px] rounded-full bg-accent/10 blur-3xl`} />
-        <div className="container mx-auto px-4 lg:px-8 relative pt-8 pb-10 md:pt-16 md:pb-20 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="container mx-auto px-4 lg:px-8 relative pt-3 pb-8 md:pt-5 md:pb-16 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div className="animate-fade-in-up order-2 lg:order-1 text-center lg:text-start">
             <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent font-semibold mb-4 sm:mb-6 ${isRtl ? "text-xs sm:text-sm tracking-normal" : "text-[10px] sm:text-xs uppercase tracking-wider"}`}>
               <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" /> {t("hero.eyebrow")}

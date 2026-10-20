@@ -1089,7 +1089,7 @@ function VisibilityPreview({
                     const Icon = s.icon;
                     return (
                       <div key={s.slug} className="flex items-start gap-2 p-2 rounded-md bg-background border">
-                        <div className="h-7 w-7 rounded gradient-hero flex items-center justify-center text-primary-foreground shrink-0">
+                        <div className="h-7 w-7 rounded bg-accent text-white flex items-center justify-center shrink-0 shadow-xs">
                           <Icon className="h-3.5 w-3.5" />
                         </div>
                         <div className="min-w-0">
