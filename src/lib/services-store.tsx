@@ -145,6 +145,14 @@ const setLocalServiceCache = (slug: string, patch: Partial<Service>) => {
   } catch {}
 };
 
+const removeLocalServiceCache = (slug: string) => {
+  try {
+    const current = getLocalServicesCache();
+    delete current[slug];
+    localStorage.setItem("it_services_cache", JSON.stringify(current));
+  } catch {}
+};
+
 const getInitialFallback = (): Service[] => {
   const localCache = getLocalServicesCache();
   return defaultServicesData.map((s, idx) => {
@@ -186,7 +194,7 @@ type Ctx = {
   services: Service[];
   loading: boolean;
   refresh: () => Promise<void>;
-  upsert: (s: Service) => Promise<void>;
+  upsert: (s: Service, oldSlug?: string) => Promise<void>;
   togglePublish: (slug: string, published: boolean) => Promise<void>;
   remove: (slug: string) => Promise<void>;
   get: (slug: string) => Service | undefined;
@@ -273,9 +281,18 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const upsert: Ctx["upsert"] = async (s) => {
+  const upsert: Ctx["upsert"] = async (s, oldSlug) => {
+    const slugChanged = !!(oldSlug && oldSlug !== s.slug);
+
+    if (slugChanged) {
+      removeLocalServiceCache(oldSlug);
+    }
     setLocalServiceCache(s.slug, s);
+
     setServices((prev) => {
+      if (slugChanged) {
+        return prev.map((x) => (x.slug === oldSlug ? s : x));
+      }
       const idx = prev.findIndex((x) => x.slug === s.slug);
       if (idx >= 0) {
         const next = [...prev];
@@ -295,6 +312,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
       icon_name: s.iconName,
       published: s.published !== false,
       sort_order: s.sortOrder ?? 0,
+      features: s.features || [],
       meta_title_en: s.seo?.metaTitle?.en,
       meta_title_ar: s.seo?.metaTitle?.ar,
       meta_description_en: s.seo?.metaDescription?.en,
@@ -305,8 +323,23 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
     };
 
     try {
-      const { error } = await db.from("services").upsert(payload, { onConflict: "slug" });
-      if (error) throw new Error(error.message);
+      if (slugChanged) {
+        const { data, error } = await db
+          .from("services")
+          .update(payload)
+          .eq("slug", oldSlug)
+          .select("slug");
+
+        if (error) throw new Error(error.message);
+
+        if (!data || data.length === 0) {
+          const { error: upsertErr } = await db.from("services").upsert(payload, { onConflict: "slug" });
+          if (upsertErr) throw new Error(upsertErr.message);
+        }
+      } else {
+        const { error } = await db.from("services").upsert(payload, { onConflict: "slug" });
+        if (error) throw new Error(error.message);
+      }
       await refresh();
     } catch (err) {
       console.warn("[services] DB upsert exception:", err);
@@ -328,6 +361,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
   };
 
   const remove: Ctx["remove"] = async (slug) => {
+    removeLocalServiceCache(slug);
     setServices((prev) => prev.filter((s) => s.slug !== slug));
     toast.success("Service removed");
 

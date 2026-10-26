@@ -126,10 +126,12 @@ export function SeoBotPanel() {
   const handleRun = async (full = false) => {
     if (full) setRunningFull(true); else setRunning(true);
     try {
-      // 1. Fetch current SEO pages and global config
-      const [{ data: pages }, { data: global }] = await Promise.all([
+      // 1. Fetch current SEO pages, global config, real services, and real products
+      const [{ data: pages }, { data: global }, { data: realServices }, { data: realProducts }] = await Promise.all([
         supabase.from("seo_pages").select("*"),
         supabase.from("seo_global").select("*").eq("id", "main").maybeSingle(),
+        supabase.from("services").select("slug,title_en,title_ar,desc_en,desc_ar,meta_title_en,meta_title_ar,meta_description_en,meta_description_ar,og_image"),
+        supabase.from("products").select("id,slug,name_en,name_ar,meta_title_en,meta_title_ar,meta_description_en,meta_description_ar,og_image,canonical_url"),
       ]);
 
       const items: any[] = pages || [];
@@ -282,6 +284,65 @@ export function SeoBotPanel() {
             suggestion: { og_image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80" },
             applied: false,
           });
+        }
+      }
+
+      // Audit Real Services
+      for (const s of (realServices || [])) {
+        if (!s.meta_title_en && !s.title_en) {
+          newFindings.push({
+            id: `f-srv-${s.slug}-t-${Date.now()}`,
+            page_id: `service-${s.slug}`,
+            category: "service_seo",
+            severity: "warn",
+            title: `[Service: /services/${s.slug}] Missing Meta Title`,
+            detail: "Service page lacks an optimized SEO title for search listings.",
+            suggestion: { title_en: `${s.slug.replace(/-/g, " ").toUpperCase()} — Turnkey Solutions | Integrated Technics` },
+            applied: false,
+          });
+          penalties += 3;
+        }
+        if (!s.meta_description_en && !s.desc_en) {
+          newFindings.push({
+            id: `f-srv-${s.slug}-d-${Date.now()}`,
+            page_id: `service-${s.slug}`,
+            category: "service_seo",
+            severity: "warn",
+            title: `[Service: /services/${s.slug}] Missing Meta Description`,
+            detail: "Provide a 70-160 character description of this engineering service.",
+            suggestion: { description_en: `Certified ${s.slug.replace(/-/g, " ")} engineering, turnkey installation, and 24/7 SLA maintenance by Integrated Technics.` },
+            applied: false,
+          });
+          penalties += 3;
+        }
+      }
+
+      // Audit Real Products
+      for (const pr of (realProducts || [])) {
+        if (!pr.meta_title_en) {
+          newFindings.push({
+            id: `f-prd-${pr.id}-t-${Date.now()}`,
+            page_id: `product-${pr.id}`,
+            category: "product_seo",
+            severity: "info",
+            title: `[Product: ${pr.name_en || pr.slug}] SEO Title Not Set`,
+            detail: "Configure dedicated title tags for hardware and catalog pages.",
+            suggestion: { meta_title_en: `${pr.name_en || pr.slug} | Integrated Technics Shop` },
+            applied: false,
+          });
+          penalties += 2;
+        }
+        if (!pr.canonical_url) {
+          newFindings.push({
+            id: `f-prd-${pr.id}-c-${Date.now()}`,
+            page_id: `product-${pr.id}`,
+            category: "product_seo",
+            severity: "info",
+            title: `[Product: ${pr.name_en || pr.slug}] Missing Canonical URL`,
+            detail: "Set canonical link to prevent duplicate content indexing.",
+            suggestion: { canonical_url: `/shop/${pr.slug}` },
+            applied: false,
+          });
           penalties += 1;
         }
       }
@@ -360,8 +421,18 @@ export function SeoBotPanel() {
       const s = f.suggestion;
       if (f.page_id === "global") {
         await supabase.from("seo_global").update(s as any).eq("id", "main");
+      } else if (f.page_id.startsWith("product-")) {
+        const prodId = f.page_id.replace(/^product-/, "");
+        await supabase.from("products").update(s as any).eq("id", prodId);
+      } else if (f.page_id.startsWith("service-")) {
+        const srvSlug = f.page_id.replace(/^service-/, "");
+        await supabase.from("seo_pages").upsert({ id: f.page_id, path: `/services/${srvSlug}`, ...s } as any, { onConflict: "id" });
+        await supabase.from("services").update({
+          meta_title_en: (s as any).title_en || (s as any).meta_title_en || null,
+          meta_description_en: (s as any).description_en || (s as any).meta_description_en || null,
+        } as any).eq("slug", srvSlug);
       } else {
-        await supabase.from("seo_pages").update(s as any).eq("id", f.page_id);
+        await supabase.from("seo_pages").upsert({ id: f.page_id, ...s } as any, { onConflict: "id" });
       }
 
       try {

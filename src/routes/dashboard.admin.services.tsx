@@ -48,6 +48,7 @@ function ServicesAdminPage() {
   // Dialog State
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [originalSlug, setOriginalSlug] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<Service | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -98,6 +99,7 @@ function ServicesAdminPage() {
       seo: { metaTitle: { en: "", ar: "" }, metaDescription: { en: "", ar: "" } },
     });
     setIsEditing(false);
+    setOriginalSlug(null);
     setDialogOpen(true);
   };
 
@@ -125,6 +127,7 @@ function ServicesAdminPage() {
       },
     });
     setIsEditing(true);
+    setOriginalSlug(s.slug);
     setDialogOpen(true);
   };
 
@@ -190,23 +193,46 @@ function ServicesAdminPage() {
       return;
     }
 
+    const cleanSlug = editingItem.slug.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "-");
+    if (!cleanSlug) {
+      toast.error(isAr ? "يرجى إدخال معرف الخدمة (Slug)" : "Please enter a valid service slug");
+      return;
+    }
+
+    const slugInUse = services.some(
+      (s) => s.slug === cleanSlug && (!isEditing || s.slug !== originalSlug)
+    );
+    if (slugInUse) {
+      toast.error(
+        isAr
+          ? "معرف الخدمة (Slug) مستخدم بالفعل، يرجى اختيار معرف آخر"
+          : "This slug is already in use by another service"
+      );
+      return;
+    }
+
     setSaving(true);
     try {
-      await upsert({
-        ...editingItem,
-        title: {
-          en: editingItem.title.en || editingItem.title.ar,
-          ar: editingItem.title.ar || editingItem.title.en,
+      await upsert(
+        {
+          ...editingItem,
+          slug: cleanSlug,
+          title: {
+            en: editingItem.title.en || editingItem.title.ar,
+            ar: editingItem.title.ar || editingItem.title.en,
+          },
+          desc: {
+            en: editingItem.desc.en || editingItem.desc.ar,
+            ar: editingItem.desc.ar || editingItem.desc.en,
+          },
+          features: (editingItem.features || []).filter((f) => f.en.trim() || f.ar.trim()),
         },
-        desc: {
-          en: editingItem.desc.en || editingItem.desc.ar,
-          ar: editingItem.desc.ar || editingItem.desc.en,
-        },
-        features: (editingItem.features || []).filter((f) => f.en.trim() || f.ar.trim()),
-      });
+        originalSlug || undefined
+      );
       toast.success(isAr ? "تم حفظ الخدمة بنجاح" : "Service saved successfully");
       setDialogOpen(false);
       setEditingItem(null);
+      setOriginalSlug(null);
     } catch (err: any) {
       toast.error(err?.message || "Failed to save service");
     } finally {
@@ -472,7 +498,7 @@ function ServicesAdminPage() {
 
       {/* SERVICE EDIT/CREATE DIALOG WITH RICHTEXT, DELIVERABLES & IMAGE UPLOAD */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl w-[96vw] max-h-[92vh] overflow-y-auto">
           <DialogHeader className="flex flex-row items-center justify-between pb-2 border-b">
             <DialogTitle className="font-display text-xl">
               {editingItem
@@ -527,7 +553,7 @@ function ServicesAdminPage() {
                     value={editingItem.slug}
                     onChange={(e) => setEditingItem({ ...editingItem, slug: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "-") })}
                     placeholder="e.g. security-systems"
-                    disabled={isEditing}
+                    required
                   />
                 </div>
 

@@ -16,7 +16,7 @@ import { useCanAccess } from "@/lib/permissions-store";
 import { toast } from "sonner";
 import { SeoBotPanel } from "@/components/admin/seo-bot-panel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { services as staticServices } from "@/data/site";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import * as XLSX from "xlsx";
 
 export const Route = createFileRoute("/dashboard/admin/seo")({
@@ -51,8 +51,26 @@ type Page = {
   sort_order: number;
 };
 
+const DEFAULT_SITE_PAGES: Array<Omit<Page, "noindex" | "og_image_url">> = [
+  { id: 'home', path: '/', title_en: 'Integrated Technics — Enterprise Security & ICT Integrator', title_ar: 'إنتجريتد تكنيكس — تكامل أنظمة الأمن وتكنولوجيا المعلومات للمؤسسات', description_en: 'Turnkey security, ICT, AV and data center integration delivered end-to-end by certified engineers.', description_ar: 'حلول متكاملة للأمن وتكنولوجيا المعلومات والصوتيات والمرئيات ومراكز البيانات يقدمها مهندسون معتمدون.', keywords_en: 'system integrator, enterprise security, ICT, AV, data center', keywords_ar: 'تكامل الأنظمة، أمن المؤسسات، تكنولوجيا المعلومات، مراكز البيانات', sort_order: 1 },
+  { id: 'services', path: '/services', title_en: 'Services — Security, ICT, AV & Data Center Solutions', title_ar: 'الخدمات — حلول الأمن وتكنولوجيا المعلومات والصوتيات ومراكز البيانات', description_en: 'Explore our security integration, structured cabling, AV, networking, smart building and data center services.', description_ar: 'تعرف على خدماتنا في تكامل الأنظمة الأمنية والكابلات المهيكلة والصوتيات والشبكات والمباني الذكية ومراكز البيانات.', keywords_en: 'security services, structured cabling, networking, smart building, av integration, data center services', keywords_ar: 'خدمات الأمن، الكابلات المهيكلة، الشبكات، المباني الذكية، تكامل الصوتيات والمرئيات', sort_order: 2 },
+  { id: 'products', path: '/products', title_en: 'Products & Enterprise Hardware Catalog — Integrated Technics', title_ar: 'المنتجات وكتالوج الأجهزة المؤسسية — إنتجريتد تكنيكس', description_en: 'Browse certified enterprise hardware, IP surveillance, rack servers, network switches, and biometric access controllers.', description_ar: 'استعرض أجهزة المؤسسات المعتمدة، كاميرات المراقبة، خوادم الكبائن، محولات الشبكة، وأجهزة التحكم بالدخول.', keywords_en: 'enterprise products, cctv hardware, rack servers, network switches, biometric access', keywords_ar: 'منتجات المؤسسات، أجهزة كاميرات المراقبة، خوادم، محولات شبكة، تحكم بالوصول', sort_order: 3 },
+  { id: 'solutions', path: '/solutions', title_en: 'Turnkey Solutions & Systems Architecture — Integrated Technics', title_ar: 'الحلول المتكاملة ومعمارية الأنظمة — إنتجريتد تكنيكس', description_en: 'Comprehensive technology solutions for enterprise surveillance, unified communications, and critical facility infrastructure.', description_ar: 'حلول تكنولوجية شاملة للمراقبة المؤسسية، الاتصالات الموحدة، والبنية التحتية للمنشآت الحيوية.', keywords_en: 'enterprise solutions, surveillance solutions, unified communications, critical infrastructure', keywords_ar: 'حلول مؤسسية، حلول مراقبة، اتصالات موحدة، بنية تحتية حيوية', sort_order: 4 },
+  { id: 'industries', path: '/industries', title_en: 'Industries We Serve — Banking, Energy, Government & More', title_ar: 'القطاعات التي نخدمها — البنوك والطاقة والحكومة وأكثر', description_en: 'Tailored low-current and ICT solutions for banking, energy, government, healthcare, education and hospitality sectors.', description_ar: 'حلول التيار الخفيف وتكنولوجيا المعلومات مخصصة لقطاعات البنوك والطاقة والحكومة والصحة والتعليم والضيافة.', keywords_en: 'industries, banking technology, government ICT, healthcare security, education AV', keywords_ar: 'القطاعات، تقنية البنوك، تكنولوجيا المعلومات الحكومية، أمن الرعاية الصحية', sort_order: 5 },
+  { id: 'projects', path: '/projects', title_en: 'Projects & Case Studies — Integrated Technics', title_ar: 'المشاريع ودراسات الحالة — إنتجريتد تكنيكس', description_en: 'Browse delivered projects across security, networking, AV and data center for leading enterprises.', description_ar: 'استعرض المشاريع المنفذة في مجالات الأمن والشبكات والصوتيات ومراكز البيانات لكبرى المؤسسات.', keywords_en: 'case studies, integration projects, security projects, data center projects', keywords_ar: 'دراسات حالة، مشاريع التكامل، مشاريع الأمن، مشاريع مراكز البيانات', sort_order: 6 },
+  { id: 'partners', path: '/partners', title_en: 'Technology Partners — Authorized Vendor Ecosystem', title_ar: 'الشركاء التقنيون — منظومة الموردين المعتمدين', description_en: 'Authorized partner of the world\'s leading security, networking, AV and data center technology vendors.', description_ar: 'شريك معتمد لكبرى الشركات العالمية في الأمن والشبكات والصوتيات ومراكز البيانات.', keywords_en: 'technology partners, authorized vendor, cisco, hikvision, axis, hpe, juniper', keywords_ar: 'الشركاء التقنيون، موزع معتمد، سيسكو، هيكفيجن، أكسيس', sort_order: 7 },
+  { id: 'about', path: '/about', title_en: 'About Integrated Technics — Certified Engineers, Trusted Delivery', title_ar: 'عن إنتجريتد تكنيكس — مهندسون معتمدون وتنفيذ موثوق', description_en: 'Learn about our story, mission and the certified engineering team behind every project we deliver.', description_ar: 'تعرف على قصتنا ورسالتنا وفريق الهندسة المعتمد الذي يقف وراء كل مشروع ننفذه.', keywords_en: 'about us, company profile, engineering team, certifications', keywords_ar: 'من نحن، نبذة عن الشركة، فريق الهندسة، الشهادات', sort_order: 8 },
+  { id: 'careers', path: '/careers', title_en: 'Careers at Integrated Technics — Join Our Engineering Team', title_ar: 'الوظائف في إنتجريتد تكنيكس — انضم إلى فريق الهندسة', description_en: 'Open roles for engineers, project managers and technicians across security, ICT and AV disciplines.', description_ar: 'وظائف شاغرة للمهندسين ومديري المشاريع والفنيين في مجالات الأمن وتكنولوجيا المعلومات والصوتيات والمرئيات.', keywords_en: 'careers, jobs, engineering jobs, ict jobs, security careers', keywords_ar: 'وظائف، فرص عمل، وظائف هندسية، وظائف تكنولوجيا المعلومات', sort_order: 9 },
+  { id: 'news', path: '/news', title_en: 'News & Insights — Integrated Technics', title_ar: 'الأخبار والمقالات — إنتجريتد تكنيكس', description_en: 'Latest company news, project announcements and insights on enterprise security and ICT trends.', description_ar: 'أحدث أخبار الشركة وإعلانات المشاريع ورؤى حول اتجاهات أمن المؤسسات وتكنولوجيا المعلومات.', keywords_en: 'news, insights, security trends, ict news, technology updates', keywords_ar: 'أخبار، رؤى، اتجاهات الأمن، أخبار تكنولوجيا المعلومات', sort_order: 10 },
+  { id: 'contact', path: '/contact', title_en: 'Contact Us — Request a Proposal | Integrated Technics', title_ar: 'تواصل معنا — اطلب عرض سعر | إنتجريتد تكنيكس', description_en: 'Talk to our solution team. Request a proposal, site survey or technical consultation.', description_ar: 'تواصل مع فريق الحلول لدينا. اطلب عرض سعر أو زيارة موقعية أو استشارة فنية.', keywords_en: 'contact, request proposal, site survey, consultation', keywords_ar: 'تواصل، طلب عرض سعر، زيارة موقعية، استشارة', sort_order: 11 },
+  { id: 'training', path: '/training', title_en: 'Training & Certification Academy — Integrated Technics', title_ar: 'أكاديمية التدريب والشهادات المعتمدة — إنتجريتد تكنيكس', description_en: 'Professional engineering training programs and vendor certification courses in low-current and networking.', description_ar: 'برامج تدريب هندسية متخصصة ودورات شهادات معتمدة في التيار الخفيف والشبكات.', keywords_en: 'training, certifications, engineering courses, cctv certification', keywords_ar: 'تدريب، شهادات معتمدة، دورات هندسية', sort_order: 12 },
+  { id: 'faq', path: '/faq', title_en: 'Frequently Asked Questions (FAQ) — Integrated Technics', title_ar: 'الأسئلة الشائعة — إنتجريتد تكنيكس', description_en: 'Answers to common questions regarding enterprise projects, warranties, SLAs, and integration services.', description_ar: 'إجابات على الأسئلة الشائعة حول المشاريع والضمانات واتفاقيات مستوى الخدمة (SLA).', keywords_en: 'faq, enterprise questions, sla warranty, support questions', keywords_ar: 'أسئلة شائعة، ضمان، دعم فني', sort_order: 13 },
+  { id: 'track-quote', path: '/track-quote', title_en: 'Track Commercial Quotation — Integrated Technics', title_ar: 'متابعة عروض الأسعار — إنتجريتد تكنيكس', description_en: 'Live status tracking and PDF invoice inspection for official technical proposals and RFQs.', description_ar: 'متابعة حالة عروض الأسعار وفواتير المشاريع وطلبات التسعير الرسمية مباشرة.', keywords_en: 'track quote, rfq status, proposal tracker', keywords_ar: 'تتبع عرض السعر، عروض أسعار', sort_order: 14 },
+  { id: 'terms', path: '/terms', title_en: 'Terms of Service — Integrated Technics', title_ar: 'شروط الخدمة — إنتجريتد تكنيكس', description_en: 'Commercial terms of service, governance, and contractual SLAs for engineering deliveries.', description_ar: 'شروط الخدمة التجارية والحوكمة واتفاقيات مستوى الخدمة للمشاريع الهندسية.', keywords_en: 'terms of service, legal terms, engineering sla', keywords_ar: 'شروط الخدمة، بنود قانونية', sort_order: 15 },
+  { id: 'privacy', path: '/privacy', title_en: 'Privacy Policy — Integrated Technics', title_ar: 'سياسة الخصوصية — إنتجريتد تكنيكس', description_en: 'Privacy policy and data protection standards for Integrated Technics clients and users.', description_ar: 'سياسة الخصوصية ومعايير حماية البيانات لعملاء ومستخدمي إنتجريتد تكنيكس.', keywords_en: 'privacy policy, data protection, privacy terms', keywords_ar: 'سياسة الخصوصية، حماية البيانات', sort_order: 16 },
+];
+
 function SeoAdminPage() {
-  
   const makeDefaultGlobal = (): Global => ({
     id: "main",
     site_name_en: "", site_name_ar: "",
@@ -71,6 +89,9 @@ function SeoAdminPage() {
   const [loading, setLoading] = useState(true);
   const [savingGlobal, setSavingGlobal] = useState(false);
   const [savingPageId, setSavingPageId] = useState<string | null>(null);
+  const [syncingPages, setSyncingPages] = useState(false);
+  const [addPageOpen, setAddPageOpen] = useState(false);
+  const [newPage, setNewPage] = useState({ id: "", path: "", title_en: "", title_ar: "", description_en: "", description_ar: "", keywords_en: "", keywords_ar: "" });
 
   const load = async () => {
     setLoading(true);
@@ -82,7 +103,29 @@ function SeoAdminPage() {
       if (g.error) toast.error(g.error.message);
       if (p.error) toast.error(p.error.message);
       setGlobal((g.data as Global) ?? makeDefaultGlobal());
-      setPages((p.data ?? []) as Page[]);
+
+      const dbPages = (p.data ?? []) as Page[];
+      const dbIds = new Set(dbPages.map((x) => x.id));
+      const merged: Page[] = [...dbPages];
+      for (const def of DEFAULT_SITE_PAGES) {
+        if (!dbIds.has(def.id)) {
+          merged.push({
+            id: def.id,
+            path: def.path,
+            title_en: def.title_en,
+            title_ar: def.title_ar,
+            description_en: def.description_en,
+            description_ar: def.description_ar,
+            keywords_en: def.keywords_en,
+            keywords_ar: def.keywords_ar,
+            og_image_url: null,
+            noindex: false,
+            sort_order: def.sort_order,
+          });
+        }
+      }
+      merged.sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
+      setPages(merged);
     } catch (e) {
       toast.error((e as Error).message || "Failed to load SEO settings");
       setGlobal((prev) => prev ?? makeDefaultGlobal());
@@ -112,9 +155,58 @@ function SeoAdminPage() {
   const savePage = async (page: Page) => {
     setSavingPageId(page.id);
     const { id, ...rest } = page;
-    const { error } = await supabase.from("seo_pages").update(rest).eq("id", id);
+    const { error } = await supabase.from("seo_pages").upsert({ id, ...rest }, { onConflict: "id" });
     setSavingPageId(null);
-    if (error) toast.error(error.message); else toast.success(`Saved ${page.id}`);
+    if (error) toast.error(error.message); else toast.success(`Saved SEO for ${page.path || page.id}`);
+  };
+
+  const syncAllPagesToDb = async () => {
+    setSyncingPages(true);
+    try {
+      let count = 0;
+      for (const page of pages) {
+        const { error } = await supabase.from("seo_pages").upsert(page, { onConflict: "id" });
+        if (!error) count++;
+      }
+      toast.success(`Successfully synced ${count} real pages to SEO database`);
+      await load();
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to sync pages");
+    } finally {
+      setSyncingPages(false);
+    }
+  };
+
+  const handleAddCustomPage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanId = newPage.id.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "-");
+    const cleanPath = newPage.path.trim().startsWith("/") ? newPage.path.trim() : `/${newPage.path.trim()}`;
+    if (!cleanId || !cleanPath) {
+      toast.error("Please enter a valid page ID and path");
+      return;
+    }
+    const pageObj: Page = {
+      id: cleanId,
+      path: cleanPath,
+      title_en: newPage.title_en || cleanId,
+      title_ar: newPage.title_ar || newPage.title_en || cleanId,
+      description_en: newPage.description_en || "",
+      description_ar: newPage.description_ar || "",
+      keywords_en: newPage.keywords_en || "",
+      keywords_ar: newPage.keywords_ar || "",
+      og_image_url: null,
+      noindex: false,
+      sort_order: pages.length + 1,
+    };
+    const { error } = await supabase.from("seo_pages").upsert(pageObj, { onConflict: "id" });
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(`Page ${cleanPath} added to SEO`);
+      setAddPageOpen(false);
+      setNewPage({ id: "", path: "", title_en: "", title_ar: "", description_en: "", description_ar: "", keywords_en: "", keywords_ar: "" });
+      await load();
+    }
   };
 
   if (loading || !global) return (
@@ -169,6 +261,70 @@ function SeoAdminPage() {
 
         {/* PAGES */}
         <TabsContent value="pages" className="space-y-4 mt-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl border bg-card">
+            <div>
+              <div className="font-semibold text-base flex items-center gap-2">
+                Real Website Pages <Badge variant="secondary">{pages.length}</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Full list of all real site routes and landing pages. Edit meta tags per route or sync them all to DB.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+                <RefreshCw className={`h-4 w-4 me-1.5 ${loading ? "animate-spin" : ""}`} /> Refresh
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setAddPageOpen(true)}>
+                <Plus className="h-4 w-4 me-1.5" /> Add Page
+              </Button>
+              <Button size="sm" onClick={syncAllPagesToDb} disabled={syncingPages}>
+                {syncingPages ? <Loader2 className="h-4 w-4 me-1.5 animate-spin" /> : <Save className="h-4 w-4 me-1.5" />}
+                Sync All to Database
+              </Button>
+            </div>
+          </div>
+
+          <Dialog open={addPageOpen} onOpenChange={setAddPageOpen}>
+            <DialogContent className="max-w-xl">
+              <DialogHeader>
+                <DialogTitle>Add Custom Page to SEO</DialogTitle>
+                <DialogDescription>Add any custom page route to manage its search metadata and Open Graph tags.</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleAddCustomPage} className="space-y-3 py-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Page ID (unique)</Label>
+                    <Input placeholder="e.g. promo-2026" value={newPage.id} onChange={(e) => setNewPage({ ...newPage, id: e.target.value })} required />
+                  </div>
+                  <div>
+                    <Label>Route Path</Label>
+                    <Input placeholder="/promo-2026" value={newPage.path} onChange={(e) => setNewPage({ ...newPage, path: e.target.value })} required />
+                  </div>
+                </div>
+                <div>
+                  <Label>Title (EN)</Label>
+                  <Input placeholder="Page title in English" value={newPage.title_en} onChange={(e) => setNewPage({ ...newPage, title_en: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Title (AR)</Label>
+                  <Input dir="rtl" placeholder="عنوان الصفحة بالعربية" value={newPage.title_ar} onChange={(e) => setNewPage({ ...newPage, title_ar: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Description (EN)</Label>
+                  <Textarea rows={2} placeholder="Meta description in English" value={newPage.description_en} onChange={(e) => setNewPage({ ...newPage, description_en: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Description (AR)</Label>
+                  <Textarea dir="rtl" rows={2} placeholder="وصف الميتا بالعربية" value={newPage.description_ar} onChange={(e) => setNewPage({ ...newPage, description_ar: e.target.value })} />
+                </div>
+                <DialogFooter className="gap-2 pt-2 border-t">
+                  <Button type="button" variant="outline" onClick={() => setAddPageOpen(false)}>Cancel</Button>
+                  <Button type="submit">Create Page Record</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+
           {pages.map((p) => (
             <Card key={p.id}>
               <CardHeader>
@@ -408,16 +564,24 @@ function ProductSeoPanel() {
   const [draft, setDraft] = useState<ProductRow | null>(null);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    (async () => {
+  const loadProducts = async () => {
+    setLoading(true);
+    try {
       const { data, error } = await supabase
         .from("products")
         .select("id,slug,name_en,name_ar,meta_title_en,meta_title_ar,meta_description_en,meta_description_ar,meta_keywords,og_image,canonical_url")
         .order("name_en", { ascending: true });
       if (error) toast.error(error.message);
       else setItems((data ?? []) as ProductRow[]);
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to load products");
+    } finally {
       setLoading(false);
-    })();
+    }
+  };
+
+  useEffect(() => {
+    void loadProducts();
   }, []);
 
   useEffect(() => {
@@ -474,39 +638,42 @@ function ProductSeoPanel() {
     }
   };
 
-  if (loading) return <div className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading products…</div>;
-
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader>
-          <CardTitle>Select a product</CardTitle>
-          <CardDescription>Edit per-product meta tags (title, description, keywords, OG image, canonical).</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              Select a real product <Badge variant="secondary">{items.length}</Badge>
+            </CardTitle>
+            <CardDescription>Edit per-product meta tags (title, description, keywords, OG image, canonical).</CardDescription>
+          </div>
+          <Button size="sm" variant="outline" onClick={loadProducts} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 me-1.5 ${loading ? "animate-spin" : ""}`} /> Refresh Products
+          </Button>
         </CardHeader>
         <CardContent>
-          <Select value={sel} onValueChange={setSel}>
-            <SelectTrigger className="max-w-md"><SelectValue placeholder={items.length ? "Choose a product…" : "No products yet"} /></SelectTrigger>
-            <SelectContent>
-              {items.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name_en || p.name_ar || p.slug} <span className="text-muted-foreground text-xs">/shop/{p.slug}</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {loading ? (
+            <div className="text-sm text-muted-foreground flex items-center gap-2 py-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading real products…</div>
+          ) : (
+            <Select value={sel} onValueChange={setSel}>
+              <SelectTrigger className="max-w-md"><SelectValue placeholder={items.length ? "Choose a product…" : "No products yet"} /></SelectTrigger>
+              <SelectContent>
+                {items.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name_en || p.name_ar || p.slug} <span className="text-muted-foreground text-xs">/shop/{p.slug}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </CardContent>
       </Card>
 
       <SeoBulkImport
         kind="product"
         items={items.map((p) => ({ slug: p.slug, label: p.name_en || p.slug }))}
-        onApplied={async () => {
-          const { data } = await supabase
-            .from("products")
-            .select("id,slug,name_en,name_ar,meta_title_en,meta_title_ar,meta_description_en,meta_description_ar,meta_keywords,og_image,canonical_url")
-            .order("name_en", { ascending: true });
-          setItems((data ?? []) as ProductRow[]);
-        }}
+        onApplied={loadProducts}
       />
 
       {draft && (
@@ -546,8 +713,26 @@ function ProductSeoPanel() {
   );
 }
 
+type RealServiceItem = {
+  slug: string;
+  title_en: string;
+  title_ar: string;
+  desc_en: string;
+  desc_ar: string;
+  image?: string;
+  meta_title_en?: string | null;
+  meta_title_ar?: string | null;
+  meta_description_en?: string | null;
+  meta_description_ar?: string | null;
+  meta_keywords?: string | null;
+  og_image?: string | null;
+  canonical_url?: string | null;
+};
+
 function ServiceSeoPanel() {
   type Row = { id: string; path: string; title_en: string; title_ar: string; description_en: string; description_ar: string; keywords_en: string; keywords_ar: string; og_image_url: string | null; noindex: boolean; sort_order: number; };
+  const [servicesList, setServicesList] = useState<RealServiceItem[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
   const [sel, setSel] = useState<string>("");
   const [draft, setDraft] = useState<Row | null>(null);
   const [loading, setLoading] = useState(false);
@@ -555,7 +740,30 @@ function ServiceSeoPanel() {
   const [exists, setExists] = useState(false);
   const [tick, setTick] = useState(0);
 
-  const svc = staticServices.find((s) => s.slug === sel);
+  const loadServices = async () => {
+    setServicesLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("services")
+        .select("slug,title_en,title_ar,desc_en,desc_ar,image,meta_title_en,meta_title_ar,meta_description_en,meta_description_ar,meta_keywords,og_image,canonical_url,sort_order")
+        .order("sort_order", { ascending: true });
+      if (error) {
+        console.warn("[ServiceSeo] DB load warning:", error.message);
+      } else if (data && data.length > 0) {
+        setServicesList(data as RealServiceItem[]);
+      }
+    } catch (err: any) {
+      console.warn("[ServiceSeo] Fetch error:", err?.message);
+    } finally {
+      setServicesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadServices();
+  }, [tick]);
+
+  const svc = servicesList.find((s) => s.slug === sel);
   const rowId = sel ? `service-${sel}` : "";
   const path = sel ? `/services/${sel}` : "";
 
@@ -563,86 +771,153 @@ function ServiceSeoPanel() {
     if (!sel) { setDraft(null); setExists(false); return; }
     setLoading(true);
     supabase.from("seo_pages").select("*").eq("id", rowId).maybeSingle().then(({ data }) => {
-      if (data) { setDraft(data as Row); setExists(true); }
-      else {
+      if (data) {
+        setDraft(data as Row);
+        setExists(true);
+      } else {
         setDraft({
-          id: rowId, path, sort_order: 0, noindex: false, og_image_url: null,
-          title_en: svc?.title.en ?? "", title_ar: svc?.title.ar ?? "",
-          description_en: svc?.desc.en ?? "", description_ar: svc?.desc.ar ?? "",
-          keywords_en: "", keywords_ar: "",
+          id: rowId,
+          path,
+          sort_order: 0,
+          noindex: false,
+          og_image_url: svc?.og_image || svc?.image || null,
+          title_en: svc?.meta_title_en || svc?.title_en || "",
+          title_ar: svc?.meta_title_ar || svc?.title_ar || "",
+          description_en: svc?.meta_description_en || svc?.desc_en || "",
+          description_ar: svc?.meta_description_ar || svc?.desc_ar || "",
+          keywords_en: svc?.meta_keywords || "",
+          keywords_ar: "",
         });
         setExists(false);
       }
       setLoading(false);
     });
-  }, [sel, tick]);
+  }, [sel, tick, servicesList]);
 
   const upd = (patch: Partial<Row>) => setDraft((d) => (d ? { ...d, ...patch } : d));
 
   const save = async () => {
-    if (!draft) return;
+    if (!draft || !sel) return;
     setSaving(true);
-    const { error } = await supabase.from("seo_pages").upsert(draft, { onConflict: "id" });
-    setSaving(false);
-    if (error) toast.error(error.message);
-    else { setExists(true); toast.success(exists ? "Updated service SEO" : "Created service SEO"); }
+    try {
+      const { error: pageErr } = await supabase.from("seo_pages").upsert(draft, { onConflict: "id" });
+      if (pageErr) throw pageErr;
+
+      await supabase.from("services").update({
+        meta_title_en: draft.title_en || null,
+        meta_title_ar: draft.title_ar || null,
+        meta_description_en: draft.description_en || null,
+        meta_description_ar: draft.description_ar || null,
+        meta_keywords: draft.keywords_en || draft.keywords_ar || null,
+        og_image: draft.og_image_url || null,
+        canonical_url: `/services/${sel}`,
+      }).eq("slug", sel);
+
+      setExists(true);
+      toast.success(exists ? "Updated service SEO" : "Created service SEO");
+      await loadServices();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save service SEO");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const resetFromDefaults = () => {
     if (!sel) return;
     setDraft({
-      id: rowId, path, sort_order: 0, noindex: false, og_image_url: null,
-      title_en: svc?.title.en ?? "", title_ar: svc?.title.ar ?? "",
-      description_en: svc?.desc.en ?? "", description_ar: svc?.desc.ar ?? "",
-      keywords_en: "", keywords_ar: "",
+      id: rowId,
+      path,
+      sort_order: 0,
+      noindex: false,
+      og_image_url: svc?.image || null,
+      title_en: svc?.title_en ?? "",
+      title_ar: svc?.title_ar ?? "",
+      description_en: svc?.desc_en ?? "",
+      description_ar: svc?.desc_ar ?? "",
+      keywords_en: "",
+      keywords_ar: "",
     });
     toast.message("Reset to service defaults — click Save to persist");
   };
 
   const remove = async () => {
-    if (!exists || !rowId) return;
+    if (!exists || !rowId || !sel) return;
     if (!confirm("Delete this service SEO record? The service will fall back to global defaults.")) return;
     setSaving(true);
-    const { error } = await supabase.from("seo_pages").delete().eq("id", rowId);
-    setSaving(false);
-    if (error) toast.error(error.message);
-    else {
+    try {
+      const { error } = await supabase.from("seo_pages").delete().eq("id", rowId);
+      if (error) throw error;
+
+      await supabase.from("services").update({
+        meta_title_en: null,
+        meta_title_ar: null,
+        meta_description_en: null,
+        meta_description_ar: null,
+        meta_keywords: null,
+        og_image: null,
+        canonical_url: null,
+      }).eq("slug", sel);
+
       setExists(false);
       setDraft({
-        id: rowId, path, sort_order: 0, noindex: false, og_image_url: null,
-        title_en: svc?.title.en ?? "", title_ar: svc?.title.ar ?? "",
-        description_en: svc?.desc.en ?? "", description_ar: svc?.desc.ar ?? "",
-        keywords_en: "", keywords_ar: "",
+        id: rowId,
+        path,
+        sort_order: 0,
+        noindex: false,
+        og_image_url: svc?.image || null,
+        title_en: svc?.title_en ?? "",
+        title_ar: svc?.title_ar ?? "",
+        description_en: svc?.desc_en ?? "",
+        description_ar: svc?.desc_ar ?? "",
+        keywords_en: "",
+        keywords_ar: "",
       });
       toast.success("Service SEO deleted");
+      await loadServices();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete service SEO");
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader>
-          <CardTitle>Select a service</CardTitle>
-          <CardDescription>Edit per-service meta tags. Creates a seo_pages entry on first save.</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              Select a real service <Badge variant="secondary">{servicesList.length}</Badge>
+            </CardTitle>
+            <CardDescription>Edit per-service search tags. Changes sync with both services catalog and SEO database.</CardDescription>
+          </div>
+          <Button variant="outline" size="sm" onClick={loadServices} disabled={servicesLoading}>
+            <RefreshCw className={`h-4 w-4 me-1.5 ${servicesLoading ? "animate-spin" : ""}`} /> Refresh Services
+          </Button>
         </CardHeader>
         <CardContent>
-          <Select value={sel} onValueChange={setSel}>
-            <SelectTrigger className="max-w-md"><SelectValue placeholder="Choose a service…" /></SelectTrigger>
-            <SelectContent>
-              {staticServices.map((s) => (
-                <SelectItem key={s.slug} value={s.slug}>
-                  {s.title.en} <span className="text-muted-foreground text-xs">/services/{s.slug}</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {servicesLoading ? (
+            <div className="text-sm text-muted-foreground flex items-center gap-2 py-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading real services…</div>
+          ) : (
+            <Select value={sel} onValueChange={setSel}>
+              <SelectTrigger className="max-w-md"><SelectValue placeholder={servicesList.length ? "Choose a service…" : "No services found"} /></SelectTrigger>
+              <SelectContent>
+                {servicesList.map((s) => (
+                  <SelectItem key={s.slug} value={s.slug}>
+                    {s.title_en || s.title_ar || s.slug} <span className="text-muted-foreground text-xs">/services/{s.slug}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </CardContent>
       </Card>
 
       <SeoBulkImport
         kind="service"
-        items={staticServices.map((s) => ({ slug: s.slug, label: s.title.en }))}
-        onApplied={() => setTick((t) => t + 1)}
+        items={servicesList.map((s) => ({ slug: s.slug, label: s.title_en || s.slug }))}
+        onApplied={() => { setTick((t) => t + 1); void loadServices(); }}
       />
 
       {loading && <div className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>}
@@ -813,23 +1088,37 @@ function SeoBulkImport({ kind, items, onApplied }: { kind: BulkKind; items: Bulk
           if (error) { results.push({ row: rowNo, slug, status: "failed", reason: error.message }); failed++; }
           else { results.push({ row: rowNo, slug, status: "updated" }); updated++; }
         } else {
-          const svc = staticServices.find((s) => s.slug === slug);
+          const itemMatch = items.find((s) => s.slug === slug);
           const fullRow = {
             id: `service-${slug}`,
             path: `/services/${slug}`,
             sort_order: 0,
             noindex: false,
-            og_image_url: null as string | null,
-            title_en: svc?.title.en ?? "",
-            title_ar: svc?.title.ar ?? "",
-            description_en: svc?.desc.en ?? "",
-            description_ar: svc?.desc.ar ?? "",
-            keywords_en: "",
-            keywords_ar: "",
+            og_image_url: (patch.og_image_url as string) || null,
+            title_en: (patch.title_en as string) ?? itemMatch?.label ?? "",
+            title_ar: (patch.title_ar as string) ?? "",
+            description_en: (patch.description_en as string) ?? "",
+            description_ar: (patch.description_ar as string) ?? "",
+            keywords_en: (patch.keywords_en as string) ?? "",
+            keywords_ar: (patch.keywords_ar as string) ?? "",
             ...patch,
           };
           const existed = serviceExists.has(fullRow.id);
           const { error } = await supabase.from("seo_pages").upsert(fullRow as never, { onConflict: "id" });
+
+          // Also update services table directly
+          try {
+            await supabase.from("services").update({
+              meta_title_en: (patch.title_en as string) ?? null,
+              meta_title_ar: (patch.title_ar as string) ?? null,
+              meta_description_en: (patch.description_en as string) ?? null,
+              meta_description_ar: (patch.description_ar as string) ?? null,
+              meta_keywords: (patch.keywords_en || patch.keywords_ar) ? `${patch.keywords_en || ""} ${patch.keywords_ar || ""}`.trim() : null,
+              og_image: (patch.og_image_url as string) ?? null,
+              canonical_url: `/services/${slug}`,
+            }).eq("slug", slug);
+          } catch {}
+
           if (error) { results.push({ row: rowNo, slug, status: "failed", reason: error.message }); failed++; }
           else {
             if (existed) { results.push({ row: rowNo, slug, status: "updated" }); updated++; }
