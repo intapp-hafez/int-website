@@ -18,7 +18,7 @@ import {
   Briefcase,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { services } from "@/data/site";
+import { useServices, getServiceIcon } from "@/lib/services-store";
 import { useSolutions, getSolutionIcon, stripHtml } from "@/lib/solutions-store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -118,7 +118,7 @@ export function Navbar() {
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[640px] animate-fade-in z-50">
                   <div className="bg-[#1c1c1f] border border-white/10 rounded-2xl shadow-2xl p-4 grid grid-cols-2 gap-2 text-white">
                     {services.map((s) => {
-                      const Icon = s.icon;
+                      const Icon = getServiceIcon(s.iconName);
                       return (
                         <Link
                           key={s.slug}
