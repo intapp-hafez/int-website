@@ -39,6 +39,8 @@ export function Navbar() {
   const { settings } = useSettings();
   const { user, signOut } = useAuth();
   const { solutions } = useSolutions();
+  const { services: allServices } = useServices();
+  const services = allServices.filter((s) => s.published).sort((a, b) => a.sortOrder - b.sortOrder);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
