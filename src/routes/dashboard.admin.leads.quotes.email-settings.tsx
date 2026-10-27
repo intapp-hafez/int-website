@@ -97,7 +97,7 @@ function QuoteEmailSettingsPage() {
   const recipientList = s.recipients.split(/[,\s]+/).filter(Boolean);
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 w-full">
       <div className="flex items-center justify-between">
         <div>
           <Button asChild variant="ghost" size="sm" className="mb-2 -ml-2">

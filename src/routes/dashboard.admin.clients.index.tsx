@@ -175,7 +175,7 @@ function ClientsPage() {
   const go = (id: string) => navigate({ to: "/dashboard/admin/clients/$id", params: { id } });
 
   return (
-    <div className="space-y-6 max-w-6xl" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="space-y-6 w-full" dir={isRtl ? "rtl" : "ltr"}>
       <Card className="rounded-2xl border shadow-xs">
         <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 flex-wrap pb-4">
           <div>

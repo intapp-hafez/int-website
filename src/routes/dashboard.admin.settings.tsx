@@ -4,16 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useSettings, type SiteSettings, type InvoiceWatermark } from "@/lib/settings-store";
+import { useSettings, type SiteSettings, type InvoiceWatermark, type OfficeBranch } from "@/lib/settings-store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle2, RotateCcw, Download, Upload, History, Trash2, Loader2 } from "lucide-react";
+import { CheckCircle2, RotateCcw, Download, Upload, History, Trash2, Loader2, Building2, Plus } from "lucide-react";
 import { useAdminT } from "@/lib/admin-i18n";
 import { toast } from "sonner";
 import { useRef } from "react";
 import { ChevronDown, Menu as MenuIcon, Home, Info, Briefcase, Layers as LayersIcon, Phone, ShoppingCart, Search } from "lucide-react";
 import { services as servicesData } from "@/data/site";
 import { useI18n } from "@/lib/i18n";
+import { Badge } from "@/components/ui/badge";
 import { TurnstileSettingsCard } from "@/components/admin/TurnstileSettingsCard";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -141,6 +142,37 @@ function SettingsPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const updateBranch = (index: number, patch: Partial<OfficeBranch>) => {
+    const list = [...(form.branches || [])];
+    list[index] = { ...list[index], ...patch };
+    setForm({ ...form, branches: list });
+  };
+
+  const setBranchMain = (index: number, isMain: boolean) => {
+    const list = (form.branches || []).map((b, i) => ({
+      ...b,
+      isMain: i === index ? isMain : (isMain ? false : b.isMain),
+    }));
+    setForm({ ...form, branches: list });
+  };
+
+  const addBranch = () => {
+    const newBranch: OfficeBranch = {
+      id: `branch-${Date.now()}`,
+      name: { en: "New Branch", ar: "فرع جديد" },
+      address: { en: "", ar: "" },
+      phone: form.phone || "",
+      email: form.email || "",
+      isMain: (form.branches || []).length === 0,
+    };
+    setForm({ ...form, branches: [...(form.branches || []), newBranch] });
+  };
+
+  const removeBranch = (index: number) => {
+    const list = (form.branches || []).filter((_, i) => i !== index);
+    setForm({ ...form, branches: list });
   };
 
   const [tab, setTab] = useState<"security"|"contact"|"company"|"home"|"site"|"backup">("security");
@@ -307,6 +339,126 @@ function SettingsPage() {
               onChange={(v) => setForm({ ...form, contactHours: { ...form.contactHours, ar: v } })}
               hint="تظهر في بطاقة ساعات العمل في صفحة التواصل."
             />
+          </CardContent>
+        </Card>
+
+        {/* Regional Branches Management */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="font-display text-lg flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-accent" />
+                Regional Branches / الفروع والمكاتب الإقليمية
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                Manage physical branches and regional hubs shown on the Contact page sidebar.
+              </p>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={addBranch}
+              className="gap-1.5"
+            >
+              <Plus className="h-4 w-4" />
+              Add Branch
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {(!form.branches || form.branches.length === 0) ? (
+              <div className="text-center py-6 border border-dashed rounded-lg text-sm text-muted-foreground">
+                No regional branches configured. Click "Add Branch" to add one.
+              </div>
+            ) : (
+              form.branches.map((b, idx) => (
+                <div key={b.id || idx} className="p-4 rounded-xl border bg-muted/20 space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        Branch #{idx + 1}
+                      </span>
+                      {b.isMain && (
+                        <Badge className="text-[10px] py-0 h-5 bg-accent text-accent-foreground">
+                          Main Headquarters / HQ
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="flex items-center gap-1.5 text-xs cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={!!b.isMain}
+                          onChange={(e) => setBranchMain(idx, e.target.checked)}
+                          className="rounded border-input text-primary focus:ring-primary h-3.5 w-3.5"
+                        />
+                        <span>Set as HQ</span>
+                      </label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeBranch(idx)}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 w-7 p-0"
+                        title="Remove Branch"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <Field
+                      label="Branch Name (English)"
+                      id={`branch_name_en_${idx}`}
+                      value={b.name?.en || ""}
+                      onChange={(v) => updateBranch(idx, { name: { ...b.name, en: v } })}
+                      hint="e.g. Cairo Headquarters"
+                    />
+                    <Field
+                      label="اسم الفرع (عربي)"
+                      id={`branch_name_ar_${idx}`}
+                      dir="rtl"
+                      value={b.name?.ar || ""}
+                      onChange={(v) => updateBranch(idx, { name: { ...b.name, ar: v } })}
+                      hint="مثال: المقر الرئيسي — القاهرة"
+                    />
+
+                    <Field
+                      label="Address (English)"
+                      id={`branch_addr_en_${idx}`}
+                      value={b.address?.en || ""}
+                      onChange={(v) => updateBranch(idx, { address: { ...b.address, en: v } })}
+                      hint="e.g. 15 Makram Ebeid, Nasr City, Cairo, Egypt"
+                    />
+                    <Field
+                      label="العنوان (عربي)"
+                      id={`branch_addr_ar_${idx}`}
+                      dir="rtl"
+                      value={b.address?.ar || ""}
+                      onChange={(v) => updateBranch(idx, { address: { ...b.address, ar: v } })}
+                      hint="مثال: 15 شارع مكرم عبيد، مدينة نصر، القاهرة، مصر"
+                    />
+
+                    <Field
+                      label="Phone"
+                      id={`branch_phone_${idx}`}
+                      value={b.phone || ""}
+                      onChange={(v) => updateBranch(idx, { phone: v })}
+                      hint="e.g. +20 100 741 9344"
+                    />
+                    <Field
+                      label="Email"
+                      id={`branch_email_${idx}`}
+                      type="email"
+                      value={b.email || ""}
+                      onChange={(v) => updateBranch(idx, { email: v })}
+                      hint="e.g. info@integratedtechnics.com"
+                    />
+                  </div>
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
 </div>

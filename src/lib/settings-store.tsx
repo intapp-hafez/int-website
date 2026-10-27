@@ -356,6 +356,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         description: { ...settings.contactSeo.description, ...(((patch as any).contactSeo?.description) ?? {}) },
         ogImage: { ...settings.contactSeo.ogImage, ...(((patch as any).contactSeo?.ogImage) ?? {}) },
       },
+      branches: Array.isArray((patch as any).branches) ? (patch as any).branches : settings.branches,
       stats: (patch as any).stats ?? settings.stats,
       testimonials: (patch as any).testimonials ?? settings.testimonials,
       visibility: { ...settings.visibility, ...((patch as any).visibility ?? {}) },

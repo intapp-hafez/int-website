@@ -473,7 +473,7 @@ function SecurityCenterPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8" dir={isAr ? "rtl" : "ltr"}>
+    <div className="space-y-8 w-full" dir={isAr ? "rtl" : "ltr"}>
       {/* 1. HERO CYBER COMMAND BANNER */}
       <div className="relative rounded-3xl border overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-card via-card/95 to-accent/5 shadow-xl">
         {/* Ambient Glows */}

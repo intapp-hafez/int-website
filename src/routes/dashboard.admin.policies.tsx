@@ -31,7 +31,7 @@ function PoliciesAdminPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 w-full">
       <div className="flex items-center justify-between gap-4 flex-wrap pb-4 border-b">
         <div>
           <div className="flex items-center gap-2">

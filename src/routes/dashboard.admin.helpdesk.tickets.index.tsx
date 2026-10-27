@@ -204,7 +204,7 @@ function HelpdeskTicketsList() {
   );
 
   return (
-    <div className="space-y-4 max-w-6xl" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="space-y-4 w-full" dir={isRtl ? "rtl" : "ltr"}>
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b">
         <div>

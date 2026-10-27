@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, CheckCircle2, Layers, Workflow, Building2, ExternalLink, ShieldCheck, Mail, Phone, User, Send, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Layers, Workflow, Building2, ExternalLink, ShieldCheck, Mail, Phone, User, Send, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useSolutions, getSolutionIcon } from "@/lib/solutions-store";
@@ -232,11 +232,6 @@ function SolutionDetail() {
                         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(isAr ? rel.bio_ar || rel.bio_en : rel.bio_en || "") }}
                       />
                     </div>
-                  </div>
-
-                  <div className="pt-4 mt-4 border-t flex items-center gap-2 text-xs font-semibold text-accent">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>{isAr ? "جاهز للتكامل والتنفيذ الميداني" : "Turnkey Deployment & SLA Ready"}</span>
                   </div>
                 </motion.div>
               );

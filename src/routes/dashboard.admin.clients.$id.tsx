@@ -198,7 +198,7 @@ function ClientDetail() {
   }
 
   return (
-    <div className="space-y-6 max-w-6xl" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="space-y-6 w-full" dir={isRtl ? "rtl" : "ltr"}>
       {/* Top Bar */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <Button asChild variant="ghost" size="sm">
