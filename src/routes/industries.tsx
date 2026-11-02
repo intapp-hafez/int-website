@@ -11,7 +11,7 @@ export const Route = createFileRoute("/industries")({
 
 function IndustriesPage() {
   const { t, lang } = useI18n();
-  const { industries } = useIndustries();
+  const { industries, loading, error } = useIndustries();
   const activeIndustries = industries.filter((i) => i.active !== false);
 
   return (
@@ -25,6 +25,9 @@ function IndustriesPage() {
         </div>
       </section>
       <Section title={lang === "ar" ? "القطاعات التي نخدمها" : "Sectors we serve"}>
+        {loading && <p role="status" className="text-muted-foreground">{lang === "ar" ? "جارٍ تحميل القطاعات…" : "Loading industries…"}</p>}
+        {error && <p role="alert" className="text-muted-foreground">{lang === "ar" ? "القطاعات غير متاحة حالياً." : "Industries are currently unavailable."}</p>}
+        {!loading && !error && activeIndustries.length === 0 && <p className="text-muted-foreground">{lang === "ar" ? "لا توجد قطاعات منشورة حالياً." : "No industries are currently published."}</p>}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {activeIndustries.map((i) => {
             const title = lang === "ar" ? (i.title_ar || i.title_en) : (i.title_en || i.title_ar);

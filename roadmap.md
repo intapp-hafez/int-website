@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Audit industry CRUD and remove false local-only saves, deletes and sample fallback rendering.
+- [ ] Create the missing industries table and verify Admin create/edit/hide/reorder/delete through the website — BLOCKED: database migration disabled by approval preference; authenticated Admin checks unavailable with external managed authentication.
+
 - [x] Add API, session, and token verification controls; real Auth rejects malformed, unsigned, and forged credentials.
 - [ ] Enforce application API authorization and verify session expiry/rotation — BLOCKED: current app uses browser-only server shims; needs trusted server deployment and access to hosted Auth settings. External managed authentication prevents signed-in end-to-end checks.
 
