@@ -1,33 +1,12 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { industries as defaultIndustriesData } from "@/data/site";
-
-export type IndustryItem = {
-  id: string;
-  slug: string;
-  title_en: string;
-  title_ar: string;
-  image: string;
-  description_en?: string;
-  description_ar?: string;
-  active: boolean;
-  sort_order: number;
-};
-
-// Initial fallback mapped from default static list
-const initialFallback: IndustryItem[] = defaultIndustriesData.map((d, index) => ({
-  id: `default-${d.slug}`,
-  slug: d.slug,
-  title_en: d.title.en,
-  title_ar: d.title.ar,
-  image: d.image,
-  active: true,
-  sort_order: index,
-}));
+import { createIndustriesRepository, type IndustryItem } from "./industries-data";
+export type { IndustryItem } from "./industries-data";
 
 type Ctx = {
   industries: IndustryItem[];
   loading: boolean;
+  error: string | null;
   upsert: (item: Partial<IndustryItem> & { id?: string }) => Promise<IndustryItem | null>;
   remove: (id: string) => Promise<void>;
   move: (id: string, dir: -1 | 1) => Promise<void>;
@@ -36,26 +15,21 @@ type Ctx = {
 
 const IndustriesContext = createContext<Ctx | null>(null);
 
-const db = supabase as any;
+const repository = createIndustriesRepository(supabase);
 
 export function IndustriesProvider({ children }: { children: ReactNode }) {
-  const [industries, setIndustries] = useState<IndustryItem[]>(initialFallback);
+  const [industries, setIndustries] = useState<IndustryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = async () => {
     try {
-      const { data, error } = await db
-        .from("industries")
-        .select("*")
-        .order("sort_order", { ascending: true });
-
-      if (error) {
-        console.warn("[industries] table query fallback to default", error.message);
-      } else if (data && data.length > 0) {
-        setIndustries(data as IndustryItem[]);
-      }
+      setIndustries(await repository.list());
+      setError(null);
     } catch (err) {
-      console.warn("[industries] fetch error", err);
+      setIndustries([]);
+      const message = err && typeof err === "object" && "message" in err ? String(err.message) : "Could not load industries.";
+      setError(message.includes("schema cache") ? "Industries are unavailable. The industry database setup has not been completed." : message);
     } finally {
       setLoading(false);
     }
@@ -65,7 +39,7 @@ export function IndustriesProvider({ children }: { children: ReactNode }) {
     void refresh();
 
     const channel = supabase
-      .channel("industries_changes")
+      .channel(`industries_changes_${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "industries" }, () => {
         void refresh();
       })
@@ -77,77 +51,26 @@ export function IndustriesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const upsert: Ctx["upsert"] = async (item) => {
-    const isNew = !item.id || item.id.startsWith("default-");
-    const payload = {
-      slug: item.slug || (item.title_en ? item.title_en.toLowerCase().replace(/[^a-z0-9]+/g, "-") : `industry-${Date.now()}`),
-      title_en: item.title_en ?? "",
-      title_ar: item.title_ar ?? "",
-      image: item.image ?? "https://images.unsplash.com/photo-1544465544-1b71aee9dfa3?w=800&q=80",
-      description_en: item.description_en ?? "",
-      description_ar: item.description_ar ?? "",
-      active: item.active ?? true,
-      sort_order: item.sort_order ?? industries.length,
-      ...(!isNew ? { id: item.id } : {}),
-    };
-
-    try {
-      const { data, error } = await db.from("industries").upsert(payload).select().single();
-      if (error) {
-        console.error("[industries] upsert error", error);
-        // Fallback state update for immediate local feedback
-        const updated = isNew
-          ? [...industries, { ...payload, id: `local-${Date.now()}` }]
-          : industries.map((i) => (i.id === item.id ? { ...i, ...payload } : i));
-        setIndustries(updated);
-        return { ...payload, id: item.id || `local-${Date.now()}` } as IndustryItem;
-      }
-      await refresh();
-      return data as IndustryItem;
-    } catch (err) {
-      console.error("[industries] save failed", err);
-      return null;
-    }
+    const saved = await repository.save(item, industries.length);
+    await refresh();
+    return saved;
   };
 
   const remove: Ctx["remove"] = async (id) => {
-    try {
-      const { error } = await db.from("industries").delete().eq("id", id);
-      if (error) {
-        console.warn("[industries] delete db error, filtering locally", error.message);
-      }
-      setIndustries((prev) => prev.filter((i) => i.id !== id));
-    } catch (err) {
-      console.error("[industries] remove failed", err);
-    }
+    await repository.remove(id);
+    await refresh();
   };
 
   const move: Ctx["move"] = async (id, dir) => {
-    const sorted = [...industries].sort((a, b) => a.sort_order - b.sort_order);
-    const idx = sorted.findIndex((p) => p.id === id);
-    const swapIdx = idx + dir;
-    if (idx < 0 || swapIdx < 0 || swapIdx >= sorted.length) return;
-
-    [sorted[idx], sorted[swapIdx]] = [sorted[swapIdx], sorted[idx]];
-
-    const updated = sorted.map((item, index) => ({
-      ...item,
-      sort_order: index,
-    }));
-    setIndustries(updated);
-
     try {
-      const updates = [
-        { id: sorted[idx].id, sort_order: idx },
-        { id: sorted[swapIdx].id, sort_order: swapIdx },
-      ];
-      await db.from("industries").upsert(updates);
-    } catch (err) {
-      console.warn("[industries] move reorder sync error", err);
+      await repository.move(industries, id, dir);
+    } finally {
+      await refresh();
     }
   };
 
   return (
-    <IndustriesContext.Provider value={{ industries, loading, upsert, remove, move, refresh }}>
+    <IndustriesContext.Provider value={{ industries, loading, error, upsert, remove, move, refresh }}>
       {children}
     </IndustriesContext.Provider>
   );

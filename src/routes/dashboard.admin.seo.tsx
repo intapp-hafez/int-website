@@ -926,7 +926,7 @@ function ServiceSeoPanel() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between gap-2">
-              <span className="truncate">{svc?.title.en} <span className="text-xs text-muted-foreground font-normal">{draft.path}</span></span>
+              <span className="truncate">{svc?.title_en} <span className="text-xs text-muted-foreground font-normal">{draft.path}</span></span>
               <div className="flex items-center gap-2">
                 <Badge variant={exists ? "default" : "secondary"} className="text-[10px]">
                   {exists ? "Custom SEO" : "Not created"}

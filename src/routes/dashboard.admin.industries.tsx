@@ -28,7 +28,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/dashboard/admin/industries")({
-  head: () => ({ meta: [{ title: "Industries — Admin" }] }),
+  head: () => ({ meta: [{ title: "Manage Industries — Integrated Technics" }, { name: "description", content: "Manage industry titles, images, publishing and display order." }, { property: "og:title", content: "Manage Industries — Integrated Technics" }, { property: "og:description", content: "Industry management for Integrated Technics." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: IndustriesAdminPage,
 });
 
@@ -53,7 +53,7 @@ async function uploadIndustryImage(file: File): Promise<string> {
 }
 
 function IndustriesAdminPage() {
-  const { industries, loading, upsert, remove, move } = useIndustries();
+  const { industries, loading, error, refresh, upsert, remove, move } = useIndustries();
   const sorted = [...industries].sort((a, b) => a.sort_order - b.sort_order);
   const [saving, setSaving] = useState(false);
   const emptyDraft = { title_en: "", title_ar: "", image: "", slug: "", active: true, sort_order: 0 };
@@ -65,12 +65,20 @@ function IndustriesAdminPage() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editSaving, setEditSaving] = useState(false);
   const [editUploading, setEditUploading] = useState(false);
+  const [busyItem, setBusyItem] = useState<string | null>(null);
+  const runAction = async (id: string, action: () => Promise<unknown>, success: string) => {
+    setBusyItem(id);
+    try { await action(); toast.success(success); }
+    catch (err: any) { toast.error(err?.message ?? "Could not save changes"); }
+    finally { setBusyItem(null); }
+  };
 
   const handleDraftUpload = async (file: File | null) => {
     if (!file) return;
     const err = validateImage(file);
     if (err) return toast.error(err);
     const localPreview = URL.createObjectURL(file);
+    const previousImage = draft.image;
     setDraft((d) => ({ ...d, image: localPreview }));
     setUploading("draft");
     try {
@@ -78,6 +86,7 @@ function IndustriesAdminPage() {
       setDraft((d) => ({ ...d, image: url }));
       toast.success("Image uploaded");
     } catch (e: any) {
+      setDraft((d) => ({ ...d, image: previousImage }));
       toast.error(e?.message ?? "Upload failed");
     } finally {
       setUploading(null);
@@ -90,6 +99,7 @@ function IndustriesAdminPage() {
     const err = validateImage(file);
     if (err) return toast.error(err);
     const localPreview = URL.createObjectURL(file);
+    const previousImage = editingItem.image;
     setEditingItem((prev) => (prev ? { ...prev, image: localPreview } : null));
     setEditUploading(true);
     try {
@@ -97,6 +107,7 @@ function IndustriesAdminPage() {
       setEditingItem((prev) => (prev ? { ...prev, image: url } : null));
       toast.success("Image uploaded");
     } catch (e: any) {
+      setEditingItem((prev) => prev ? { ...prev, image: previousImage } : null);
       toast.error(e?.message ?? "Upload failed");
     } finally {
       setEditUploading(false);
@@ -171,6 +182,7 @@ function IndustriesAdminPage() {
 
   return (
     <div className="space-y-6 w-full">
+      {error && <div role="alert" className="border border-destructive rounded-md p-4 text-destructive flex flex-wrap items-center gap-3"><span>{error}</span><Button variant="outline" onClick={() => void refresh()}>Retry</Button></div>}
       {/* Top Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap pb-4 border-b">
         <div>
@@ -257,7 +269,7 @@ function IndustriesAdminPage() {
             </div>
           )}
 
-          <Button onClick={() => void add()} disabled={saving || (!draft.title_en && !draft.title_ar)}>
+          <Button onClick={() => void add()} disabled={loading || !!error || uploading === "draft" || saving || (!draft.title_en && !draft.title_ar)}>
             {saving ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Plus className="h-4 w-4 me-2" />}
             Add Industry
           </Button>
@@ -322,7 +334,9 @@ function IndustriesAdminPage() {
                     <div className="flex items-center gap-1.5 me-2">
                       <Switch
                         checked={item.active}
-                        onCheckedChange={(checked) => void upsert({ ...item, active: checked })}
+                        aria-label={`Publish ${item.title_en || item.title_ar}`}
+                        disabled={busyItem !== null}
+                        onCheckedChange={(checked) => void runAction(item.id, () => upsert({ ...item, active: checked }), "Visibility updated")}
                       />
                       <span className="text-xs text-muted-foreground">{item.active ? "Active" : "Hidden"}</span>
                     </div>
@@ -343,8 +357,8 @@ function IndustriesAdminPage() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      disabled={idx === 0}
-                      onClick={() => void move(item.id, -1)}
+                      disabled={busyItem !== null || idx === 0}
+                      onClick={() => void runAction(item.id, () => move(item.id, -1), "Order updated")}
                       title="Move up"
                     >
                       <ArrowUp className="h-4 w-4" />
@@ -353,8 +367,8 @@ function IndustriesAdminPage() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      disabled={idx === sorted.length - 1}
-                      onClick={() => void move(item.id, 1)}
+                      disabled={busyItem !== null || idx === sorted.length - 1}
+                      onClick={() => void runAction(item.id, () => move(item.id, 1), "Order updated")}
                       title="Move down"
                     >
                       <ArrowDown className="h-4 w-4" />
@@ -364,9 +378,10 @@ function IndustriesAdminPage() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      disabled={busyItem !== null}
                       onClick={() => {
                         if (confirm(`Remove "${item.title_en || item.title_ar}"?`)) {
-                          void remove(item.id);
+                          void runAction(item.id, () => remove(item.id), "Industry removed");
                         }
                       }}
                       title="Delete"
@@ -398,7 +413,6 @@ function IndustriesAdminPage() {
                   value={editingItem.title_en}
                   onChange={(e) => setEditingItem({ ...editingItem, title_en: e.target.value })}
                   placeholder="e.g. Telecom"
-                  required
                 />
               </div>
 
@@ -409,7 +423,6 @@ function IndustriesAdminPage() {
                   onChange={(e) => setEditingItem({ ...editingItem, title_ar: e.target.value })}
                   placeholder="مثال: الاتصالات"
                   dir="rtl"
-                  required
                 />
               </div>
 
@@ -484,7 +497,7 @@ function IndustriesAdminPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={editSaving}>
+                <Button type="submit" disabled={editSaving || editUploading}>
                   {editSaving ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Save className="h-4 w-4 me-2" />}
                   Save Changes
                 </Button>
