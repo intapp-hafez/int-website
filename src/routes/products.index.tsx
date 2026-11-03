@@ -65,7 +65,7 @@ function ShopPage() {
   }, [products, q, cat, featuredOnly, lang]);
 
   return (
-    <Section eyebrow="Products" title={lang === "ar" ? "المنتجات" : "Products"} sub={lang === "ar" ? "تصفح منتجاتنا المتكاملة" : "Browse our integrated products"}>
+    <Section eyebrow="Systems" title={lang === "ar" ? "الأنظمة" : "Systems"} sub={lang === "ar" ? "تصفح أنظمتنا المتكاملة" : "Browse our integrated systems"}>
       <div className="space-y-8">
         {/* Category Tabs */}
         {!loading && categories.length > 0 && (
