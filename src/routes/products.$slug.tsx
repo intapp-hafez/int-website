@@ -142,7 +142,7 @@ function ProductDetailPage() {
               </Link>
               <ChevronRight className="h-3 w-3 rtl:rotate-180 text-muted-foreground/60" />
               <Link to="/products" className="hover:text-foreground transition-colors">
-                {isAr ? "المنتجات" : "Products"}
+                {isAr ? "الأنظمة" : "Systems"}
               </Link>
               {cat && (
                 <>
