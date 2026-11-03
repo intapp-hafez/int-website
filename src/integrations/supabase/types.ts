@@ -807,6 +807,48 @@ export type Database = {
         }
         Relationships: []
       }
+      industries: {
+        Row: {
+          active: boolean
+          created_at: string
+          description_ar: string
+          description_en: string
+          id: string
+          image: string
+          slug: string
+          sort_order: number
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          id?: string
+          image?: string
+          slug: string
+          sort_order?: number
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          id?: string
+          image?: string
+          slug?: string
+          sort_order?: number
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lead_notes: {
         Row: {
           author_id: string | null
