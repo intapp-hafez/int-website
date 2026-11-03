@@ -82,7 +82,7 @@ export function Navbar() {
       <TopHeader />
       <div className="container mx-auto px-3 sm:px-4 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-2">
         <Link to="/" className="flex items-center gap-2 font-display font-bold min-w-0 group">
-          <img src={logo} alt="Integrated Technics" className="h-8 md:h-9 w-auto shrink-0 brightness-110 drop-shadow" />
+          <img src={logo} alt="Integrated Technics" className="h-7 md:h-8 w-auto shrink-0 brightness-110 drop-shadow" />
           <span className="text-sm md:text-base truncate text-white">
             Integrated<span className="text-accent font-extrabold">Technics</span>
           </span>
