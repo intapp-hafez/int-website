@@ -4,11 +4,13 @@ import { Section } from "@/components/site/Section";
 import { useI18n } from "@/lib/i18n";
 import { useNews } from "@/lib/news-store";
 import { Countdown } from "@/components/ui/countdown";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export function LatestNews() {
   const { t, lang, dir } = useI18n();
   const { posts } = useNews();
   const active = posts.filter((p) => p.active);
+  const sectionTitle = useSectionTitle("home.news");
   if (active.length === 0) return null;
 
   const featured = active.find((p) => p.featured) ?? active[0];
@@ -18,7 +20,7 @@ export function LatestNews() {
   const isRtl = dir === "rtl";
 
   return (
-    <Section eyebrow="Newsroom" title={t("news.title")} sub={t("news.sub")}>
+    <Section eyebrow={sectionTitle.badge} title={sectionTitle.title} sub={sectionTitle.subtitle}>
       <div className="grid lg:grid-cols-2 gap-5 sm:gap-7" dir={isRtl ? "rtl" : "ltr"}>
         {/* Large featured card */}
         <Link

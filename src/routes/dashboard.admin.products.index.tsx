@@ -254,16 +254,16 @@ function ProductsAdmin() {
     setSaving(false);
     if (error) {
       console.error("[Products Save Error]:", error);
-      toast.error(error.message || "Failed to save product");
+      toast.error(error.message || "Failed to save system");
       return;
     }
-    toast.success("Product and vendors saved successfully");
+    toast.success("System and vendors saved successfully");
     setEditing(null);
     load();
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Delete this product?")) return;
+    if (!confirm("Delete this system?")) return;
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted");
@@ -286,7 +286,7 @@ function ProductsAdmin() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 justify-between">
-        <h1 className="text-xl font-semibold">Products</h1>
+        <h1 className="text-xl font-semibold">Systems</h1>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="h-4 w-4 absolute start-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -301,7 +301,7 @@ function ProductsAdmin() {
             <Switch checked={filterFeatured} onCheckedChange={setFilterFeatured} /> Featured only
           </label>
           <Button disabled={!_perms.add} onClick={openNewProduct}>
-            <Plus className="h-4 w-4 me-2" /> New product
+            <Plus className="h-4 w-4 me-2" /> New system
           </Button>
         </div>
       </div>
@@ -312,7 +312,7 @@ function ProductsAdmin() {
         </div>
       ) : filtered.length === 0 ? (
         <Card>
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">No products yet.</CardContent>
+          <CardContent className="py-10 text-center text-sm text-muted-foreground">No systems yet.</CardContent>
         </Card>
       ) : (
         <div className="grid gap-3">
@@ -378,7 +378,7 @@ function ProductsAdmin() {
           <DialogHeader className="p-6 pb-4 border-b bg-card sticky top-0 z-10">
             <DialogTitle className="text-xl font-display flex items-center gap-2">
               <Layers className="h-5 w-5 text-accent" />
-              <span>{e && "id" in e && e.id ? "Edit Product" : "New Product"}</span>
+              <span>{e && "id" in e && e.id ? "Edit System" : "New System"}</span>
             </DialogTitle>
           </DialogHeader>
 
@@ -388,7 +388,7 @@ function ProductsAdmin() {
                 <TabsList className="grid grid-cols-3 w-full mb-6 h-11 p-1 bg-muted/60">
                   <TabsTrigger value="basic" className="gap-2 text-xs sm:text-sm font-medium">
                     <Layers className="h-4 w-4 shrink-0" />
-                    <span>1. Product Details</span>
+                    <span>1. System Details</span>
                   </TabsTrigger>
                   <TabsTrigger value="vendors" className="gap-2 text-xs sm:text-sm font-medium">
                     <Building2 className="h-4 w-4 shrink-0" />
@@ -500,7 +500,7 @@ function ProductsAdmin() {
                         minHeight="140px"
                         value={e.description_en}
                         onChange={(val) => setEditing({ ...e, description_en: val })}
-                        placeholder="Detailed product specifications, architecture and features..."
+                        placeholder="Detailed system specifications, architecture and features..."
                       />
                     </div>
 
@@ -514,14 +514,14 @@ function ProductsAdmin() {
                         minHeight="140px"
                         value={e.description_ar}
                         onChange={(val) => setEditing({ ...e, description_ar: val })}
-                        placeholder="المواصفات والوصف التفصيلي للمنتج بالعربية..."
+                        placeholder="المواصفات والوصف التفصيلي للنظام بالعربية..."
                       />
                     </div>
                   </div>
 
                   {/* Product Images */}
                   <div className="space-y-2 pt-2 border-t">
-                    <Label className="text-xs font-semibold">Product Images & Gallery</Label>
+                    <Label className="text-xs font-semibold">System Images & Gallery</Label>
                     <p className="text-xs text-muted-foreground">
                       The first image is used as the primary hero image. Drag and drop to reorder.
                     </p>
@@ -535,9 +535,9 @@ function ProductsAdmin() {
                 <TabsContent value="vendors" className="space-y-5 focus-visible:outline-hidden mt-0">
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <h3 className="font-semibold text-sm">Product Vendors & Manufacturers</h3>
+                      <h3 className="font-semibold text-sm">System Vendors & Manufacturers</h3>
                       <p className="text-xs text-muted-foreground">
-                        Add partnered equipment vendors, OEMs, and technology suppliers associated with this product.
+                        Add partnered equipment vendors, OEMs, and technology suppliers associated with this system.
                       </p>
                     </div>
                   </div>
@@ -751,7 +751,7 @@ function ProductsAdmin() {
                     <div>
                       <div className="font-semibold text-sm">SEO & Social Meta Tags</div>
                       <div className="text-xs text-muted-foreground">
-                        Optimize this product for search engines and social media previews.
+                        Optimize this system for search engines and social media previews.
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-3">
@@ -837,7 +837,7 @@ function ProductsAdmin() {
             </Button>
             <Button onClick={save} disabled={!_perms.edit || saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : null}
-              Save Product
+              Save System
             </Button>
           </DialogFooter>
         </DialogContent>

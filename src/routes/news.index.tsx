@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Countdown } from "@/components/ui/countdown";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/news/")({
   head: () => ({ meta: [{ title: "News & Updates — Integrated Technics" }, { name: "description", content: "Updates from our projects, alliances and recognitions." }, { property: "og:title", content: "News & Updates — Integrated Technics" }, { property: "og:description", content: "Updates from our projects, alliances and recognitions." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
@@ -19,6 +20,7 @@ function NewsPage() {
   const { posts } = useNews();
   const locale = lang === "ar" ? "ar" : "en-US";
   const isRtl = dir === "rtl";
+  const sectionTitle = useSectionTitle("page.news");
 
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("all");
@@ -66,9 +68,9 @@ function NewsPage() {
       <section className="gradient-surface relative">
         <div className="absolute inset-0 grid-bg opacity-50" />
         <div className="container mx-auto px-4 lg:px-8 pt-16 md:pt-24 pb-8 relative">
-          <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">Newsroom</div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">{t("news.title")}</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">{t("news.sub")}</p>
+          <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{sectionTitle.badge || "Newsroom"}</div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">{sectionTitle.title || t("news.title")}</h1>
+          <p className="text-lg text-muted-foreground max-w-2xl">{sectionTitle.subtitle || t("news.sub")}</p>
         </div>
       </section>
       <Section className="!pt-8 !md:pt-12" title={lang === "ar" ? "أحدث الأخبار" : "Latest updates"}>

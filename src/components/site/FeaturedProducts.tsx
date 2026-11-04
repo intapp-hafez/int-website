@@ -9,12 +9,14 @@ import { VendorBadgesOverlay } from "@/components/site/VendorBadgesOverlay";
 import type { Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import { useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export function FeaturedProducts() {
   const { lang, dir } = useI18n();
   const isRtl = dir === "rtl";
   const [items, setItems] = useState<Product[]>([]);
   const { autoplayRef, containerRef } = useCarouselAutoplay(4000);
+  const sectionTitle = useSectionTitle("home.products");
 
   useEffect(() => {
     (async () => {
@@ -26,7 +28,7 @@ export function FeaturedProducts() {
   if (items.length === 0) return null;
 
   return (
-    <Section eyebrow={lang === "ar" ? "متجرنا" : "Products"} title={lang === "ar" ? "منتجات مميزة" : "Featured Products"} sub={lang === "ar" ? "أبرز منتجاتنا المختارة" : "Our most popular integrated solutions"} center>
+    <Section eyebrow={sectionTitle.badge} title={sectionTitle.title} sub={sectionTitle.subtitle} center>
       <Carousel
         ref={containerRef}
         opts={{ loop: items.length > 4, align: "start", direction: isRtl ? "rtl" : "ltr" }}

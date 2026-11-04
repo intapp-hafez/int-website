@@ -23,6 +23,7 @@ import { SolutionsProvider } from "@/lib/solutions-store";
 import { PartnersProvider } from "@/lib/partners-store";
 import { RecommendationsProvider } from "@/lib/recommendations-store";
 import { NotificationsProvider } from "@/lib/notifications-store";
+import { TitlesProvider } from "@/lib/titles-store";
 import { useSettings, type PageKey } from "@/lib/settings-store";
 import { useI18n } from "@/lib/i18n";
 import { Section } from "@/components/site/Section";
@@ -164,6 +165,7 @@ function RootComponent() {
           <NotificationsProvider>
           <SolutionsProvider>
           <NewsProvider>
+          <TitlesProvider>
             {!inDashboard && <Navbar />}
             <main className={inDashboard ? "min-h-screen" : "min-h-screen pt-[104px] md:pt-[100px] pb-20 lg:pb-0"}>
               <VisibilityGuard>
@@ -179,6 +181,7 @@ function RootComponent() {
             <MobileStickyCta />
             <SeoHead />
             <Toaster />
+          </TitlesProvider>
           </NewsProvider>
           </SolutionsProvider>
           </NotificationsProvider>

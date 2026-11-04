@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSlides } from "@/lib/slides-store";
 import { useIndustries } from "@/lib/industries-store";
 import { useProjects } from "@/lib/projects-store";
+import { formatProjectContent } from "@/lib/project-content";
 import { useServices, getServiceIcon } from "@/lib/services-store";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { CarouselDots } from "@/components/ui/carousel-dots";
@@ -23,6 +24,7 @@ import { FeaturedProducts } from "@/components/site/FeaturedProducts";
 import { LatestNews } from "@/components/site/LatestNews";
 import { InteractiveHeroWheel } from "@/components/site/InteractiveHeroWheel";
 import { supabase } from "@/integrations/supabase/client";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -47,6 +49,7 @@ const whyIcons = [Shield, Award, Clock, Users];
 function TestimonialsSection() {
   const { lang } = useI18n();
   const { settings } = useSettings();
+
   const [dbReviews, setDbReviews] = useState<any[]>([]);
 
   useEffect(() => {
@@ -77,10 +80,11 @@ function TestimonialsSection() {
       }))
     : settings.testimonials || [];
 
+  const testimonialsTitle = useSectionTitle("home.testimonials");
   if (!items || items.length === 0) return null;
 
   return (
-    <Section eyebrow="Testimonials" title={lang === "ar" ? "ماذا يقول عملاؤنا" : "What Our Clients Say"} center className="bg-muted/30">
+    <Section eyebrow={testimonialsTitle.badge} title={testimonialsTitle.title} sub={testimonialsTitle.subtitle} center className="bg-muted/30">
       <div className={`grid gap-6 ${items.length % 2 === 0 ? "sm:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"}`}>
         {items.map((t, i) => {
           const quote = t.quote?.[lang] || t.quote?.en || t.quote?.ar || "";
@@ -118,11 +122,12 @@ function ServicesCarouselSection() {
   const { autoplayRef, containerRef } = useCarouselAutoplay(4000);
   const [api, setApi] = useState<CarouselApi>();
 
+  const servicesTitle = useSectionTitle("home.services");
   const activeServices = services.filter((s) => s.published !== false);
   if (activeServices.length === 0) return null;
 
   return (
-    <Section eyebrow="Services" title={t("services.title")} sub={t("services.sub")} center>
+    <Section eyebrow={servicesTitle.badge} title={servicesTitle.title} sub={servicesTitle.subtitle} center>
       <Carousel
         ref={containerRef}
         opts={{ align: "start", direction: isRtl ? "rtl" : "ltr" }}
@@ -368,11 +373,12 @@ function ProjectsCarouselSection() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const activeProjects = projectItems.filter((p) => p.active === true);
   const displayedProjects = activeProjects.slice(0, 6);
+  const projectsTitle = useSectionTitle("home.projects");
 
   if (displayedProjects.length === 0) return null;
 
   return (
-    <Section eyebrow="Case Studies" title={t("projects.title")} sub={t("projects.sub")}>
+    <Section eyebrow={projectsTitle.badge} title={projectsTitle.title} sub={projectsTitle.subtitle}>
       <Carousel
         ref={containerRef}
         opts={{ align: "start", direction: isRtl ? "rtl" : "ltr" }}
@@ -398,8 +404,8 @@ function ProjectsCarouselSection() {
                   <span className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#E8722C_85%,transparent_100%)] opacity-80" />
                 </div>
 
-                <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                  <ImageWithSkeleton src={p.image} alt={p.title[lang]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="relative aspect-video overflow-hidden bg-neutral-950 flex items-center justify-center">
+                  <ImageWithSkeleton src={p.image} alt={p.title[lang]} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
                 </div>
                 <div className="p-4 sm:p-5 flex flex-col flex-1 relative z-10">
@@ -408,13 +414,13 @@ function ProjectsCarouselSection() {
                   
                   {(() => {
                     const descText = p.desc[lang] || p.desc.en || "";
-                    const items = descText.includes("•")
-                      ? descText.split("•").map((s) => s.trim()).filter(Boolean)
-                      : descText.includes(" - ")
-                      ? descText.split(" - ").map((s) => s.trim()).filter(Boolean)
-                      : [descText];
+                    const { overview, scopeBullets: items } = formatProjectContent(descText);
 
-                    if (items.length > 1) {
+
+
+
+
+                    if (items.length > 0) {
                       return (
                         <div className="space-y-1.5 mt-1 flex-1">
                           {items.slice(0, 3).map((item, i) => (
@@ -434,7 +440,7 @@ function ProjectsCarouselSection() {
 
                     return (
                       <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                        {descText}
+                        {overview || descText}
                       </p>
                     );
                   })()}
@@ -472,10 +478,15 @@ function Home() {
   const { t, lang, dir } = useI18n();
   const isRtl = dir === "rtl";
   const { settings } = useSettings();
+
   const { slides } = useSlides();
   const activeSlides = slides.filter(s => s.active);
   const autoplay = useRef(Autoplay({ delay: 5500, stopOnInteraction: false, stopOnMouseEnter: true }));
   const [heroApi, setHeroApi] = useState<CarouselApi>();
+  const heroTitle = useSectionTitle("home.hero");
+  const whyTitle = useSectionTitle("home.why");
+  const partnersTitle = useSectionTitle("home.partners");
+  const ctaTitle = useSectionTitle("home.cta");
   return (
     <div>
       {/* Hero — slider when admin slides exist, else default */}
@@ -547,13 +558,13 @@ function Home() {
         <div className="container mx-auto px-4 lg:px-8 relative pt-3 pb-8 md:pt-5 md:pb-16 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div className="animate-fade-in-up order-2 lg:order-1 text-center lg:text-start">
             <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent font-semibold mb-4 sm:mb-6 ${isRtl ? "text-xs sm:text-sm tracking-normal" : "text-[10px] sm:text-xs uppercase tracking-wider"}`}>
-              <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" /> {t("hero.eyebrow")}
+              <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" /> {heroTitle.badge || t("hero.eyebrow")}
             </div>
             <h1 className={`font-bold mb-4 sm:mb-6 ${isRtl ? "text-[28px] sm:text-4xl md:text-5xl lg:text-[56px] xl:text-6xl leading-[1.5] tracking-normal [word-spacing:0.05em]" : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.15]"}`}>
-              {t("hero.title").split(" ").slice(0, -3).join(" ")}{" "}
-              <span className="gradient-text">{t("hero.title").split(" ").slice(-3).join(" ")}</span>
+              {(heroTitle.title || t("hero.title")).split(" ").slice(0, -3).join(" ")}{" "}
+              <span className="gradient-text">{(heroTitle.title || t("hero.title")).split(" ").slice(-3).join(" ")}</span>
             </h1>
-            <p className={`text-muted-foreground mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0 ${isRtl ? "text-[15px] sm:text-lg leading-[2] tracking-normal" : "text-base sm:text-lg leading-relaxed"}`}>{t("hero.sub")}</p>
+            <p className={`text-muted-foreground mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0 ${isRtl ? "text-[15px] sm:text-lg leading-[2] tracking-normal" : "text-base sm:text-lg leading-relaxed"}`}>{heroTitle.subtitle || t("hero.sub")}</p>
             <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
               <Button asChild size="lg" className="gap-2 w-full sm:w-auto">
                 <Link to="/contact">{t("cta.proposal")} <ArrowRight className="h-4 w-4 rtl:rotate-180" /></Link>
@@ -598,7 +609,7 @@ function Home() {
       <FeaturedProducts />
 
       {/* Why Choose Us */}
-      <Section className="bg-primary text-primary-foreground" eyebrow="Why Us" title={t("why.title")}>
+      <Section className="bg-primary text-primary-foreground" eyebrow={whyTitle.badge} title={whyTitle.title} sub={whyTitle.subtitle}>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {[1, 2, 3, 4].map((i, idx) => {
             const Icon = whyIcons[idx];
@@ -616,7 +627,7 @@ function Home() {
       </Section>
 
       {/* Partners */}
-      <Section eyebrow="Ecosystem" title={t("partners.title")} sub={t("partners.sub")} center>
+      <Section eyebrow={partnersTitle.badge} title={partnersTitle.title} sub={partnersTitle.subtitle} center>
         <PartnersSlider />
       </Section>
 
@@ -625,8 +636,8 @@ function Home() {
         <div className="relative overflow-hidden rounded-3xl gradient-hero p-10 md:p-16 text-primary-foreground">
           <div className="absolute inset-0 grid-bg opacity-20" />
           <div className="relative max-w-2xl">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">{t("ctaSection.title")}</h2>
-            <p className="text-lg opacity-85 mb-8">{t("ctaSection.sub")}</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">{ctaTitle.title || t("ctaSection.title")}</h2>
+            <p className="text-lg opacity-85 mb-8">{ctaTitle.subtitle || t("ctaSection.sub")}</p>
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg" variant="secondary"><Link to="/contact">{t("cta.contact")}</Link></Button>
               <Button asChild size="lg" variant="outline" className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
@@ -647,6 +658,7 @@ function IndustriesSection() {
   const { t, lang } = useI18n();
   const { industries } = useIndustries();
   const activeIndustries = industries.filter((i) => i.active !== false);
+  const industriesTitle = useSectionTitle("home.industries");
   const isRtl = lang === "ar";
 
   if (activeIndustries.length === 0) return null;
@@ -660,7 +672,7 @@ function IndustriesSection() {
   const list2 = [...row2, ...row2, ...row2, ...row2];
 
   return (
-    <Section className="bg-muted/30 overflow-hidden" eyebrow="Industries" title={t("industries.title")} sub={t("industries.sub")}>
+    <Section className="bg-muted/30 overflow-hidden" eyebrow={industriesTitle.badge} title={industriesTitle.title} sub={industriesTitle.subtitle}>
       <div className="flex flex-col gap-6 relative py-4">
         <style>{`
           @keyframes marquee {

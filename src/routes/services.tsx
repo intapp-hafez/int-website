@@ -4,6 +4,7 @@ import { ArrowRight, Layers } from "lucide-react";
 import { Section } from "@/components/site/Section";
 import { useI18n } from "@/lib/i18n";
 import { useServices, getServiceIcon } from "@/lib/services-store";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
@@ -30,6 +31,7 @@ function ServicesIndex() {
   const { t, lang } = useI18n();
   const { services } = useServices();
   const activeServices = services.filter((s) => s.published !== false);
+  const sectionTitle = useSectionTitle("page.services");
 
   return (
     <div className="bg-background relative overflow-hidden">
@@ -53,7 +55,7 @@ function ServicesIndex() {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold uppercase tracking-widest mb-6"
           >
             <Layers className="h-3.5 w-3.5" />
-            {t("nav.services")}
+            {sectionTitle.badge || t("nav.services")}
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
@@ -63,20 +65,17 @@ function ServicesIndex() {
               lang === "ar" ? "leading-[1.4] sm:leading-[1.3]" : ""
             }`}
           >
-            {lang === "ar" ? (
+            {sectionTitle.title.split(" ").length > 2 ? (
               <>
-                حلول هندسية متكاملة{" "}
+                {sectionTitle.title.split(" ").slice(0, -2).join(" ")}{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-                  للمهام الحيوية والحرجة
+                  {sectionTitle.title.split(" ").slice(-2).join(" ")}
                 </span>
               </>
             ) : (
-              <>
-                Mission-Critical{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-                  Solutions
-                </span>
-              </>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                {sectionTitle.title}
+              </span>
             )}
           </motion.h1>
           <motion.p 
@@ -85,7 +84,7 @@ function ServicesIndex() {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-medium"
           >
-            {t("services.sub")}
+            {sectionTitle.subtitle || t("services.sub")}
           </motion.p>
         </motion.div>
       </section>

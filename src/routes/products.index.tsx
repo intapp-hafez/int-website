@@ -10,6 +10,7 @@ import { useI18n } from "@/lib/i18n";
 import { VendorBadgesOverlay } from "@/components/site/VendorBadgesOverlay";
 import type { Product } from "@/lib/products";
 import { toast } from "sonner";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/products/")({
   head: () => ({
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/products/")({
 
 function ShopPage() {
   const { lang } = useI18n();
+  const sectionTitle = useSectionTitle("page.products");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
@@ -65,7 +67,7 @@ function ShopPage() {
   }, [products, q, cat, featuredOnly, lang]);
 
   return (
-    <Section eyebrow="Systems" title={lang === "ar" ? "الأنظمة" : "Systems"} sub={lang === "ar" ? "تصفح أنظمتنا المتكاملة" : "Browse our integrated systems"}>
+    <Section eyebrow={sectionTitle.badge} title={sectionTitle.title} sub={sectionTitle.subtitle}>
       <div className="space-y-8">
         {/* Category Tabs */}
         {!loading && categories.length > 0 && (
@@ -112,6 +114,7 @@ function ShopPage() {
 
 export function ProductCard({ p }: { p: Product }) {
   const { lang } = useI18n();
+  const sectionTitle = useSectionTitle("page.products");
   const name = (lang === "ar" ? p.name_ar : p.name_en) || p.name_en;
   const cat = (lang === "ar" ? p.category_ar : p.category_en) || p.category_en;
   const vendors = (p.vendors || []).filter((v) => v && (v.logo || v.name));

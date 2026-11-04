@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Section } from "@/components/site/Section";
 import { useI18n } from "@/lib/i18n";
 import { useIndustries } from "@/lib/industries-store";
+import { useSectionTitle } from "@/lib/titles-store";
 import { Building2 } from "lucide-react";
 
 export const Route = createFileRoute("/industries")({
@@ -13,15 +14,16 @@ function IndustriesPage() {
   const { t, lang } = useI18n();
   const { industries, loading, error } = useIndustries();
   const activeIndustries = industries.filter((i) => i.active !== false);
+  const sectionTitle = useSectionTitle("page.industries");
 
   return (
     <div>
       <section className="gradient-surface relative">
         <div className="absolute inset-0 grid-bg opacity-50" />
         <div className="container mx-auto px-4 lg:px-8 py-24 relative">
-          <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">Industries</div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">{t("industries.title")}</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">{t("industries.sub")}</p>
+          <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{sectionTitle.badge || "Industries"}</div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">{sectionTitle.title || t("industries.title")}</h1>
+          <p className="text-lg text-muted-foreground max-w-2xl">{sectionTitle.subtitle || t("industries.sub")}</p>
         </div>
       </section>
       <Section title={lang === "ar" ? "القطاعات التي نخدمها" : "Sectors we serve"}>

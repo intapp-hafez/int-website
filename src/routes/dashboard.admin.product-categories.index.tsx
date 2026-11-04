@@ -84,8 +84,8 @@ function ProductCategoriesAdmin() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Product Categories</h2>
-          <p className="text-muted-foreground">Manage your product categories in English and Arabic.</p>
+          <h2 className="text-2xl font-bold tracking-tight">System Categories</h2>
+          <p className="text-muted-foreground">Manage your system categories in English and Arabic.</p>
         </div>
         <Button onClick={() => setEditing({ name_en: "", name_ar: "" })}><Plus className="h-4 w-4 me-2" /> Add Category</Button>
       </div>

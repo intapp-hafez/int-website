@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { MapPin, Briefcase, Loader2, CheckCircle2, Calendar, Users, DollarSign, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
+import { useSectionTitle } from "@/lib/titles-store";
 import { mockJobs } from "@/data/careers-mock";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -65,6 +66,7 @@ const REMOTE_LABEL: Record<string, { en: string; ar: string }> = {
 function CareersPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
+  const sectionTitle = useSectionTitle("page.careers");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<Job | null>(null);
@@ -97,10 +99,10 @@ function CareersPage() {
         <div className="container mx-auto px-4 lg:px-8 py-24 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{ar ? "الوظائف" : "Careers"}</div>
-              <h1 className="text-4xl md:text-6xl font-bold mb-4">{ar ? "ابنِ ما له معنى." : "Build what matters."}</h1>
+              <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{sectionTitle.badge || (ar ? "الوظائف" : "Careers")}</div>
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">{sectionTitle.title || (ar ? "ابنِ ما له معنى." : "Build what matters.")}</h1>
               <p className="text-lg text-muted-foreground max-w-xl">
-                {ar ? "انضم إلى فريق من المهندسين المعتمدين الذين يقدمون أنظمة معقدة لأكثر مؤسسات المنطقة تطلباً." : "Join a team of certified engineers delivering complex systems for the region's most demanding enterprises."}
+                {sectionTitle.subtitle || (ar ? "انضم إلى فريق من المهندسين المعتمدين الذين يقدمون أنظمة معقدة لأكثر مؤسسات المنطقة تطلباً." : "Join a team of certified engineers delivering complex systems for the region's most demanding enterprises.")}
               </p>
             </div>
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 aspect-video md:aspect-auto md:h-full min-h-[300px]">

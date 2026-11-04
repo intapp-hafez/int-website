@@ -4,7 +4,7 @@ import { useAuth, type Role, isClientRole } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2, Tag, ArrowRight, ArrowLeft, MessageSquare, Layers, CalendarDays } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2, Tag, ArrowRight, ArrowLeft, MessageSquare, Layers, CalendarDays, Heading } from "lucide-react";
 import { useCanAccess, usePermissions, resolveAdminPage } from "@/lib/permissions-store";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import logo from "@/assets/logo.png";
@@ -53,8 +53,8 @@ const adminGroups: NavGroup[] = [
       { to: "/dashboard/admin/projects", en: "Projects", ar: "المشاريع", icon: ShieldCheck, role: "admin", pageKey: "projects" },
       { to: "/dashboard/admin/services", en: "Services", ar: "الخدمات", icon: Briefcase, role: "admin", pageKey: "services" },
       { to: "/dashboard/admin/solutions", en: "Solutions", ar: "الحلول", icon: Layers, role: "admin", pageKey: "solutions" },
-      { to: "/dashboard/admin/products", en: "Products", ar: "المنتجات", icon: ShoppingBag, role: "admin", pageKey: "products" },
-      { to: "/dashboard/admin/product-categories", en: "Product Categories", ar: "فئات المنتجات", icon: Tag, role: "admin", pageKey: "products" },
+      { to: "/dashboard/admin/products", en: "Systems", ar: "الأنظمة", icon: ShoppingBag, role: "admin", pageKey: "products" },
+      { to: "/dashboard/admin/product-categories", en: "System Categories", ar: "فئات الأنظمة", icon: Tag, role: "admin", pageKey: "products" },
       { to: "/dashboard/admin/reports", en: "Reports", ar: "التقارير", icon: BarChart3, role: "admin", pageKey: "reports" },
     ],
   },
@@ -69,6 +69,7 @@ const adminGroups: NavGroup[] = [
   {
     en: "Content", ar: "المحتوى", icon: FileCog,
     items: [
+      { to: "/dashboard/admin/titles", en: "Titles & Subtitles", ar: "العناوين والنصوص", icon: Heading, role: "admin", pageKey: "titles" },
       { to: "/dashboard/admin/sliders", en: "Sliders", ar: "العروض المتحركة", icon: Images, role: "admin", pageKey: "sliders" },
       { to: "/dashboard/admin/industries", en: "Industries", ar: "القطاعات", icon: Building2, role: "admin", pageKey: "industries" },
       { to: "/dashboard/admin/partners", en: "Partners", ar: "الشركاء", icon: Users, role: "admin", pageKey: "partners" },
@@ -303,11 +304,12 @@ const MODULE_DESCRIPTIONS: Record<string, { en: string; ar: string }> = {
   reviews: { en: "Customer testimonials", ar: "تقييمات وآراء العملاء" },
   projects: { en: "Portfolio case studies", ar: "المشاريع والأعمال المنجزة" },
   services: { en: "Technical service offerings", ar: "الخدمات والحلول التقنية" },
-  products: { en: "Product catalog items", ar: "كتالوج المنتجات والأجهزة" },
+  products: { en: "System catalog items", ar: "كتالوج الأنظمة والأجهزة" },
   reports: { en: "Performance analytics", ar: "التقارير والإحصاءات" },
   careers: { en: "Recruitment & job openings", ar: "الوظائف وإدارة التوظيف" },
   careers_applications: { en: "Review candidate profiles", ar: "مراجعة طلبات التوظيف" },
   careers_analytics: { en: "Hiring metrics & pipeline", ar: "تحليلات وإحصاءات التوظيف" },
+  titles: { en: "Dynamic page & section titles", ar: "عناوين ونصوص الأقسام والصفحات" },
   sliders: { en: "Homepage banners & slides", ar: "عروض وبنرات الصفحة الرئيسية" },
   industries: { en: "Target industry sectors", ar: "القطاعات المستهدفة" },
   partners: { en: "Partner network & vendors", ar: "شبكة الشركاء والموردين" },

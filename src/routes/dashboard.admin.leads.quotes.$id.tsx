@@ -89,7 +89,7 @@ function QuoteDetailPage() {
           company: lead.company,
           email: lead.email,
           phone: lead.phone,
-          service_name: lead.product_name ? `Product Quotation: ${lead.product_name}` : "Product Integration Solution",
+          service_name: lead.product_name ? `System Quotation: ${lead.product_name}` : "System Integration Solution",
           total: 5000,
           currency: "USD",
           status: "draft",
@@ -206,7 +206,7 @@ function QuoteDetailPage() {
           {lead.product_slug && (
             <div className="inline-flex items-center gap-2 text-sm bg-muted/30 p-2.5 rounded-xl border">
               <Package className="h-4 w-4 text-accent" />
-              <span className="text-muted-foreground">{isAr ? "المنتج المطلوب:" : "Requested Product:"}</span>
+              <span className="text-muted-foreground">{isAr ? "النظام المطلوب:" : "Requested System:"}</span>
               <Link to="/products/$slug" params={{ slug: lead.product_slug }} className="font-semibold hover:text-accent">
                 {lead.product_name}
               </Link>

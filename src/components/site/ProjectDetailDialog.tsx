@@ -29,13 +29,13 @@ export function ProjectDetailDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 rounded-2xl border bg-card">
         {/* Cover Image */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-950 flex items-center justify-center">
           <img
             src={project.image || "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80"}
             alt={title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
           <div className="absolute top-4 start-4">
             <Badge variant="secondary" className="bg-background/85 backdrop-blur font-semibold px-3 py-1 text-xs">
               <Building2 className="h-3.5 w-3.5 me-1.5 text-accent" />
@@ -58,7 +58,7 @@ export function ProjectDetailDialog({
             </h4>
             {isHtml ? (
               <div
-                className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed"
+                className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-sm [&_h3]:font-bold [&_h3]:text-foreground [&_h3]:mt-4 [&_h3]:mb-2 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:ps-5 [&_ul]:mb-4 [&_li]:mb-1.5 [&_strong]:text-foreground [&_strong]:font-semibold"
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(desc) }}
               />
             ) : desc.includes("•") || desc.includes(" - ") ? (

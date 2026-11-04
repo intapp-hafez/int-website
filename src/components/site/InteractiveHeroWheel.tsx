@@ -185,7 +185,7 @@ export function InteractiveHeroWheel() {
               const midAngle = (s.startAngle + s.endAngle) / 2;
               const isBottom = midAngle >= 90 && midAngle < 270;
               // Multi-line labels get one arc per line (outer line first); single-line labels stay mid-band
-              const radii = s.titleLines ? [151, 131] : [142];
+              const radii = s.titleLines ? [149, 127] : [138];
               return radii.map((r, i) => {
                 const pathD = isBottom
                   ? describeTextArc(250, 250, r, s.endAngle - 2, s.startAngle + 2, 0)
@@ -247,7 +247,7 @@ export function InteractiveHeroWheel() {
               >
                 <Link to={s.href as any}>
                   <path
-                    d={describeArcSector(250, 250, 105, 178, s.startAngle + 1.5, s.endAngle - 1.5)}
+                    d={describeArcSector(250, 250, 86, 178, s.startAngle + 1.5, s.endAngle - 1.5)}
                     fill={`url(#grad-${s.id})`}
                     className={`transition-all duration-300 ${
                       isHovered ? "opacity-100 filter brightness-110 drop-shadow-lg" : "opacity-85 hover:opacity-100"
@@ -279,23 +279,23 @@ export function InteractiveHeroWheel() {
           <circle
             cx="250"
             cy="250"
-            r="102"
-            className="fill-card stroke-border/70 drop-shadow-xl transition-all"
-            strokeWidth="4"
+            r="86.5"
+            className="fill-white"
+
           />
         </svg>
 
         {/* Central Core: LOGO (Clickable -> Home) */}
         <Link
           to="/"
-          className="absolute z-20 w-[41.5%] aspect-square rounded-full bg-white border-2 border-[#E8722C]/50 hover:border-[#E8722C] shadow-[0_4px_28px_rgba(232,114,44,0.22)] flex items-center justify-center p-1 hover:scale-105 active:scale-95 transition-all duration-300 group cursor-pointer"
+          className="absolute z-20 w-[34.4%] aspect-square rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-transform duration-300 group cursor-pointer"
           title={lang === "ar" ? "الصفحة الرئيسية — إنتجريتد تكنيكس" : "Home — Integrated Technics"}
         >
           <div className="relative w-full h-full flex items-center justify-center">
             <img
               src="/logo-512x512.png"
               alt="Integrated Technics"
-              className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-300 select-none scale-120"
+              className="w-[82%] h-[82%] object-contain group-hover:scale-105 transition-transform duration-300 select-none"
               draggable={false}
             />
           </div>

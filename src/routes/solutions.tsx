@@ -7,6 +7,7 @@ import { useSolutions, getSolutionIcon, type SolutionRow } from "@/lib/solutions
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/solutions")({
   head: () => ({
@@ -33,6 +34,7 @@ function SolutionsIndex() {
   const { lang, t } = useI18n();
   const isAr = lang === "ar";
   const { solutions, loading } = useSolutions();
+  const sectionTitle = useSectionTitle("page.solutions");
   const [search, setSearch] = useState("");
 
   const activeSolutions = solutions.filter((s) => s.active !== false);
@@ -68,7 +70,7 @@ function SolutionsIndex() {
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold uppercase tracking-widest mb-5"
           >
             <Layers className="h-3.5 w-3.5" />
-            <span>{isAr ? "الحلول المتكاملة" : "Enterprise Solutions"}</span>
+            <span>{sectionTitle.badge || (isAr ? "الحلول المتكاملة" : "Enterprise Solutions")}</span>
           </motion.div>
 
           <motion.h1
@@ -77,10 +79,17 @@ function SolutionsIndex() {
             transition={{ delay: 0.25, duration: 0.7 }}
             className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight text-foreground font-display"
           >
-            {isAr ? (
-              <>منظومات تقنية وهندسية <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">متكاملة</span></>
+            {sectionTitle.title.split(" ").length > 2 ? (
+              <>
+                {sectionTitle.title.split(" ").slice(0, -1).join(" ")}{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                  {sectionTitle.title.split(" ").slice(-1).join(" ")}
+                </span>
+              </>
             ) : (
-              <>End-to-End Enterprise <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Solutions</span></>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                {sectionTitle.title}
+              </span>
             )}
           </motion.h1>
 
@@ -90,9 +99,7 @@ function SolutionsIndex() {
             transition={{ delay: 0.35, duration: 0.7 }}
             className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8"
           >
-            {isAr
-              ? "تصميم وتنفيذ وتشغيل منظومات البنية التحتية، الأمن السيبراني، المراقبة الذكية ومراكز البيانات بأعلى معايير الجودة والاعتمادية العالمية."
-              : "Turnkey enterprise integration spanning cyber defense, intelligent networking, optical surveillance, and next-generation data center infrastructure."}
+            {sectionTitle.subtitle}
           </motion.p>
 
           {/* Search Box */}

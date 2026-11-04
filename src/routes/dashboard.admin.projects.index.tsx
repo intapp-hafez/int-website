@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useProjects, type Project } from "@/lib/projects-store";
+import { stripHtmlTags } from "@/lib/project-content";
 import { Plus, Pencil, Trash2, Upload, Loader2, Save, X, ExternalLink } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useAdminT } from "@/lib/admin-i18n";
@@ -273,7 +274,7 @@ function ProjectsAdmin() {
                     className={`border rounded-lg overflow-hidden bg-card transition-all duration-200 flex flex-col ${!p.active ? "opacity-60 bg-muted/20" : ""}`}
                   >
                     <div className="relative aspect-[16/9] overflow-hidden bg-muted">
-                      <img src={p.image || "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80"} alt="" className="w-full h-full object-cover" />
+                      <img src={p.image || "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80"} alt="" className="w-full h-full object-contain" />
                       <div className="absolute top-2 end-2">
                         <Badge variant={p.active ? "default" : "secondary"} className="text-[10px] shadow">
                           {p.active ? (isAr ? "منشور" : "Live") : (isAr ? "معطل" : "Hidden")}
@@ -287,7 +288,7 @@ function ProjectsAdmin() {
                           <span className="text-[10px] text-muted-foreground">#{p.id}</span>
                         </div>
                         <h3 className="font-medium text-sm line-clamp-1">{title}</h3>
-                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{desc}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{stripHtmlTags(desc)}</p>
                       </div>
 
                       <div className="flex items-center justify-between gap-2 pt-3 border-t mt-2">
@@ -343,7 +344,7 @@ function ProjectsAdmin() {
                     <img src={p.image || "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80"} alt="" className="h-10 w-14 object-cover rounded shrink-0" />
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-medium truncate">{title}</div>
-                      <div className="text-xs text-muted-foreground truncate">{desc}</div>
+                      <div className="text-xs text-muted-foreground truncate">{stripHtmlTags(desc)}</div>
                     </div>
                     <Badge variant="secondary" className="hidden sm:inline-flex">{p.industry}</Badge>
                     <div className="flex items-center gap-2">
@@ -385,7 +386,7 @@ function ProjectsAdmin() {
 
       {/* INLINE EDIT / CREATE PROJECT MODAL DIALOG */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl sm:max-w-5xl md:max-w-6xl w-[95vw] max-h-[92vh] overflow-y-auto">
           <DialogHeader className="flex flex-row items-center justify-between pb-2 border-b">
             <DialogTitle className="font-display text-xl">
               {isEditing ? (isAr ? `تعديل المشروع #${form.id}` : `Edit Project #${form.id}`) : (isAr ? "إضافة مشروع جديد" : "Add New Project")}
@@ -466,8 +467,8 @@ function ProjectsAdmin() {
             </div>
 
             {form.image && (
-              <div className="relative aspect-[16/9] max-h-40 w-full rounded-lg overflow-hidden border bg-muted">
-                <img src={form.image} alt="" className="w-full h-full object-cover" />
+              <div className="relative aspect-video max-h-52 w-full max-w-md mx-auto rounded-lg overflow-hidden border bg-neutral-950">
+                <img src={form.image} alt="" className="w-full h-full object-contain" />
               </div>
             )}
 

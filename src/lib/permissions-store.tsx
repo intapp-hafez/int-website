@@ -27,6 +27,7 @@ export const ADMIN_PAGES: AdminPage[] = [
   { key: "users", en: "Users", ar: "المستخدمون" },
   { key: "permissions", en: "Permissions", ar: "الصلاحيات" },
   { key: "faqs", en: "FAQs", ar: "الأسئلة الشائعة" },
+  { key: "titles", en: "Titles & Subtitles", ar: "العناوين والنصوص" },
   { key: "about", en: "About Page", ar: "صفحة من نحن" },
   { key: "terms", en: "Terms", ar: "الشروط والأحكام" },
   { key: "policies", en: "Privacy Policy", ar: "سياسة الخصوصية" },

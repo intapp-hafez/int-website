@@ -54,7 +54,7 @@ type Page = {
 const DEFAULT_SITE_PAGES: Array<Omit<Page, "noindex" | "og_image_url">> = [
   { id: 'home', path: '/', title_en: 'Integrated Technics — Enterprise Security & ICT Integrator', title_ar: 'إنتجريتد تكنيكس — تكامل أنظمة الأمن وتكنولوجيا المعلومات للمؤسسات', description_en: 'Turnkey security, ICT, AV and data center integration delivered end-to-end by certified engineers.', description_ar: 'حلول متكاملة للأمن وتكنولوجيا المعلومات والصوتيات والمرئيات ومراكز البيانات يقدمها مهندسون معتمدون.', keywords_en: 'system integrator, enterprise security, ICT, AV, data center', keywords_ar: 'تكامل الأنظمة، أمن المؤسسات، تكنولوجيا المعلومات، مراكز البيانات', sort_order: 1 },
   { id: 'services', path: '/services', title_en: 'Services — Security, ICT, AV & Data Center Solutions', title_ar: 'الخدمات — حلول الأمن وتكنولوجيا المعلومات والصوتيات ومراكز البيانات', description_en: 'Explore our security integration, structured cabling, AV, networking, smart building and data center services.', description_ar: 'تعرف على خدماتنا في تكامل الأنظمة الأمنية والكابلات المهيكلة والصوتيات والشبكات والمباني الذكية ومراكز البيانات.', keywords_en: 'security services, structured cabling, networking, smart building, av integration, data center services', keywords_ar: 'خدمات الأمن، الكابلات المهيكلة، الشبكات، المباني الذكية، تكامل الصوتيات والمرئيات', sort_order: 2 },
-  { id: 'products', path: '/products', title_en: 'Products & Enterprise Hardware Catalog — Integrated Technics', title_ar: 'المنتجات وكتالوج الأجهزة المؤسسية — إنتجريتد تكنيكس', description_en: 'Browse certified enterprise hardware, IP surveillance, rack servers, network switches, and biometric access controllers.', description_ar: 'استعرض أجهزة المؤسسات المعتمدة، كاميرات المراقبة، خوادم الكبائن، محولات الشبكة، وأجهزة التحكم بالدخول.', keywords_en: 'enterprise products, cctv hardware, rack servers, network switches, biometric access', keywords_ar: 'منتجات المؤسسات، أجهزة كاميرات المراقبة، خوادم، محولات شبكة، تحكم بالوصول', sort_order: 3 },
+  { id: 'products', path: '/products', title_en: 'Systems & Enterprise Solutions Catalog — Integrated Technics', title_ar: 'الأنظمة وكتالوج الحلول المؤسسية — إنتجريتد تكنيكس', description_en: 'Browse certified enterprise hardware, IP surveillance, rack servers, network switches, and biometric access controllers.', description_ar: 'استعرض أجهزة المؤسسات المعتمدة، كاميرات المراقبة، خوادم الكبائن، محولات الشبكة، وأجهزة التحكم بالدخول.', keywords_en: 'enterprise systems, cctv hardware, rack servers, network switches, biometric access', keywords_ar: 'أنظمة المؤسسات، أجهزة كاميرات المراقبة، خوادم، محولات شبكة، تحكم بالوصول', sort_order: 3 },
   { id: 'solutions', path: '/solutions', title_en: 'Turnkey Solutions & Systems Architecture — Integrated Technics', title_ar: 'الحلول المتكاملة ومعمارية الأنظمة — إنتجريتد تكنيكس', description_en: 'Comprehensive technology solutions for enterprise surveillance, unified communications, and critical facility infrastructure.', description_ar: 'حلول تكنولوجية شاملة للمراقبة المؤسسية، الاتصالات الموحدة، والبنية التحتية للمنشآت الحيوية.', keywords_en: 'enterprise solutions, surveillance solutions, unified communications, critical infrastructure', keywords_ar: 'حلول مؤسسية، حلول مراقبة، اتصالات موحدة، بنية تحتية حيوية', sort_order: 4 },
   { id: 'industries', path: '/industries', title_en: 'Industries We Serve — Banking, Energy, Government & More', title_ar: 'القطاعات التي نخدمها — البنوك والطاقة والحكومة وأكثر', description_en: 'Tailored low-current and ICT solutions for banking, energy, government, healthcare, education and hospitality sectors.', description_ar: 'حلول التيار الخفيف وتكنولوجيا المعلومات مخصصة لقطاعات البنوك والطاقة والحكومة والصحة والتعليم والضيافة.', keywords_en: 'industries, banking technology, government ICT, healthcare security, education AV', keywords_ar: 'القطاعات، تقنية البنوك، تكنولوجيا المعلومات الحكومية، أمن الرعاية الصحية', sort_order: 5 },
   { id: 'projects', path: '/projects', title_en: 'Projects & Case Studies — Integrated Technics', title_ar: 'المشاريع ودراسات الحالة — إنتجريتد تكنيكس', description_en: 'Browse delivered projects across security, networking, AV and data center for leading enterprises.', description_ar: 'استعرض المشاريع المنفذة في مجالات الأمن والشبكات والصوتيات ومراكز البيانات لكبرى المؤسسات.', keywords_en: 'case studies, integration projects, security projects, data center projects', keywords_ar: 'دراسات حالة، مشاريع التكامل، مشاريع الأمن، مشاريع مراكز البيانات', sort_order: 6 },
@@ -225,7 +225,7 @@ function SeoAdminPage() {
           <TabsTrigger value="bot"><Bot className="h-4 w-4 me-2" /> AI Bot</TabsTrigger>
           <TabsTrigger value="global"><Globe2 className="h-4 w-4 me-2" /> Global Defaults</TabsTrigger>
           <TabsTrigger value="pages"><Search className="h-4 w-4 me-2" /> Pages ({pages.length})</TabsTrigger>
-          <TabsTrigger value="products"><Package className="h-4 w-4 me-2" /> Product SEO</TabsTrigger>
+          <TabsTrigger value="products"><Package className="h-4 w-4 me-2" /> System SEO</TabsTrigger>
           <TabsTrigger value="services"><Wrench className="h-4 w-4 me-2" /> Service SEO</TabsTrigger>
           <TabsTrigger value="analytics"><BarChart3 className="h-4 w-4 me-2" /> Analytics</TabsTrigger>
           <TabsTrigger value="verify"><ShieldCheck className="h-4 w-4 me-2" /> Verifications</TabsTrigger>
@@ -602,7 +602,7 @@ function ProductSeoPanel() {
     }).eq("id", draft.id);
     setSaving(false);
     if (error) toast.error(error.message);
-    else { toast.success("Saved product SEO"); setItems((p) => p.map((x) => x.id === draft.id ? draft : x)); }
+    else { toast.success("Saved system SEO"); setItems((p) => p.map((x) => x.id === draft.id ? draft : x)); }
   };
 
   const hasSeo = (r: ProductRow) =>
@@ -624,7 +624,7 @@ function ProductSeoPanel() {
 
   const deleteSeo = async () => {
     if (!draft) return;
-    if (!confirm("Clear all SEO fields for this product?")) return;
+    if (!confirm("Clear all SEO fields for this system?")) return;
     setSaving(true);
     const cleared = { meta_title_en: null, meta_title_ar: null, meta_description_en: null, meta_description_ar: null, meta_keywords: null, og_image: null, canonical_url: null };
     const { error } = await supabase.from("products").update(cleared).eq("id", draft.id);
@@ -634,7 +634,7 @@ function ProductSeoPanel() {
       const next = { ...draft, ...cleared } as ProductRow;
       setDraft(next);
       setItems((p) => p.map((x) => x.id === draft.id ? next : x));
-      toast.success("Product SEO cleared");
+      toast.success("System SEO cleared");
     }
   };
 
@@ -644,20 +644,20 @@ function ProductSeoPanel() {
         <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-4">
           <div>
             <CardTitle className="flex items-center gap-2">
-              Select a real product <Badge variant="secondary">{items.length}</Badge>
+              Select a real system <Badge variant="secondary">{items.length}</Badge>
             </CardTitle>
-            <CardDescription>Edit per-product meta tags (title, description, keywords, OG image, canonical).</CardDescription>
+            <CardDescription>Edit per-system meta tags (title, description, keywords, OG image, canonical).</CardDescription>
           </div>
           <Button size="sm" variant="outline" onClick={loadProducts} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 me-1.5 ${loading ? "animate-spin" : ""}`} /> Refresh Products
+            <RefreshCw className={`h-4 w-4 me-1.5 ${loading ? "animate-spin" : ""}`} /> Refresh Systems
           </Button>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-sm text-muted-foreground flex items-center gap-2 py-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading real products…</div>
+            <div className="text-sm text-muted-foreground flex items-center gap-2 py-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading real systems…</div>
           ) : (
             <Select value={sel} onValueChange={setSel}>
-              <SelectTrigger className="max-w-md"><SelectValue placeholder={items.length ? "Choose a product…" : "No products yet"} /></SelectTrigger>
+              <SelectTrigger className="max-w-md"><SelectValue placeholder={items.length ? "Choose a system…" : "No systems yet"} /></SelectTrigger>
               <SelectContent>
                 {items.map((p) => (
                   <SelectItem key={p.id} value={p.id}>
@@ -687,7 +687,7 @@ function ProductSeoPanel() {
                     <Badge variant="secondary" className="text-[10px]">SEO set</Badge>
                   ) : (
                     <Button size="sm" variant="outline" onClick={createFromProduct} disabled={saving}>
-                      <Plus className="h-4 w-4 me-1" /> Create from product
+                      <Plus className="h-4 w-4 me-1" /> Create from system
                     </Button>
                   )}
                   <Button size="sm" variant="ghost" onClick={deleteSeo} disabled={saving || !hasSeo(draft)}>
@@ -1024,7 +1024,7 @@ function SeoBulkImport({ kind, items, onApplied }: { kind: BulkKind; items: Bulk
     const ws = XLSX.utils.json_to_sheet(sample, { header: ["slug", ...optional] });
     ws["!cols"] = [{ wch: 24 }, ...optional.map(() => ({ wch: 28 }))];
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, kind === "product" ? "Product SEO" : "Service SEO");
+    XLSX.utils.book_append_sheet(wb, ws, kind === "product" ? "System SEO" : "Service SEO");
     XLSX.writeFile(wb, `${kind}-seo-template.xlsx`);
   };
 

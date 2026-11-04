@@ -16,9 +16,11 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useProjects, type Project } from "@/lib/projects-store";
+import { formatProjectContent } from "@/lib/project-content";
 import { cn } from "@/lib/utils";
 import { ProjectDetailDialog } from "@/components/site/ProjectDetailDialog";
 import { Button } from "@/components/ui/button";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
@@ -33,19 +35,7 @@ export const Route = createFileRoute("/projects")({
   component: ProjectsPage,
 });
 
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>?/gm, "").trim();
-}
 
-function parseScopeItems(desc: string): string[] {
-  if (desc.includes("•")) {
-    return desc.split("•").map((s) => s.trim()).filter(Boolean);
-  }
-  if (desc.includes(" - ")) {
-    return desc.split(" - ").map((s) => s.trim()).filter(Boolean);
-  }
-  return [desc];
-}
 
 const INDUSTRY_TRANSLATIONS: Record<string, { en: string; ar: string }> = {
   All: { en: "All Sectors", ar: "جميع القطاعات" },
@@ -62,6 +52,7 @@ export default function ProjectsPage() {
   const { t, lang } = useI18n();
   const isAr = lang === "ar";
   const { items: projects, loading } = useProjects();
+  const sectionTitle = useSectionTitle("page.projects");
   const [filter, setFilter] = useState<string>("All");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [clienteleModalOpen, setClienteleModalOpen] = useState(false);
@@ -98,7 +89,7 @@ export default function ProjectsPage() {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8722C]/10 border border-[#E8722C]/30 text-[#E8722C] text-xs font-bold uppercase tracking-wider mb-6 shadow-sm"
           >
             <Briefcase className="h-3.5 w-3.5" />
-            {isAr ? "العملاء والمشاريع المرجعية والمعرض" : "Clientele, Projects References & Gallery"}
+            {sectionTitle.badge || (isAr ? "العملاء والمشاريع المرجعية والمعرض" : "Clientele, Projects References & Gallery")}
           </motion.div>
 
           <motion.h1
@@ -109,20 +100,17 @@ export default function ProjectsPage() {
               isAr ? "leading-[1.35] sm:leading-[1.25]" : ""
             }`}
           >
-            {isAr ? (
+            {sectionTitle.title.split(" ").length > 2 ? (
               <>
-                سجل المشاريع{" "}
+                {sectionTitle.title.split(" ").slice(0, -2).join(" ")}{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#E8722C] to-accent">
-                  والإنجازات الهندسية المرجعية
+                  {sectionTitle.title.split(" ").slice(-2).join(" ")}
                 </span>
               </>
             ) : (
-              <>
-                Prestigious References &{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#E8722C] to-accent">
-                  Engineering Showcase
-                </span>
-              </>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#E8722C] to-accent">
+                {sectionTitle.title}
+              </span>
             )}
           </motion.h1>
 
@@ -132,9 +120,7 @@ export default function ProjectsPage() {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed"
           >
-            {isAr
-              ? "نخبة من المشاريع القومية والسيادية، المطارات، البنوك المركزية، والمدن الذكية المنفذة بأعلى معايير الجودة والاعتماد العالمي."
-              : "A showcase of turnkey security, ICT, BMS and audiovisual infrastructure delivered for Egypt's top government ministries, central banks, and mega-cities."}
+            {sectionTitle.subtitle}
           </motion.p>
         </motion.div>
       </section>
@@ -258,8 +244,7 @@ export default function ProjectsPage() {
           filtered.map((p, idx) => {
             const title = p.title[lang] || p.title.en || "Project";
             const rawDesc = p.desc[lang] || p.desc.en || "";
-            const plainDesc = stripHtml(rawDesc);
-            const scopeBullets = parseScopeItems(plainDesc);
+            const { overview, scopeBullets } = formatProjectContent(rawDesc);
             const isEven = idx % 2 === 0;
 
             const industryLabel = INDUSTRY_TRANSLATIONS[p.industry]
@@ -277,7 +262,7 @@ export default function ProjectsPage() {
                       viewport={{ once: true, margin: "-80px" }}
                       transition={{ duration: 0.7, ease: "easeOut" }}
                       onClick={() => setSelectedProject(p)}
-                      className={`relative rounded-3xl overflow-hidden cursor-pointer group border-2 border-[#E8722C] shadow-[0_4px_24px_rgba(232,114,44,0.14)] aspect-[4/3] ${
+                      className={`relative rounded-3xl overflow-hidden cursor-pointer group border-2 border-[#E8722C] shadow-[0_4px_24px_rgba(232,114,44,0.14)] aspect-video ${
                         !isEven ? "lg:order-last" : ""
                       }`}
                     >
@@ -286,14 +271,14 @@ export default function ProjectsPage() {
                         <span className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#E8722C_85%,transparent_100%)] opacity-80" />
                       </div>
 
-                      <div className="relative z-10 w-full h-full overflow-hidden bg-muted">
+                      <div className="relative z-10 w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
                         <img
                           src={p.image || "/projects/alamein.jpg"}
                           alt={title}
                           loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 ease-out"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-80 group-hover:opacity-50 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none" />
 
                         {/* Floating Industry Badge */}
                         <div className="absolute bottom-5 left-5 lg:bottom-6 lg:left-6 px-4 py-2 bg-background/90 backdrop-blur-md rounded-xl border border-[#E8722C]/40 shadow-lg flex items-center gap-2 text-foreground font-semibold text-xs group-hover:-translate-y-1 transition-all duration-300">
@@ -323,25 +308,34 @@ export default function ProjectsPage() {
 
                       <h2
                         onClick={() => setSelectedProject(p)}
-                        className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-5 text-foreground tracking-tight cursor-pointer hover:text-[#E8722C] transition-colors"
+                        className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-4 text-foreground tracking-tight cursor-pointer hover:text-[#E8722C] transition-colors"
                       >
                         {title}
                       </h2>
 
+                      {/* Executive overview paragraph when present */}
+                      {overview && (
+                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-5 line-clamp-3">
+                          {overview}
+                        </p>
+                      )}
+
                       {/* Scope highlights as executive bullet tags */}
-                      <div className="space-y-2 mb-6">
-                        {scopeBullets.slice(0, 4).map((bullet, bIdx) => (
-                          <div key={bIdx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                            <CheckCircle2 className="h-4 w-4 text-[#E8722C] shrink-0 mt-0.5" />
-                            <span className="leading-snug">{bullet}</span>
-                          </div>
-                        ))}
-                        {scopeBullets.length > 4 && (
-                          <div className="text-xs font-semibold text-[#E8722C] pt-1">
-                            +{scopeBullets.length - 4} {isAr ? "أنظمة إضافية منفذة في هذا المشروع" : "more specialized systems integrated"}
-                          </div>
-                        )}
-                      </div>
+                      {scopeBullets.length > 0 && (
+                        <div className="space-y-2.5 mb-6">
+                          {scopeBullets.slice(0, 4).map((bullet, bIdx) => (
+                            <div key={bIdx} className="flex items-start gap-2.5 text-sm sm:text-[15px] text-foreground/90 font-medium">
+                              <CheckCircle2 className="h-4 w-4 text-[#E8722C] shrink-0 mt-0.5" />
+                              <span className="leading-snug">{bullet}</span>
+                            </div>
+                          ))}
+                          {scopeBullets.length > 4 && (
+                            <div className="text-xs font-semibold text-[#E8722C] pt-1">
+                              +{scopeBullets.length - 4} {isAr ? "أنظمة إضافية منفذة في هذا المشروع" : "more specialized systems integrated"}
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       <div className="pt-2">
                         <Button

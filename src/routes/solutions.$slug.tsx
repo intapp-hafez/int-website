@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Layers, Workflow, Building2, ExternalLink, ShieldCheck, Mail, Phone, User, Send, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
-import { useSolutions, getSolutionIcon } from "@/lib/solutions-store";
+import { useSolutions, getSolutionIcon, stripHtml } from "@/lib/solutions-store";
 import { useState, type FormEvent } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -374,7 +374,7 @@ function SolutionDetail() {
                     {isAr ? other.name_ar || other.name_en : other.name_en}
                   </h4>
                   <p className="text-xs text-muted-foreground line-clamp-2">
-                    {isAr ? other.bio_ar || other.bio_en : other.bio_en}
+                    {stripHtml(isAr ? other.bio_ar || other.bio_en : other.bio_en)}
                   </p>
                 </div>
               </Link>

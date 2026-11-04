@@ -39,9 +39,9 @@ const DEFAULTS: Settings = {
   subjectEn: "New quote request — {{product_name}}",
   subjectAr: "طلب عرض سعر جديد — {{product_name}}",
   bodyEn:
-    "Hello Sales Team,\n\nA new quote request has just been submitted from the website.\n\nProduct: {{product_name}} ({{product_slug}})\nLanguage: {{lang}}\n\nFrom: {{full_name}} <{{email}}>\nPhone: {{phone}}\nCompany: {{company}}\n\nMessage:\n{{message}}\n\nOpen lead: {{lead_link}}",
+    "Hello Sales Team,\n\nA new quote request has just been submitted from the website.\n\nSystem: {{product_name}} ({{product_slug}})\nLanguage: {{lang}}\n\nFrom: {{full_name}} <{{email}}>\nPhone: {{phone}}\nCompany: {{company}}\n\nMessage:\n{{message}}\n\nOpen lead: {{lead_link}}",
   bodyAr:
-    "مرحبًا فريق المبيعات،\n\nتم استلام طلب عرض سعر جديد من الموقع.\n\nالمنتج: {{product_name}} ({{product_slug}})\nاللغة: {{lang}}\n\nمن: {{full_name}} <{{email}}>\nالهاتف: {{phone}}\nالشركة: {{company}}\n\nالرسالة:\n{{message}}\n\nفتح الطلب: {{lead_link}}",
+    "مرحبًا فريق المبيعات،\n\nتم استلام طلب عرض سعر جديد من الموقع.\n\nالنظام: {{product_name}} ({{product_slug}})\nاللغة: {{lang}}\n\nمن: {{full_name}} <{{email}}>\nالهاتف: {{phone}}\nالشركة: {{company}}\n\nالرسالة:\n{{message}}\n\nفتح الطلب: {{lead_link}}",
   includeMessage: true,
   includeProductLink: true,
 };
@@ -163,7 +163,7 @@ function QuoteEmailSettingsPage() {
               <Switch checked={s.includeMessage} onCheckedChange={(v) => update("includeMessage", v)} />
             </div>
             <div className="flex items-center justify-between gap-4 rounded-md border p-3">
-              <Label className="font-normal text-sm">Include product link (slug)</Label>
+              <Label className="font-normal text-sm">Include system link (slug)</Label>
               <Switch checked={s.includeProductLink} onCheckedChange={(v) => update("includeProductLink", v)} />
             </div>
           </div>

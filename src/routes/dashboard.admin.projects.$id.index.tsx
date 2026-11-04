@@ -53,7 +53,7 @@ function ProjectDetail() {
       </div>
       <Card>
         <div className="relative aspect-[21/9] max-h-72 overflow-hidden bg-muted">
-          <img src={p.image || "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80"} alt={title} className="w-full h-full object-cover" />
+          <img src={p.image || "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80"} alt={title} className="w-full h-full object-contain" />
           <div className="absolute top-3 end-3">
             <Badge variant={p.active ? "default" : "secondary"}>
               {p.active ? (lang === "ar" ? "منشور نشط" : "Live Active") : (lang === "ar" ? "معطل مخفي" : "Hidden Draft")}

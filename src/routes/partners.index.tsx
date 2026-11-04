@@ -6,6 +6,7 @@ import { SmartLogo } from "@/components/ui/smart-logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search, ArrowRight, Sparkles, ShieldCheck, CheckCircle2, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/partners/")({
   head: () => ({
@@ -21,6 +22,7 @@ function PartnersPage() {
   const { t, lang, dir } = useI18n();
   const { partners, loading } = usePartners();
   const isAr = lang === "ar";
+  const sectionTitle = useSectionTitle("page.partners");
 
   const [search, setSearch] = useState("");
   const [filterTab, setFilterTab] = useState<"all" | "featured">("all");
@@ -75,19 +77,17 @@ function PartnersPage() {
           {/* Eyebrow badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent font-semibold text-xs mb-4">
             <ShieldCheck className="h-4 w-4" />
-            <span>{isAr ? "المنظومة التقنية العالمية" : "Global Technology Alliances"}</span>
+            <span>{sectionTitle.badge || (isAr ? "المنظومة التقنية العالمية" : "Global Technology Alliances")}</span>
           </div>
 
           {/* Heading */}
           <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isAr ? "font-arabic leading-[1.3]" : ""}`}>
-            {isAr ? "شركاء التكنولوجيا" : "Technology Partners"}
+            {sectionTitle.title || (isAr ? "شركاء التكنولوجيا" : "Technology Partners")}
           </h1>
 
           {/* Subtitle */}
           <p className={`text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed ${isAr ? "font-arabic leading-loose ms-auto" : ""}`}>
-            {isAr
-              ? "شريك معتمد واستراتيجي لأبرز الشركات العالمية في مجالات البنية التحتية، الشبكات، الأمن والمراقبة الذكية، والأنظمة المدمجة."
-              : "Authorized and strategic integration partner with leading global hardware, networking, and enterprise security manufacturers."}
+            {sectionTitle.subtitle}
           </p>
 
           {/* Search & Filter Toolbar */}

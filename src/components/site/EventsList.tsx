@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { registerForEvent, useEvents, type EventRow } from "@/lib/events";
 import { buildIcs, downloadIcs } from "@/lib/ics";
 import DOMPurify from "dompurify";
+import { useSectionTitle } from "@/lib/titles-store";
 
 function fmt(d: string | null, isAr: boolean) {
   if (!d) return "";
@@ -27,6 +28,7 @@ export function EventsList() {
   const { lang, dir } = useI18n();
   const isAr = lang === "ar";
   const { items, loading } = useEvents(true);
+  const sectionTitle = useSectionTitle("page.events");
 
   const copy = {
     eyebrow: isAr ? "الفعاليات" : "Events",
@@ -42,9 +44,9 @@ export function EventsList() {
       <section className="gradient-surface relative">
         <div className="absolute inset-0 grid-bg opacity-50" />
         <div className={`container mx-auto px-4 lg:px-8 py-24 relative ${isAr ? "text-right" : "text-left"}`}>
-          <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{copy.eyebrow}</div>
-          <h1 className={`text-4xl md:text-6xl font-bold mb-4 ${isAr ? "font-arabic leading-[1.3]" : ""}`}>{copy.title}</h1>
-          <p className={`text-lg text-muted-foreground max-w-2xl ${isAr ? "font-arabic leading-loose ms-auto" : ""}`}>{copy.sub}</p>
+          <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">{sectionTitle.badge || copy.eyebrow}</div>
+          <h1 className={`text-4xl md:text-6xl font-bold mb-4 ${isAr ? "font-arabic leading-[1.3]" : ""}`}>{sectionTitle.title || copy.title}</h1>
+          <p className={`text-lg text-muted-foreground max-w-2xl ${isAr ? "font-arabic leading-loose ms-auto" : ""}`}>{sectionTitle.subtitle || copy.sub}</p>
         </div>
       </section>
 

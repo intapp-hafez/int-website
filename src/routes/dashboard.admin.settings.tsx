@@ -852,7 +852,7 @@ function SettingsPage() {
                 ["about", "About", "من نحن"],
                 ["services", "Services", "الخدمات"],
                 ["solutions", "Solutions", "الحلول"],
-                ["products", "Products", "المنتجات"],
+                ["products", "Systems", "الأنظمة"],
                 ["projects", "Projects", "المشاريع"],
                 ["industries", "Industries", "القطاعات"],
                 ["careers", "Careers", "الوظائف"],
@@ -1150,7 +1150,7 @@ function VisibilityPreview({
     show("home") && { label: L("Home", "الرئيسية") },
     show("about") && { label: L("About", "من نحن") },
     show("services") && { label: L("Services", "الخدمات"), mega: true },
-    show("products") && { label: L("Products", "المنتجات") },
+    show("products") && { label: L("Systems", "الأنظمة") },
     show("projects") && { label: L("Projects", "المشاريع") },
   ].filter(Boolean) as { label: string; mega?: boolean }[];
 
@@ -1159,7 +1159,7 @@ function VisibilityPreview({
     show("services") && L("Services", "الخدمات"),
     show("projects") && L("Projects", "المشاريع"),
     show("industries") && L("Industries", "القطاعات"),
-    show("products") && L("Products", "المنتجات"),
+    show("products") && L("Systems", "الأنظمة"),
   ].filter(Boolean) as string[];
 
   const footerCompany = [
