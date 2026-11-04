@@ -71,7 +71,7 @@ function TitlesAdminPage() {
   const isAr = lang === "ar";
   const { user } = useAuth();
   const { getUserPerms } = usePermissions();
-  const _perms = user?.role === "admin" ? { add: true, edit: true, delete: true } : (getUserPerms(user?.id)?.titles ?? { add: false, edit: false, delete: false });
+  const _perms = user?.role === "admin" ? { add: true, edit: true, delete: true } : (getUserPerms(user?.id ?? "")?.titles ?? { add: false, edit: false, delete: false });
 
   const [selectedPage, setSelectedPage] = useState("all");
   const [search, setSearch] = useState("");
