@@ -1890,6 +1890,45 @@ export type Database = {
         }
         Relationships: []
       }
+      site_titles: {
+        Row: {
+          badge_ar: string | null
+          badge_en: string | null
+          key: string
+          page: string
+          section: string
+          subtitle_ar: string | null
+          subtitle_en: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string | null
+        }
+        Insert: {
+          badge_ar?: string | null
+          badge_en?: string | null
+          key: string
+          page?: string
+          section?: string
+          subtitle_ar?: string | null
+          subtitle_en?: string | null
+          title_ar: string
+          title_en: string
+          updated_at?: string | null
+        }
+        Update: {
+          badge_ar?: string | null
+          badge_en?: string | null
+          key?: string
+          page?: string
+          section?: string
+          subtitle_ar?: string | null
+          subtitle_en?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       smtp_settings: {
         Row: {
           created_at: string
