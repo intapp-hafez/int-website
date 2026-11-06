@@ -9,14 +9,21 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { usePartners, type PartnerRow } from "@/lib/partners-store";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Plus, Loader2, Upload, ImageIcon, ArrowUp, ArrowDown, Star, ChevronDown, ChevronUp, FileText } from "lucide-react";
+import { Trash2, Plus, Loader2, Upload, ImageIcon, ArrowUp, ArrowDown, Star, ChevronDown, ChevronUp, FileText, Search, X } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/dashboard/admin/partners")({
-  head: () => ({ meta: [{ title: "Partners — Admin" }] }),
+  head: () => ({ meta: [
+    { title: "Partners — INT Admin" },
+    { name: "description", content: "Manage and search INT technology partners." },
+    { property: "og:title", content: "Partners — INT Admin" },
+    { property: "og:description", content: "Manage and search INT technology partners." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: PartnersAdminPage,
 });
 
@@ -50,6 +57,12 @@ function PartnersAdminPage() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("list");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const query = search.trim().toLocaleLowerCase();
+  const visiblePartners = sorted
+    .map((partner, index) => ({ partner, index }))
+    .filter(({ partner }) => [partner.name_en, partner.name_ar, partner.href]
+      .some(value => (value ?? "").toLocaleLowerCase().includes(query)));
 
   const handleDraftUpload = async (file: File | null) => {
     if (!file) return;
@@ -167,7 +180,20 @@ function PartnersAdminPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="list" className="mt-0">
+        <TabsContent value="list" className="mt-0 space-y-4">
+          <div className="relative w-full sm:max-w-sm">
+            <Search aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              aria-label="Search partners by English or Arabic name or link"
+              placeholder="Search partners…"
+              value={search}
+              onChange={event => setSearch(event.target.value)}
+              className="ps-9 pe-10 [&::-webkit-search-cancel-button]:hidden"
+            />
+            {search && <Button type="button" variant="ghost" size="icon" aria-label="Clear partner search" onClick={() => setSearch("")} className="absolute end-1 top-1/2 h-8 w-8 -translate-y-1/2"><X aria-hidden="true" className="h-4 w-4" /></Button>}
+          </div>
+          {!loading && partners.length > 0 && <p role="status" className="text-xs text-muted-foreground">{visiblePartners.length} of {partners.length} partners</p>}
           {loading ? (
         <div className="text-sm text-muted-foreground">Loading partners…</div>
       ) : partners.length === 0 ? (
@@ -187,7 +213,8 @@ function PartnersAdminPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sorted.map((p, i) => (
+                {visiblePartners.length === 0 && <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">No partners match your search.</TableCell></TableRow>}
+                {visiblePartners.map(({ partner: p, index: i }) => (
                   <React.Fragment key={p.id}>
                     <TableRow className={expandedId === p.id ? "border-b-0 bg-muted/20" : ""}>
                       <TableCell>
