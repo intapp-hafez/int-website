@@ -14,6 +14,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { paginatePartners } from "@/lib/partners-pagination";
 
 export const Route = createFileRoute("/dashboard/admin/partners")({
   head: () => ({ meta: [
@@ -58,11 +59,18 @@ function PartnersAdminPage() {
   const [activeTab, setActiveTab] = useState("list");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const query = search.trim().toLocaleLowerCase();
   const visiblePartners = sorted
     .map((partner, index) => ({ partner, index }))
     .filter(({ partner }) => [partner.name_en, partner.name_ar, partner.href]
       .some(value => (value ?? "").toLocaleLowerCase().includes(query)));
+  const pagination = paginatePartners(visiblePartners, page);
+  const updateSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+    setExpandedId(null);
+  };
 
   const handleDraftUpload = async (file: File | null) => {
     if (!file) return;
@@ -188,10 +196,10 @@ function PartnersAdminPage() {
               aria-label="Search partners by English or Arabic name or link"
               placeholder="Search partners…"
               value={search}
-              onChange={event => setSearch(event.target.value)}
+              onChange={event => updateSearch(event.target.value)}
               className="ps-9 pe-10 [&::-webkit-search-cancel-button]:hidden"
             />
-            {search && <Button type="button" variant="ghost" size="icon" aria-label="Clear partner search" onClick={() => setSearch("")} className="absolute end-1 top-1/2 h-8 w-8 -translate-y-1/2"><X aria-hidden="true" className="h-4 w-4" /></Button>}
+            {search && <Button type="button" variant="ghost" size="icon" aria-label="Clear partner search" onClick={() => updateSearch("")} className="absolute end-1 top-1/2 h-8 w-8 -translate-y-1/2"><X aria-hidden="true" className="h-4 w-4" /></Button>}
           </div>
           {!loading && partners.length > 0 && <p role="status" className="text-xs text-muted-foreground">{visiblePartners.length} of {partners.length} partners</p>}
           {loading ? (
@@ -214,7 +222,7 @@ function PartnersAdminPage() {
               </TableHeader>
               <TableBody>
                 {visiblePartners.length === 0 && <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">No partners match your search.</TableCell></TableRow>}
-                {visiblePartners.map(({ partner: p, index: i }) => (
+                {pagination.items.map(({ partner: p, index: i }) => (
                   <React.Fragment key={p.id}>
                     <TableRow className={expandedId === p.id ? "border-b-0 bg-muted/20" : ""}>
                       <TableCell>
@@ -296,6 +304,15 @@ function PartnersAdminPage() {
           </div>
         </Card>
       )}
+          {!loading && pagination.totalPages > 1 && (
+            <nav aria-label="Partners pagination" className="flex flex-wrap items-center justify-between gap-3">
+              <p role="status" className="text-sm text-muted-foreground">Page {pagination.page} of {pagination.totalPages}</p>
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="outline" size="sm" disabled={pagination.page === 1} onClick={() => { setPage(pagination.page - 1); setExpandedId(null); }}>Previous</Button>
+                <Button type="button" variant="outline" size="sm" disabled={pagination.page === pagination.totalPages} onClick={() => { setPage(pagination.page + 1); setExpandedId(null); }}>Next</Button>
+              </div>
+            </nav>
+          )}
         </TabsContent>
       </Tabs>
     </div>
