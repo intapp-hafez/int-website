@@ -1,5 +1,9 @@
 # Roadmap
 
+- [ ] Enhance Permissions Management: staff search and confirmed save/error states.
+- [ ] Enforce permission-table access and atomic grant approval in Supabase.
+- [ ] Connect approval emails and verify delivery — trusted email deployment and authenticated testing required.
+
 - [x] Audit industry CRUD and remove false local-only saves, deletes and sample fallback rendering.
 - [ ] Create the missing industries table and verify Admin create/edit/hide/reorder/delete through the website — BLOCKED: database migration disabled by approval preference; authenticated Admin checks unavailable with external managed authentication.
 
