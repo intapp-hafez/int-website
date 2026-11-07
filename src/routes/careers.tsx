@@ -317,16 +317,14 @@ function ApplyDialog({ job, onClose, ar }: { job: Job | null; onClose: () => voi
       e.target.value = "";
       return;
     }
-    const allowed = [
+    const allowedMime = [
       "application/pdf", 
       "application/msword", 
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
-      "image/png", 
-      "image/jpeg", 
-      "image/jpg"
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ];
-    if (!allowed.includes(file.type)) {
-      toast.error(ar ? "صيغة الملف غير مدعومة" : "Unsupported file format");
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    if (!['pdf', 'doc', 'docx'].includes(ext) || (file.type && !allowedMime.includes(file.type))) {
+      toast.error(ar ? "يرجى رفع ملف بصيغة PDF أو Word (.pdf, .doc, .docx)" : "Please upload a PDF or Word document (.pdf, .doc, .docx)");
       e.target.value = "";
       return;
     }
@@ -519,7 +517,7 @@ ${d.cover_letter}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   <Input dir="ltr" placeholder="https://" value={form.resume_url} onChange={e => { update("resume_url", e.target.value); setResumeFile(null); }} disabled={!!resumeFile} className="flex-1" />
                   <span className="text-muted-foreground text-sm shrink-0">{ar ? "أو رفع ملف:" : "or upload:"}</span>
-                  <Input type="file" className="flex-1" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onChange={handleFileChange} />
+                  <Input type="file" className="flex-1" accept=".pdf,.doc,.docx" onChange={handleFileChange} />
                 </div>
                 {resumeFile && <p className="text-xs text-green-600 mt-1.5 font-medium">{resumeFile.name} ({Math.round(resumeFile.size / 1024)} KB)</p>}
               </Field>

@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +16,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ShieldCheck, Save, ShieldOff, RotateCcw, Loader2 } from "lucide-react";
+import {
+  ShieldCheck,
+  Save,
+  ShieldOff,
+  RotateCcw,
+  Loader2,
+  Search,
+  Check,
+  ChevronsUpDown,
+  AlertCircle,
+  User as UserIcon,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useAdminT } from "@/lib/admin-i18n";
 import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
@@ -62,11 +75,18 @@ type LiveUser = {
 
 function PermissionsPage() {
   const { lang } = useAdminT();
-  const { getUserPerms, setAllForUser, resetUser } = usePermissions();
+  const ar = lang === "ar";
+  const { getBaseUserPerms, saveUserPerms, setAllForUser, resetUser } = usePermissions();
 
   const [users, setUsers] = useState<LiveUser[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [selectedId, setSelectedId] = useState<string>("");
+  const [staffSearchOpen, setStaffSearchOpen] = useState(false);
+  const [staffQuery, setStaffQuery] = useState("");
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [savingAction, setSavingAction] = useState<"save" | "reset" | "revoke" | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // Load real users from user_roles
   useEffect(() => {
@@ -77,7 +97,7 @@ function PermissionsPage() {
           .select("id, user_id, role, display_name")
           .order("created_at", { ascending: true });
         if (error) throw error;
-        // Filter out client roles — clients use the client workspace portal and do not have admin panel permissions
+        // Filter out client roles — clients use client workspace and have separate auth
         const staffRoles = (data ?? []).filter((r: any) => r.role !== "client" && r.role !== "client_user");
         const mapped: LiveUser[] = staffRoles.map((r: any, idx: number) => ({
           id: r.user_id,
@@ -97,36 +117,100 @@ function PermissionsPage() {
     })();
   }, []);
 
+  const filteredUsers = useMemo(() => {
+    const q = staffQuery.trim().toLowerCase();
+    if (!q) return users;
+    return users.filter((u) => {
+      const roleText = ROLE_DISPLAY[u.role]?.[ar ? "ar" : "en"] || u.role;
+      return u.name.toLowerCase().includes(q) || roleText.toLowerCase().includes(q) || u.role.toLowerCase().includes(q);
+    });
+  }, [users, staffQuery, ar]);
+
   const user = users.find((u) => u.id === selectedId);
   const isAdmin = user?.role === "admin";
 
   const grantedCount = user
     ? ADMIN_PAGES.reduce(
-        (sum, p) => sum + PERM_ACTIONS.filter((a) => getUserPerms(user.id)[p.key]?.[a]).length,
+        (sum, p) => sum + PERM_ACTIONS.filter((a) => getBaseUserPerms(user.id)[p.key]?.[a]).length,
         0,
       )
     : 0;
   const total = ADMIN_PAGES.length * PERM_ACTIONS.length;
 
-  const onSave = () => {
-    toast.success(lang === "ar" ? "تم حفظ الصلاحيات" : "Permissions saved", {
-      description:
-        lang === "ar"
-          ? "تُطبَّق التغييرات فورًا على جلسات المستخدم."
-          : "Changes apply to the user's sessions immediately.",
-    });
+  const onSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    setSavingAction("save");
+    setActionError(null);
+    try {
+      const res = await saveUserPerms(user.id);
+      if (res.success) {
+        toast.success(ar ? "تم حفظ الصلاحيات بنجاح" : "Permissions saved successfully", {
+          description: ar
+            ? "تم التأكيد وحفظ الصلاحيات في قاعدة البيانات وتطبيقها فورًا."
+            : "Permissions confirmed and persisted to the database.",
+        });
+      } else {
+        const msg = res.error || (ar ? "فشل حفظ الصلاحيات" : "Failed to save permissions");
+        setActionError(msg);
+        toast.error(msg);
+      }
+    } catch (err: any) {
+      const msg = err?.message || (ar ? "خطأ غير متوقع أثناء الحفظ" : "Unexpected error saving permissions");
+      setActionError(msg);
+      toast.error(msg);
+    } finally {
+      setIsSaving(false);
+      setSavingAction(null);
+    }
   };
 
-  const onRevoke = () => {
+  const onRevoke = async () => {
     if (!user) return;
-    setAllForUser(user.id, false);
-    toast.success(lang === "ar" ? "تم سحب جميع الصلاحيات" : "All permissions revoked");
+    setIsSaving(true);
+    setSavingAction("revoke");
+    setActionError(null);
+    try {
+      const res = await setAllForUser(user.id, false);
+      if (res.success) {
+        toast.success(ar ? "تم سحب جميع الصلاحيات" : "All permissions revoked");
+      } else {
+        const msg = res.error || (ar ? "فشل سحب الصلاحيات" : "Failed to revoke permissions");
+        setActionError(msg);
+        toast.error(msg);
+      }
+    } catch (err: any) {
+      const msg = err?.message || (ar ? "خطأ غير متوقع أثناء سحب الصلاحيات" : "Unexpected error revoking permissions");
+      setActionError(msg);
+      toast.error(msg);
+    } finally {
+      setIsSaving(false);
+      setSavingAction(null);
+    }
   };
 
-  const onReset = () => {
+  const onReset = async () => {
     if (!user) return;
-    resetUser(user.id);
-    toast.success(lang === "ar" ? "تمت إعادة الضبط" : "Permissions reset to defaults");
+    setIsSaving(true);
+    setSavingAction("reset");
+    setActionError(null);
+    try {
+      const res = await resetUser(user.id);
+      if (res.success) {
+        toast.success(ar ? "تمت إعادة الضبط للوضع الافتراضي" : "Permissions reset to defaults");
+      } else {
+        const msg = res.error || (ar ? "فشل إعادة الضبط" : "Failed to reset permissions");
+        setActionError(msg);
+        toast.error(msg);
+      }
+    } catch (err: any) {
+      const msg = err?.message || (ar ? "خطأ غير متوقع أثناء إعادة الضبط" : "Unexpected error resetting permissions");
+      setActionError(msg);
+      toast.error(msg);
+    } finally {
+      setIsSaving(false);
+      setSavingAction(null);
+    }
   };
 
   return (
@@ -135,12 +219,12 @@ function PermissionsPage() {
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-accent" />
-            {lang === "ar" ? "إدارة الصلاحيات" : "Permissions Management"}
+            {ar ? "إدارة الصلاحيات" : "Permissions Management"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            {lang === "ar"
-              ? "اختر مستخدمًا لتحديد الصفحات المسموح له بزيارتها وما يمكنه فعله (عرض، إضافة، تعديل، حذف)."
-              : "Pick a user to control which admin pages they can access and which actions (view, add, edit, delete) they can perform."}
+            {ar
+              ? "اختر موظفًا لتحديد صفحات الإدارة المسموح له بزيارتها والإجراءات (عرض، إضافة، تعديل، حذف) مع حفظ دقيق وموثوق."
+              : "Select a staff member to control admin section access and actions (view, add, edit, delete) with verified database persistence."}
           </p>
         </div>
       </div>
@@ -149,85 +233,203 @@ function PermissionsPage() {
         <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 flex-wrap">
           <div className="flex items-center gap-3 flex-wrap">
             <CardTitle className="font-display text-base">
-              {lang === "ar" ? "المستخدم" : "User"}
+              {ar ? "الموظف" : "Staff Member"}
             </CardTitle>
 
             {loadingUsers ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                {lang === "ar" ? "جاري التحميل..." : "Loading..."}
+                {ar ? "جاري التحميل..." : "Loading..."}
               </div>
             ) : (
-              <Select value={selectedId} onValueChange={setSelectedId}>
-                <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder={lang === "ar" ? "اختر مستخدمًا" : "Select a user"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {users.map((u) => (
-                    <SelectItem key={u.id} value={u.id}>
-                      <span className="font-medium">{u.name}</span>
-                      <span className="text-muted-foreground ms-1">
-                        · {ROLE_DISPLAY[u.role]?.[lang as "en" | "ar"] ?? u.role}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              /* Searchable Staff Selector Popover */
+              <Popover open={staffSearchOpen} onOpenChange={setStaffSearchOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={staffSearchOpen}
+                    className="w-[280px] sm:w-[320px] justify-between text-start font-normal h-9"
+                  >
+                    <span className="truncate flex items-center gap-2">
+                      <UserIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+                      {user ? (
+                        <>
+                          <span className="font-medium text-foreground">{user.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            · {ROLE_DISPLAY[user.role]?.[ar ? "ar" : "en"] ?? user.role}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {ar ? "ابحث أو اختر موظفًا..." : "Search or pick staff..."}
+                        </span>
+                      )}
+                    </span>
+                    <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[320px] p-2" align="start">
+                  <div className="relative mb-2">
+                    <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={ar ? "ابحث بالاسم أو الدور..." : "Search staff name or role..."}
+                      value={staffQuery}
+                      onChange={(e) => setStaffQuery(e.target.value)}
+                      className="ps-8 pe-8 h-9 text-sm"
+                      autoFocus
+                    />
+                    {staffQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setStaffQuery("")}
+                        className="absolute end-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-[240px] overflow-y-auto space-y-1">
+                    {filteredUsers.length === 0 ? (
+                      <div className="py-6 text-center text-xs text-muted-foreground">
+                        {ar ? "لا يوجد موظف مطابق للبحث." : "No matching staff found."}
+                      </div>
+                    ) : (
+                      filteredUsers.map((u) => {
+                        const isSelected = u.id === selectedId;
+                        return (
+                          <button
+                            key={u.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedId(u.id);
+                              setStaffSearchOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between p-2 rounded-md text-sm text-start transition-colors hover:bg-muted ${
+                              isSelected ? "bg-muted/80 font-medium" : ""
+                            }`}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate font-medium">{u.name}</div>
+                              <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                                <Badge variant="outline" className={`text-[10px] px-1 py-0 h-4 ${ROLE_BADGE_STYLE[u.role] ?? ""}`}>
+                                  {ROLE_DISPLAY[u.role]?.[ar ? "ar" : "en"] ?? u.role}
+                                </Badge>
+                              </div>
+                            </div>
+                            {isSelected && <Check className="h-4 w-4 text-accent shrink-0 ms-2" />}
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
             )}
 
             {user && (
               <Badge variant="outline" className={ROLE_BADGE_STYLE[user.role] ?? ""}>
-                {ROLE_DISPLAY[user.role]?.[lang as "en" | "ar"] ?? user.role}
+                {ROLE_DISPLAY[user.role]?.[ar ? "ar" : "en"] ?? user.role}
               </Badge>
             )}
             {!isAdmin && user && (
               <Badge variant="outline">
-                {grantedCount}/{total} {lang === "ar" ? "ممنوحة" : "granted"}
+                {grantedCount}/{total} {ar ? "دائمة" : "granted"}
               </Badge>
             )}
           </div>
+
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={onReset} disabled={!user || isAdmin}>
-              <RotateCcw className="h-4 w-4 me-1" />
-              {lang === "ar" ? "إعادة الضبط" : "Reset"}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onReset}
+              disabled={!user || isAdmin || isSaving}
+            >
+              {savingAction === "reset" ? (
+                <Loader2 className="h-4 w-4 animate-spin me-1" />
+              ) : (
+                <RotateCcw className="h-4 w-4 me-1" />
+              )}
+              {ar ? "إعادة الضبط" : "Reset"}
             </Button>
+
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button size="sm" variant="destructive" disabled={!user || isAdmin}>
-                  <ShieldOff className="h-4 w-4 me-1" />
-                  {lang === "ar" ? "سحب الكل" : "Revoke all"}
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  disabled={!user || isAdmin || isSaving}
+                >
+                  {savingAction === "revoke" ? (
+                    <Loader2 className="h-4 w-4 animate-spin me-1" />
+                  ) : (
+                    <ShieldOff className="h-4 w-4 me-1" />
+                  )}
+                  {ar ? "سحب الكل" : "Revoke all"}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    {lang === "ar" ? "سحب جميع الصلاحيات؟" : "Revoke all permissions?"}
+                    {ar ? "سحب جميع الصلاحيات؟" : "Revoke all permissions?"}
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    {lang === "ar"
+                    {ar
                       ? `سيتم منع ${user?.name ?? "هذا المستخدم"} من الوصول إلى جميع صفحات الإدارة حتى يتم منحه صلاحيات جديدة.`
                       : `${user?.name ?? "This user"} will lose access to every admin page until new permissions are granted.`}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>{lang === "ar" ? "إلغاء" : "Cancel"}</AlertDialogCancel>
+                  <AlertDialogCancel>{ar ? "إلغاء" : "Cancel"}</AlertDialogCancel>
                   <AlertDialogAction onClick={onRevoke}>
-                    {lang === "ar" ? "سحب الكل" : "Revoke all"}
+                    {ar ? "سحب الكل" : "Revoke all"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button size="sm" onClick={onSave} disabled={!user}>
-              <Save className="h-4 w-4 me-1" />
-              {lang === "ar" ? "حفظ" : "Save"}
+
+            <Button
+              size="sm"
+              onClick={onSave}
+              disabled={!user || isSaving}
+              className="min-w-[80px]"
+            >
+              {savingAction === "save" ? (
+                <Loader2 className="h-4 w-4 animate-spin me-1" />
+              ) : (
+                <Save className="h-4 w-4 me-1" />
+              )}
+              {ar ? "حفظ" : "Save"}
             </Button>
           </div>
         </CardHeader>
-        {user && (
-          <CardContent className="text-xs text-muted-foreground">
-            {lang === "ar"
-              ? "ملاحظة: تُحفظ التغييرات تلقائيًا لحظة تعديلها. زر «حفظ» للتأكيد فقط."
-              : "Note: changes save automatically as you edit. The Save button is just a confirmation."}
+
+        {actionError && (
+          <CardContent className="pt-0">
+            <div className="p-3 bg-destructive/10 text-destructive border border-destructive/20 rounded-md text-sm flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{actionError}</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={() => setActionError(null)}
+              >
+                {ar ? "إغلاق" : "Dismiss"}
+              </Button>
+            </div>
+          </CardContent>
+        )}
+
+        {user && !actionError && (
+          <CardContent className="text-xs text-muted-foreground pt-0">
+            {ar
+              ? "ملاحظة: يتم حفظ وتطبيق الصلاحيات بدقة فورية في قاعدة البيانات. انقر فوق «حفظ» لتأكيد المزامنة."
+              : "Note: Permissions are stored and verified directly against the database repository."}
           </CardContent>
         )}
       </Card>
@@ -241,7 +443,7 @@ function PermissionsPage() {
       ) : !loadingUsers ? (
         <Card>
           <CardContent className="p-10 text-center text-sm text-muted-foreground">
-            {lang === "ar" ? "اختر مستخدمًا للبدء." : "Select a user to begin."}
+            {ar ? "اختر موظفًا للبدء." : "Select a staff member to begin."}
           </CardContent>
         </Card>
       ) : null}

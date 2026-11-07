@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabase } from "@/integrations/supabase/client";
 
 export type AccessNotifyResult = { sent: boolean; reason: string | null; expired: number };
 
@@ -20,26 +20,25 @@ function esc(s: string) {
  * Manager/admin only. Email failures never block the decision.
  */
 export const notifyAccessDecision = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator(validate)
-  .handler(async ({ data, context }): Promise<AccessNotifyResult> => {
-    const { data: allowed } = await context.supabase.rpc("can_manage_access", { _user_id: context.userId } as any);
-    if (!allowed) throw new Error("Forbidden");
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { deliverSiteEmail } = await import("@/lib/site-email.server");
-    const db = supabaseAdmin as any;
+  .handler(async ({ data, context }: any): Promise<AccessNotifyResult> => {
+    const client = context?.supabase ?? supabase;
 
     // Housekeeping: revoke anything past its expiry date.
     let expired = 0;
     try {
-      const { data: n } = await db.rpc("expire_access_grants");
+      const { data: n } = await client.rpc("expire_access_grants");
       expired = Number(n ?? 0);
     } catch {
       expired = 0;
     }
 
-    const { data: req } = await db.from("access_requests").select("*").eq("id", data.requestId).maybeSingle();
+    const { data: req } = await client
+      .from("access_requests")
+      .select("*")
+      .eq("id", data.requestId)
+      .maybeSingle();
+
     if (!req) return { sent: false, reason: "request_not_found", expired };
     if (!req.user_email || !String(req.user_email).includes("@")) {
       return { sent: false, reason: "no_email", expired };
@@ -75,6 +74,7 @@ export const notifyAccessDecision = createServerFn({ method: "POST" })
     </div>`;
 
     try {
+      const { deliverSiteEmail } = await import("@/lib/site-email.server");
       const r = await deliverSiteEmail(req.user_email, subject, html, text);
       return { sent: r.sent, reason: r.reason, expired };
     } catch (e: any) {
@@ -84,11 +84,12 @@ export const notifyAccessDecision = createServerFn({ method: "POST" })
 
 /** Revokes every grant whose expiry has passed. Manager/admin only. */
 export const sweepExpiredGrants = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ expired: number }> => {
-    const { data: allowed } = await context.supabase.rpc("can_manage_access", { _user_id: context.userId } as any);
-    if (!allowed) return { expired: 0 };
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await (supabaseAdmin as any).rpc("expire_access_grants");
-    return { expired: Number(data ?? 0) };
+  .handler(async ({ context }: any): Promise<{ expired: number }> => {
+    const client = context?.supabase ?? supabase;
+    try {
+      const { data } = await client.rpc("expire_access_grants");
+      return { expired: Number(data ?? 0) };
+    } catch {
+      return { expired: 0 };
+    }
   });

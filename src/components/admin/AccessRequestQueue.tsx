@@ -6,7 +6,7 @@ import { notifyAccessDecision, sweepExpiredGrants } from "@/lib/access-notify.fu
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Inbox, Check, X, Clock } from "lucide-react";
+import { Inbox, Check, X, Clock, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -37,7 +37,7 @@ export function AccessRequestQueue() {
   const ar = lang === "ar";
   const { user } = useAuth();
   const { requests, decide } = useAccessRequests();
-  const { grantAccess, refreshGrants } = usePermissions();
+  const { grantAccess, revokeGrant, refreshGrants } = usePermissions();
   const { quotes, available: quotesAvailable, saveQuote } = useAccessQuotes();
   const notifyDecision = useServerFn(notifyAccessDecision);
   const sweepGrants = useServerFn(sweepExpiredGrants);
@@ -55,37 +55,113 @@ export function AccessRequestQueue() {
     return p ? (ar ? p.ar : p.en) : key;
   };
 
+  const [processingId, setProcessingId] = useState<string | null>(null);
+
   const approve = async (id: string) => {
     const req = requests.find((r) => r.id === id);
     if (!req) return;
-    const days = Number(durations[id] ?? "7");
-    // Granting any action implies being able to open the page.
-    const actions = Array.from(
-      new Set<PermAction>(["view", ...PERM_ACTIONS.filter((a) => req.actions.includes(a))]),
-    );
-    const grant = await grantAccess({
-      userId: req.userId,
-      pageKey: req.pageKey,
-      actions,
-      days: days > 0 ? days : null,
-      grantedBy: user?.name || user?.email || "manager",
-      requestId: id,
-    });
-    await decide(id, "approved", user?.name || user?.email || "manager", undefined, grant?.expiresAt);
-    toast.success(
-      grant?.expiresAt
-        ? ar
-          ? `تمت الموافقة حتى ${new Date(grant.expiresAt).toLocaleString("ar-EG")}`
-          : `Approved until ${new Date(grant.expiresAt).toLocaleString("en-GB")}`
-        : ar
-          ? "تمت الموافقة ومنح صلاحية دائمة"
-          : "Approved with permanent access",
-    );
+    setProcessingId(id);
+
+    try {
+      const days = Number(durations[id] ?? "7");
+      // Granting any action implies being able to open the page.
+      const actions = Array.from(
+        new Set<PermAction>(["view", ...PERM_ACTIONS.filter((a) => req.actions.includes(a))]),
+      );
+
+      // 1. Grant access in database first; verify it actually succeeded
+      const grant = await grantAccess({
+        userId: req.userId,
+        pageKey: req.pageKey,
+        actions,
+        days: days > 0 ? days : null,
+        grantedBy: user?.id || user?.email || "manager",
+        requestId: id,
+      });
+
+      if (!grant) {
+        toast.error(
+          ar
+            ? "فشل منح الصلاحية في قاعدة البيانات. لم يتم اعتماد الطلب."
+            : "Failed to grant access in database. Request was not approved.",
+        );
+        return;
+      }
+
+      // 2. Only if the grant succeeded, mark request approved
+      const decided = await decide(
+        id,
+        "approved",
+        user?.id || user?.email || "manager",
+        undefined,
+        grant.expiresAt,
+      );
+
+      if (!decided) {
+        // Rollback grant to keep state strictly consistent
+        await revokeGrant(grant.id);
+        toast.error(
+          ar
+            ? "فشل تحديث حالة الطلب. تم إلغاء الصلاحية لتجنب عدم الاتساق."
+            : "Failed to record approval. Access grant was rolled back.",
+        );
+        return;
+      }
+
+      // 3. Send confirmation email to the requester
+      try {
+        await notifyDecision({
+          data: {
+            requestId: id,
+            kind: "approved",
+            expiresAt: grant.expiresAt,
+          },
+        });
+      } catch (emailErr) {
+        console.warn("[AccessRequestQueue] Approval email notification failed:", emailErr);
+      }
+
+      await refreshGrants();
+
+      toast.success(
+        grant.expiresAt
+          ? ar
+            ? `تمت الموافقة حتى ${new Date(grant.expiresAt).toLocaleString("ar-EG")}`
+            : `Approved until ${new Date(grant.expiresAt).toLocaleString("en-GB")}`
+          : ar
+            ? "تمت الموافقة ومنح صلاحية دائمة"
+            : "Approved with permanent access",
+      );
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   const deny = async (id: string) => {
-    await decide(id, "denied", user?.name || user?.email || "manager");
-    toast.success(ar ? "تم رفض الطلب" : "Request denied");
+    setProcessingId(id);
+    try {
+      const decided = await decide(id, "denied", user?.id || user?.email || "manager");
+      if (!decided) {
+        toast.error(ar ? "فشل تسجيل رفض الطلب" : "Failed to record request denial");
+        return;
+      }
+
+      // Send denial confirmation email
+      try {
+        await notifyDecision({
+          data: {
+            requestId: id,
+            kind: "denied",
+          },
+        });
+      } catch (emailErr) {
+        console.warn("[AccessRequestQueue] Denial email notification failed:", emailErr);
+      }
+
+      toast.success(ar ? "تم رفض الطلب" : "Request denied");
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   return (
@@ -158,11 +234,30 @@ export function AccessRequestQueue() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Button size="sm" variant="outline" onClick={() => deny(r.id)}>
-                      <X className="h-4 w-4 me-1" />{ar ? "رفض" : "Deny"}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={processingId === r.id}
+                      onClick={() => deny(r.id)}
+                    >
+                      {processingId === r.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin me-1" />
+                      ) : (
+                        <X className="h-4 w-4 me-1" />
+                      )}
+                      {ar ? "رفض" : "Deny"}
                     </Button>
-                    <Button size="sm" onClick={() => approve(r.id)}>
-                      <Check className="h-4 w-4 me-1" />{ar ? "موافقة" : "Approve"}
+                    <Button
+                      size="sm"
+                      disabled={processingId === r.id}
+                      onClick={() => approve(r.id)}
+                    >
+                      {processingId === r.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin me-1" />
+                      ) : (
+                        <Check className="h-4 w-4 me-1" />
+                      )}
+                      {ar ? "موافقة" : "Approve"}
                     </Button>
                   </>
                 )}

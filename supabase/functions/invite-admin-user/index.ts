@@ -45,6 +45,13 @@ Deno.serve(async (req: Request) => {
     if (!email || !password || !name || !role) {
       throw new Error("Missing required fields (email, password, name, role)");
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(String(email).trim())) {
+      throw new Error("Invalid email format");
+    }
+    if (typeof password !== "string" || password.trim().length < 8) {
+      throw new Error("Password must be at least 8 characters long");
+    }
     const requestedRole = String(role).trim();
     const ALL_ROLES = ["admin","moderator","user","helpdesk_manager","technician","client_user","hr","assistant","manager","agent","seo"];
     if (!ALL_ROLES.includes(requestedRole)) throw new Error("Invalid role");

@@ -232,16 +232,22 @@ export const defaultPermsForRole = (role?: string): UserPerms => {
   return defaultUserPerms();
 };
 
+export const isValidUuid = (val?: string | null): boolean =>
+  typeof val === 'string' &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
 type Ctx = {
   perms: PermsMap;
+  getBaseUserPerms: (userId: string) => UserPerms;
   getUserPerms: (userId: string) => UserPerms;
-  setPagePerms: (userId: string, pageKey: string, patch: Partial<PagePerms>) => void;
-  setAllForUser: (userId: string, value: boolean) => void;
-  setActionForUser: (userId: string, action: PermAction, value: boolean) => void;
-  setAllForPage: (userId: string, pageKey: string, value: boolean) => void;
-  resetUser: (userId: string) => void;
+  saveUserPerms: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  setPagePerms: (userId: string, pageKey: string, patch: Partial<PagePerms>) => Promise<{ success: boolean; error?: string }>;
+  setAllForUser: (userId: string, value: boolean) => Promise<{ success: boolean; error?: string }>;
+  setActionForUser: (userId: string, action: PermAction, value: boolean) => Promise<{ success: boolean; error?: string }>;
+  setAllForPage: (userId: string, pageKey: string, value: boolean) => Promise<{ success: boolean; error?: string }>;
+  resetUser: (userId: string) => Promise<{ success: boolean; error?: string }>;
   presets: PermPreset[];
-  applyPreset: (presetId: string, userIds: string[]) => number;
+  applyPreset: (presetId: string, userIds: string[]) => Promise<{ appliedCount: number; error?: string }>;
   saveCustomPreset: (name: { en: string; ar: string }, fromUserId: string) => PermPreset | null;
   updateCustomPreset: (presetId: string, patch: { name?: { en: string; ar: string }; perms?: UserPerms }) => boolean;
   duplicatePreset: (presetId: string, name: { en: string; ar: string }, perms?: UserPerms) => PermPreset | null;
@@ -257,7 +263,7 @@ type Ctx = {
     note?: string;
     requestId?: string;
   }) => Promise<AccessGrant | null>;
-  revokeGrant: (grantId: string) => Promise<void>;
+  revokeGrant: (grantId: string) => Promise<boolean>;
   grantsForUser: (userId: string) => AccessGrant[];
   refreshGrants: () => Promise<void>;
 };
@@ -361,10 +367,47 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
 
 
 
-  const persist = async (next: PermsMap, modifiedUsers: string[]) => {
-    setPerms(next);
-    for (const uid of modifiedUsers) {
-      await db.from("user_roles").update({ permissions: next[uid] || null }).eq("user_id", uid);
+  const persist = async (
+    next: PermsMap,
+    modifiedUsers: string[],
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      for (const uid of modifiedUsers) {
+        const payload = { permissions: next[uid] || null };
+        const { data, error } = await db
+          .from("user_roles")
+          .update(payload)
+          .eq("user_id", uid)
+          .select("id, user_id, permissions");
+
+        if (error) {
+          console.error(`[permissions] failed to save permissions for user ${uid}:`, error);
+          return { success: false, error: error.message || "Failed to update permissions in database" };
+        }
+
+        // Fallback check by row ID if user_id did not match directly
+        if (!data || data.length === 0) {
+          const { data: byIdData, error: byIdError } = await db
+            .from("user_roles")
+            .update(payload)
+            .eq("id", uid)
+            .select("id, user_id, permissions");
+
+          if (byIdError) {
+            console.error(`[permissions] failed fallback update for ${uid}:`, byIdError);
+            return { success: false, error: byIdError.message || "Database update error" };
+          }
+          if (!byIdData || byIdData.length === 0) {
+            console.error(`[permissions] user ${uid} not found in user_roles`);
+            return { success: false, error: `User record ${uid} not found in database` };
+          }
+        }
+      }
+      setPerms(next);
+      return { success: true };
+    } catch (err: any) {
+      console.error("[permissions] unexpected persist error:", err);
+      return { success: false, error: err?.message || "Storage error" };
     }
   };
 
@@ -392,18 +435,25 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const getUserPerms: Ctx["getUserPerms"] = (userId) => {
+  /**
+   * Return only the permanent base permissions stored for the user,
+   * completely unpolluted by any temporary active grants.
+   */
+  const getBaseUserPerms: Ctx["getBaseUserPerms"] = (userId) => {
     const existing = perms[userId];
-    let base: UserPerms;
     if (existing) {
-      // Backfill any missing pages
-      base = { ...defaultUserPerms(), ...existing };
-    } else {
-      const liveRole = userRolesMap[userId];
-      const matchedUser = demoUsers.find((u) => u.id === userId);
-      base = defaultPermsForRole(liveRole || matchedUser?.role);
+      return { ...defaultUserPerms(), ...existing };
     }
-    // Layer active time-limited grants on top; expired ones simply vanish.
+    const liveRole = userRolesMap[userId];
+    const matchedUser = demoUsers.find((u) => u.id === userId);
+    return defaultPermsForRole(liveRole || matchedUser?.role);
+  };
+
+  /**
+   * Runtime effective permissions: base permanent permissions + active temporary grants layered on top.
+   */
+  const getUserPerms: Ctx["getUserPerms"] = (userId) => {
+    const base = getBaseUserPerms(userId);
     const now = Date.now();
     const mine = grants.filter((g) => g.userId === userId && isGrantActive(g, now));
     if (mine.length === 0) return base;
@@ -416,45 +466,53 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     return merged;
   };
 
-  const setPagePerms: Ctx["setPagePerms"] = (userId, pageKey, patch) => {
-    const current = getUserPerms(userId);
-    const next: PermsMap = {
-      ...perms,
-      [userId]: { ...current, [pageKey]: { ...current[pageKey], ...patch } },
-    };
-    persist(next, [userId]);
+  /** Explicitly persist a user's current base permissions to verify database save. */
+  const saveUserPerms: Ctx["saveUserPerms"] = async (userId) => {
+    const currentBase = getBaseUserPerms(userId);
+    const next: PermsMap = { ...perms, [userId]: currentBase };
+    return await persist(next, [userId]);
   };
 
-  const setAllForUser: Ctx["setAllForUser"] = (userId, value) => {
+  const setPagePerms: Ctx["setPagePerms"] = async (userId, pageKey, patch) => {
+    // Modify only base permanent permissions — never copy temporary grants into permanent storage
+    const currentBase = getBaseUserPerms(userId);
+    const next: PermsMap = {
+      ...perms,
+      [userId]: { ...currentBase, [pageKey]: { ...currentBase[pageKey], ...patch } },
+    };
+    return await persist(next, [userId]);
+  };
+
+  const setAllForUser: Ctx["setAllForUser"] = async (userId, value) => {
     const next: PermsMap = { ...perms, [userId]: {} };
     for (const p of ADMIN_PAGES) {
       next[userId][p.key] = value ? allPerms() : noPerms();
     }
-    persist(next, [userId]);
+    return await persist(next, [userId]);
   };
 
-  const setActionForUser: Ctx["setActionForUser"] = (userId, action, value) => {
-    const current = getUserPerms(userId);
+  const setActionForUser: Ctx["setActionForUser"] = async (userId, action, value) => {
+    const currentBase = getBaseUserPerms(userId);
     const updated: UserPerms = {};
-    for (const p of ADMIN_PAGES) updated[p.key] = { ...current[p.key], [action]: value };
-    persist({ ...perms, [userId]: updated }, [userId]);
+    for (const p of ADMIN_PAGES) updated[p.key] = { ...currentBase[p.key], [action]: value };
+    return await persist({ ...perms, [userId]: updated }, [userId]);
   };
 
-  const setAllForPage: Ctx["setAllForPage"] = (userId, pageKey, value) => {
-    setPagePerms(userId, pageKey, value ? allPerms() : noPerms());
+  const setAllForPage: Ctx["setAllForPage"] = async (userId, pageKey, value) => {
+    return await setPagePerms(userId, pageKey, value ? allPerms() : noPerms());
   };
 
-  const resetUser: Ctx["resetUser"] = (userId) => {
+  const resetUser: Ctx["resetUser"] = async (userId) => {
     const next = { ...perms };
     delete next[userId];
-    persist(next, [userId]);
+    return await persist(next, [userId]);
   };
 
   const presets = useMemo<PermPreset[]>(() => [...BUILTIN_PRESETS, ...customPresets], [customPresets]);
 
-  const applyPreset: Ctx["applyPreset"] = (presetId, userIds) => {
+  const applyPreset: Ctx["applyPreset"] = async (presetId, userIds) => {
     const preset = presets.find((p) => p.id === presetId);
-    if (!preset || userIds.length === 0) return 0;
+    if (!preset || userIds.length === 0) return { appliedCount: 0, error: "Preset or users missing" };
     const next: PermsMap = { ...perms };
     for (const uid of userIds) {
       // Deep clone so each user has an independent copy.
@@ -462,14 +520,17 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       for (const p of ADMIN_PAGES) cloned[p.key] = { ...(preset.perms[p.key] ?? noPerms()) };
       next[uid] = cloned;
     }
-    persist(next, userIds);
-    return userIds.length;
+    const res = await persist(next, userIds);
+    if (!res.success) {
+      return { appliedCount: 0, error: res.error };
+    }
+    return { appliedCount: userIds.length };
   };
 
   const saveCustomPreset: Ctx["saveCustomPreset"] = (name, fromUserId) => {
     const trimmed = name.en.trim();
     if (!trimmed) return null;
-    const snapshot = getUserPerms(fromUserId);
+    const snapshot = getBaseUserPerms(fromUserId);
     const cloned: UserPerms = {};
     for (const p of ADMIN_PAGES) cloned[p.key] = { ...(snapshot[p.key] ?? noPerms()) };
     const preset: PermPreset = {
@@ -523,7 +584,9 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
 
   const grantAccess: Ctx["grantAccess"] = async ({ userId, pageKey, actions, days, grantedBy, note, requestId }) => {
     const expiresAt = days && days > 0 ? new Date(Date.now() + days * 86_400_000).toISOString() : null;
-    
+    const grantedByUuid = isValidUuid(grantedBy) ? grantedBy : null;
+    const effectiveNote = note || (!grantedByUuid && grantedBy ? `Granted by ${grantedBy}` : undefined);
+
     const { data, error } = await db
       .from("access_grants")
       .insert({
@@ -531,9 +594,9 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
         page_key: pageKey,
         actions: actions.length ? actions : ["view"],
         expires_at: expiresAt,
-        granted_by: grantedBy,
-        note,
-        request_id: requestId,
+        granted_by: grantedByUuid,
+        note: effectiveNote,
+        request_id: isValidUuid(requestId) ? requestId : null,
       })
       .select()
       .single();
@@ -543,7 +606,7 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       return null;
     }
     
-    return {
+    const newGrant: AccessGrant = {
       id: data.id,
       userId: data.user_id,
       pageKey: data.page_key,
@@ -554,6 +617,9 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       requestId: data.request_id,
       createdAt: data.created_at,
     };
+
+    setGrants((prev) => [newGrant, ...prev.filter((g) => g.id !== newGrant.id)]);
+    return newGrant;
   };
 
   const revokeGrant: Ctx["revokeGrant"] = async (grantId) => {
@@ -564,7 +630,10 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       
     if (error) {
       console.error("[permissions] failed to revoke access", error);
+      return false;
     }
+    setGrants((prev) => prev.filter((g) => g.id !== grantId));
+    return true;
   };
 
   const grantsForUser: Ctx["grantsForUser"] = (userId) =>
@@ -573,7 +642,9 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
   const value = useMemo<Ctx>(
     () => ({
       perms,
+      getBaseUserPerms,
       getUserPerms,
+      saveUserPerms,
       setPagePerms,
       setAllForUser,
       setActionForUser,

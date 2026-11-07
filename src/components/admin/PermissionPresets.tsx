@@ -147,14 +147,23 @@ export function PermissionPresets({ activeUserId }: { activeUserId?: string }) {
   const toggleUser = (id: string) =>
     setTargetUsers((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
-  const onApply = () => {
+  const onApply = async () => {
     const preset = presets.find((p) => p.id === selectedPreset);
     if (!preset) return;
-    const n = applyPreset(preset.id, targetUsers);
-    if (n === 0) {
+    if (targetUsers.length === 0) {
       toast.error(lang === "ar" ? "اختر مستخدمًا واحدًا على الأقل" : "Pick at least one user");
       return;
     }
+    const res = await applyPreset(preset.id, targetUsers);
+    if (res.error) {
+      toast.error(
+        lang === "ar"
+          ? `فشل تطبيق النموذج: ${res.error}`
+          : `Failed to apply preset: ${res.error}`,
+      );
+      return;
+    }
+    const n = res.appliedCount;
     toast.success(
       lang === "ar"
         ? `تم تطبيق «${preset.name.ar}» على ${n} مستخدم`

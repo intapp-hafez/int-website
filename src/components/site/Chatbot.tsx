@@ -353,6 +353,7 @@ export function Chatbot() {
   // Check existing live chat session in localStorage
   useEffect(() => {
     const savedSessionId = localStorage.getItem("it_live_chat_session_id");
+    const savedSessionToken = localStorage.getItem("it_live_chat_session_token");
     if (savedSessionId) {
       setLiveSessionId(savedSessionId);
       // Fetch existing session status and messages
@@ -366,18 +367,69 @@ export function Chatbot() {
             setLiveSessionStatus("active");
           }
 
-          const { data } = await (supabase as any)
-            .from("live_chat_messages")
-            .select("*")
-            .eq("session_id", savedSessionId)
-            .order("created_at", { ascending: true });
-          if (data && data.length > 0) {
-            setLiveMessages(data);
+          let fetchedMessages: LiveMessage[] | null = null;
+          if (savedSessionToken) {
+            const { data: rpcData } = await (supabase as any).rpc("get_visitor_chat_messages", {
+              p_session_id: savedSessionId,
+              p_session_token: savedSessionToken,
+            });
+            if (rpcData && Array.isArray(rpcData)) {
+              fetchedMessages = rpcData;
+            }
+          }
+
+          // Fallback if staff or direct select
+          if (!fetchedMessages) {
+            const { data } = await (supabase as any)
+              .from("live_chat_messages")
+              .select("*")
+              .eq("session_id", savedSessionId)
+              .order("created_at", { ascending: true });
+            if (data && data.length > 0) {
+              fetchedMessages = data;
+            }
+          }
+
+          if (fetchedMessages && fetchedMessages.length > 0) {
+            setLiveMessages(fetchedMessages);
           }
         } catch {}
       })();
     }
   }, []);
+
+  // Periodic poll for visitor's messages to guarantee delivery even if Realtime RLS restricts anon
+  useEffect(() => {
+    if (!liveSessionId || chatMode !== "live_chat" || liveSessionStatus === "closed") return;
+    const token = localStorage.getItem("it_live_chat_session_token");
+    if (!token) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const { data: status } = await (supabase as any).rpc("get_live_chat_session_status", { _id: liveSessionId });
+        if (status === "closed") {
+          setLiveSessionStatus("closed");
+          return;
+        }
+
+        const { data } = await (supabase as any).rpc("get_visitor_chat_messages", {
+          p_session_id: liveSessionId,
+          p_session_token: token,
+        });
+
+        if (data && Array.isArray(data) && data.length > 0) {
+          setLiveMessages((prev) => {
+            if (data.length !== prev.length || data[data.length - 1].id !== prev[prev.length - 1]?.id) {
+              return data;
+            }
+            return prev;
+          });
+        }
+      } catch {}
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [liveSessionId, chatMode, liveSessionStatus]);
 
   // Realtime subscription for visitor's live chat messages and session status
   useEffect(() => {
@@ -539,6 +591,7 @@ export function Chatbot() {
   // Start fresh chat session
   const handleStartNewChat = () => {
     localStorage.removeItem("it_live_chat_session_id");
+    localStorage.removeItem("it_live_chat_session_token");
     setLiveSessionId(null);
     setLiveSessionStatus("active");
     setLiveMessages([]);
@@ -591,6 +644,7 @@ export function Chatbot() {
       setLiveSessionId(newSessionId);
       setLiveSessionStatus("active");
       localStorage.setItem("it_live_chat_session_id", newSessionId);
+      localStorage.setItem("it_live_chat_session_token", token);
 
       // 2. Insert initial visitor message if typed
       if (liveForm.message.trim() && sessionData?.id) {

@@ -125,13 +125,18 @@ export function AccessRequestsProvider({ children }: { children: ReactNode }) {
   };
 
   const decide: Ctx["decide"] = async (id, status, by, note, expiresAt) => {
+    const isValidUuid = typeof by === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(by);
+    const decidedByUuid = isValidUuid ? by : null;
+    const effectiveNote = note || (!decidedByUuid && by ? `Decided by ${by}` : undefined);
+
     const { data, error } = await db
       .from("access_requests")
       .update({
         status,
-        decided_by: by,
-        decision_note: note,
+        decided_by: decidedByUuid,
+        decision_note: effectiveNote,
         expires_at: expiresAt,
+        decided_at: new Date().toISOString(),
       })
       .eq("id", id)
       .select()
@@ -141,7 +146,9 @@ export function AccessRequestsProvider({ children }: { children: ReactNode }) {
       console.error("[access-requests] decide failed", error);
       return null;
     }
-    return mapToLegacy(data as AccessRequest);
+    const legacy = mapToLegacy(data as AccessRequest);
+    setRequests((prev) => prev.map((r) => (r.id === id ? legacy : r)));
+    return legacy;
   };
 
   const removeRequest: Ctx["removeRequest"] = async (id) => {
