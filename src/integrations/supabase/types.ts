@@ -2739,6 +2739,26 @@ export type Database = {
         }[]
       }
       get_live_chat_session_status: { Args: { _id: string }; Returns: string }
+      get_visitor_chat_messages: {
+        Args: { p_session_id: string; p_session_token: string }
+        Returns: {
+          attachments: Json | null
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          sender_id: string | null
+          sender_name: string
+          sender_type: string
+          session_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "live_chat_messages"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_page_access: {
         Args: { _action: string; _page_key: string; _user_id: string }
         Returns: boolean
