@@ -41,6 +41,14 @@ import { ProductImagesManager } from "@/components/admin/ProductImagesManager";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 export const Route = createFileRoute("/dashboard/admin/products/")({
+  head: () => ({ meta: [
+    { title: "Systems Management | INT" },
+    { name: "description", content: "Manage INT systems, bilingual categories, vendors and visibility." },
+    { property: "og:title", content: "Systems Management | INT" },
+    { property: "og:description", content: "Manage INT systems, bilingual categories, vendors and visibility." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ProductsAdmin,
 });
 
@@ -73,7 +81,35 @@ function ProductsAdmin() {
   const [search, setSearch] = useState("");
   const [filterFeatured, setFilterFeatured] = useState(false);
   const [formTab, setFormTab] = useState<"basic" | "vendors" | "seo">("basic");
-  const { categories } = useProductCategories();
+  const { categories, addCategory } = useProductCategories();
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [categoryEn, setCategoryEn] = useState("");
+  const [categoryAr, setCategoryAr] = useState("");
+  const [categorySaving, setCategorySaving] = useState(false);
+  const [categoryError, setCategoryError] = useState("");
+
+  const resetCategoryDraft = () => {
+    setAddingCategory(false);
+    setCategoryEn("");
+    setCategoryAr("");
+    setCategoryError("");
+  };
+
+  const saveCategory = async () => {
+    if (categorySaving) return;
+    setCategorySaving(true);
+    setCategoryError("");
+    try {
+      const category = await addCategory(categoryEn, categoryAr);
+      setEditing((current) => current ? { ...current, category_en: category.name_en, category_ar: category.name_ar } : current);
+      resetCategoryDraft();
+      toast.success("Category saved");
+    } catch (error) {
+      setCategoryError(error instanceof Error ? error.message : "Unable to save category.");
+    } finally {
+      setCategorySaving(false);
+    }
+  };
 
   // Vendor draft state
   const [vendorDraft, setVendorDraft] = useState<VendorItem>({ id: "", name: "", logo: "", website_url: "" });
@@ -95,6 +131,7 @@ function ProductsAdmin() {
   }, []);
 
   const openNewProduct = () => {
+    resetCategoryDraft();
     setEditing({ ...emptyProduct, vendors: [] });
     setVendorDraft({ id: "", name: "", logo: "", website_url: "" });
     setEditingVendorId(null);
@@ -102,6 +139,7 @@ function ProductsAdmin() {
   };
 
   const openEditProduct = (p: Product) => {
+    resetCategoryDraft();
     setEditing({ ...p, vendors: p.vendors || [] });
     setVendorDraft({ id: "", name: "", logo: "", website_url: "" });
     setEditingVendorId(null);
@@ -436,7 +474,12 @@ function ProductsAdmin() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Category (English) *</Label>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <Label className="text-xs font-semibold">Category (English) *</Label>
+                        {_perms.create && <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 text-xs" disabled={categorySaving} aria-expanded={addingCategory} aria-controls="new-category-fields" onClick={() => { setAddingCategory((current) => !current); setCategoryError(""); }}>
+                          <Plus className="h-3.5 w-3.5" /> Add category
+                        </Button>}
+                      </div>
                       <Select
                         value={e.category_en}
                         onValueChange={(v) => {
@@ -471,6 +514,28 @@ function ProductsAdmin() {
                         onChange={(ev) => setEditing({ ...e, category_ar: ev.target.value })}
                       />
                     </div>
+
+                    {addingCategory && <div id="new-category-fields" className="sm:col-span-2 space-y-3 border-y py-4">
+                      <h3 className="text-sm font-semibold">New category</h3>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="category-name-en">Category name (English) *</Label>
+                          <Input id="category-name-en" autoFocus value={categoryEn} disabled={categorySaving} onChange={(event) => setCategoryEn(event.target.value)} />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="category-name-ar">Category name (Arabic) *</Label>
+                          <Input id="category-name-ar" dir="rtl" value={categoryAr} disabled={categorySaving} onChange={(event) => setCategoryAr(event.target.value)} />
+                        </div>
+                      </div>
+                      {categoryError && <p role="alert" className="text-sm text-destructive">{categoryError}</p>}
+                      <div className="flex flex-wrap gap-2">
+                        <Button type="button" size="sm" disabled={categorySaving || !categoryEn.trim() || !categoryAr.trim()} onClick={saveCategory}>
+                          {categorySaving ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : <Check className="me-2 h-4 w-4" />}
+                          {categorySaving ? "Saving…" : "Save category"}
+                        </Button>
+                        <Button type="button" size="sm" variant="outline" disabled={categorySaving} onClick={resetCategoryDraft}>Cancel</Button>
+                      </div>
+                    </div>}
 
                     <div className="sm:col-span-2 space-y-1.5">
                       <Label className="text-xs font-semibold">URL Slug *</Label>

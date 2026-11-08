@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { createProductCategory, type ProductCategory } from "@/lib/product-categories";
 
 export type VendorItem = {
   id: string;
@@ -68,11 +69,7 @@ export function assertBilingualPairs(pairs: Array<{ en: string; ar: string; labe
   if (missing.length) throw new Error("Required bilingual fields missing: " + missing.join(", "));
 }
 
-export type ProductCategory = {
-  id: string;
-  name_en: string;
-  name_ar: string;
-};
+export type { ProductCategory } from "@/lib/product-categories";
 
 export function useProductCategories() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
@@ -86,5 +83,13 @@ export function useProductCategories() {
       });
   }, []);
 
-  return { categories, loading };
+  const addCategory = async (nameEn: string, nameAr: string) => {
+    const existing = categories.find((category) => category.name_en.trim().toLowerCase() === nameEn.trim().toLowerCase());
+    if (existing) throw new Error("This category already exists. Select it from the list.");
+    const category = await createProductCategory(nameEn, nameAr);
+    setCategories((current) => [...current, category].sort((a, b) => a.name_en.localeCompare(b.name_en)));
+    return category;
+  };
+
+  return { categories, loading, addCategory };
 }
