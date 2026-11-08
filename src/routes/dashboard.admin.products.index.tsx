@@ -476,7 +476,7 @@ function ProductsAdmin() {
                     <div className="space-y-1.5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <Label className="text-xs font-semibold">Category (English) *</Label>
-                        {_perms.create && <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 text-xs" disabled={categorySaving} aria-expanded={addingCategory} aria-controls="new-category-fields" onClick={() => { setAddingCategory((current) => !current); setCategoryError(""); }}>
+                        {_perms.add && <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 text-xs" disabled={categorySaving} aria-expanded={addingCategory} aria-controls="new-category-fields" onClick={() => { setAddingCategory((current) => !current); setCategoryError(""); }}>
                           <Plus className="h-3.5 w-3.5" /> Add category
                         </Button>}
                       </div>
