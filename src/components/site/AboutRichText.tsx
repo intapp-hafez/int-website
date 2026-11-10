@@ -22,10 +22,11 @@ export function AboutRichText({ value, inline = false, className = "" }: { value
       const children = domToReact(node.children as DOMNode[], options);
       if (inlineTags.has(node.name)) return createElement(node.name, {}, children);
       if (!inline && blockTags.has(node.name)) return createElement(node.name, {}, children);
+      if (!inline && node.name === "div") return <div>{children}</div>;
       // Discard editor layout wrappers, styles and attributes, retaining their content.
       return <Fragment>{children}{inline && (blockTags.has(node.name) || node.name === "div") ? " " : null}</Fragment>;
     },
   };
   const Tag = inline ? "span" : "div";
-  return <Tag className={`break-words whitespace-pre-line [&_p+p]:mt-4 [&_ul]:my-4 [&_ul]:list-disc [&_ul]:ps-6 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:ps-6 [&_li+li]:mt-2 [&_blockquote]:border-s-2 [&_blockquote]:border-accent [&_blockquote]:ps-4 ${className}`}>{parse(value, options)}</Tag>;
+  return <Tag dir="auto" className={`min-w-0 break-words whitespace-pre-line [&_p]:mb-4 [&_p:last-child]:mb-0 [&_div+div]:mt-4 [&_strong]:font-semibold [&_ul]:my-4 [&_ul]:list-disc [&_ul]:ps-6 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:ps-6 [&_li+li]:mt-2 [&_blockquote]:border-s-2 [&_blockquote]:border-accent [&_blockquote]:ps-4 ${className}`}>{parse(value, options)}</Tag>;
 }

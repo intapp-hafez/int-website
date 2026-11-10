@@ -509,7 +509,7 @@ function AboutPage() {
 
               <div className="relative p-5 rounded-2xl bg-muted/40 border border-border/70">
                 <Quote className="h-8 w-8 text-[#E8722C]/30 absolute top-3 end-4 pointer-events-none" />
-                <AboutRichText className="text-muted-foreground leading-relaxed text-sm sm:text-base relative z-10 italic" value={R(content.ownerBio,
+                <AboutRichText className="text-muted-foreground leading-7 text-sm sm:text-base relative z-10 pe-5" value={R(content.ownerBio,
                     isAr
                       ? "نفخر بمسيرتنا التي تمتد لأكثر من 20 عاماً في خدمة كبرى المشروعات القومية والتجارية، واضعين معايير الجودة ورضا العملاء في صدارة أولوياتنا."
                       : "For more than 20 years, our foundational philosophy has remained unchanged: delivering robust, future-proof engineering integration that empowers corporate growth."
