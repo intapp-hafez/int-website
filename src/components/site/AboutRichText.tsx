@@ -1,4 +1,4 @@
-import parse, { domToReact, htmlToDOM, Element, Text, type DOMNode, type HTMLReactParserOptions } from "html-react-parser";
+import parse, { domToReact, htmlToDOM, Element, type DOMNode, type HTMLReactParserOptions } from "html-react-parser";
 import { createElement, Fragment } from "react";
 
 const blocked = new Set(["script", "style", "iframe", "object", "embed", "svg", "math", "form", "input", "button", "template"]);
@@ -7,7 +7,7 @@ const blockTags = new Set(["p", "ul", "ol", "li", "blockquote"]);
 
 export function aboutPlainText(value: string): string {
   const text = (nodes: DOMNode[]): string => nodes.map((node) => {
-    if (node instanceof Text) return node.data;
+    if (node.type === "text" && "data" in node) return node.data;
     if (!(node instanceof Element) || blocked.has(node.name)) return "";
     return `${text(node.children as DOMNode[])}${blockTags.has(node.name) || node.name === "div" || node.name === "br" ? " " : ""}`;
   }).join("");
