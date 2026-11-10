@@ -453,7 +453,7 @@ function AboutPage() {
 
       {/* 5. EXECUTIVE LEADERSHIP / FOUNDER SPOTLIGHT */}
       <Section id="leadership" className="scroll-mt-28">
-        <div className="max-w-6xl mx-auto rounded-3xl border-2 border-[#E8722C] shadow-[0_8px_40px_rgba(232,114,44,0.16)] hover:shadow-[0_16px_56px_rgba(232,114,44,0.26)] transition-all duration-500 relative overflow-hidden bg-card p-8 sm:p-12 lg:p-14 group">
+        <div className="max-w-6xl mx-auto rounded-3xl border-2 border-[#E8722C] shadow-[0_8px_40px_rgba(232,114,44,0.16)] hover:shadow-[0_16px_56px_rgba(232,114,44,0.26)] transition-all duration-500 relative overflow-hidden bg-card p-4 sm:p-6 lg:p-8 group">
           {/* Live animated border beam on hover */}
           <div className="absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden z-20">
             <span className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#E8722C_85%,transparent_100%)] opacity-80" />
@@ -463,7 +463,7 @@ function AboutPage() {
           <div className="absolute -top-32 -end-32 h-96 w-96 rounded-full bg-[#E8722C]/15 blur-[130px] pointer-events-none" />
           <div className="absolute -bottom-32 -start-32 h-96 w-96 rounded-full bg-primary/15 blur-[130px] pointer-events-none" />
 
-          <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center relative z-10">
+          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10">
             {/* Founder Portrait Column */}
             <div className="lg:col-span-5 flex flex-col items-center">
               <div className="relative w-full max-w-sm aspect-[4/4.8] rounded-3xl overflow-hidden border-2 border-[#E8722C] shadow-2xl group/img bg-muted">
