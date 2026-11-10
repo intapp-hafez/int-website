@@ -1,5 +1,7 @@
 # Architecture rules
 
+- About content renders through an allowlisted rich-text renderer that drops editor wrappers and unsafe attributes; headings and image labels use plain text so saved HTML never appears literally.
+
 - System category creation uses the authenticated browser database client and only updates the selector after the database returns the saved row, so rejected writes never appear saved.
 
 - Admin Partners pagination uses a pure list helper after search filtering and preserves global ordering indices, so page boundaries do not change reorder behavior.

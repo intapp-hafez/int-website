@@ -46,6 +46,7 @@ import teamSamir from "@/assets/team-samir.jpg";
 import teamDina from "@/assets/team-dina.jpg";
 import logoImg from "@/assets/logo.png";
 import artboard39Logo from "@/assets/artboard-39.svg";
+import { AboutRichText, aboutPlainText } from "@/components/site/AboutRichText";
 import { AboutLogoWheel } from "@/components/site/AboutLogoWheel";
 
 export const Route = createFileRoute("/about")({
@@ -54,8 +55,12 @@ export const Route = createFileRoute("/about")({
       { title: "About Us — Integrated Technics" },
       {
         name: "description",
-        content: "20+ years engineering mission-critical security, ICT, AV, and Tier-3 Data Center infrastructure for the region's largest enterprises.",
+        content: "Discover Integrated Technics, our engineering expertise, leadership, and integrated technology solutions for enterprises across the Middle East.",
       },
+      { property: "og:title", content: "About Us — Integrated Technics" },
+      { property: "og:description", content: "Meet Integrated Technics and explore our engineering expertise, leadership, and integrated technology solutions." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AboutPage,
@@ -67,6 +72,8 @@ function AboutPage() {
   const { settings } = useSettings();
   const isAr = lang === "ar";
   const L = (b: { en: string; ar: string } | null | undefined, fallback = "") =>
+    aboutPlainText(pickBi(b, isAr ? "ar" : "en", fallback));
+  const R = (b: { en: string; ar: string } | null | undefined, fallback = "") =>
     pickBi(b, isAr ? "ar" : "en", fallback);
 
   const shouldMirror = hero.mirror_rtl && isAr;
@@ -139,14 +146,11 @@ function AboutPage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-in-up">
-            {L(
-              content.sub,
+          <AboutRichText className="text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-in-up" value={R(content.sub,
               isAr
                 ? "أكثر من عقدين من الخبرة في تصميم وتنفيذ البنية التحتية لمراكز البيانات والأنظمة الأمنية والشبكات وحلول القاعات الذكية."
                 : "Over two decades architecting turnkey ICT, IP security, certified Tier-3 data centers, and unified AV environments across the MENA region."
-            )}
-          </p>
+            )} />
 
           {/* Action CTAs */}
           <div className="flex flex-wrap items-center justify-center gap-3.5 animate-fade-in-up">
@@ -211,14 +215,11 @@ function AboutPage() {
               {L(content.overviewT, isAr ? "نبذة عن إنترجريتد تكنيكس" : "Architecting the Future of Enterprise Technology")}
             </h2>
             <div className="text-muted-foreground leading-relaxed text-sm sm:text-base space-y-4">
-              <p>
-                {L(
-                  content.overviewD,
+              <AboutRichText value={R(content.overviewD,
                   isAr
                     ? "تأسست شركة إنترجريتد تكنيكس لتكون الشريك الهندسي المعتمد للهيئات والمؤسسات الكبرى في تصميم وتنفيذ البنية التحتية التكنولوجية وحلول الأمن المتكاملة."
                     : "Integrated Technics stands as a premier regional technology engineering and systems integration firm, delivering certified turnkey infrastructure for high-demand enterprise environments."
-                )}
-              </p>
+                )} />
               <p>
                 {isAr
                   ? "نعتمد على منهجية هندسية صارمة تضمن أعلى معايير الجودة والسلامة والجاهزية التشغيلية (99.9% Uptime) مع دعم فني متواصل 24/7."
@@ -319,14 +320,11 @@ function AboutPage() {
                 {L(content.visionT, isAr ? "ريادة التكامل التكنولوجي بالشرق الأوسط" : "Leading Regional Innovation")}
               </h3>
 
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {L(
-                  content.visionD,
+              <AboutRichText className="text-sm text-muted-foreground leading-relaxed" value={R(content.visionD,
                   isAr
                     ? "أن نكون الخيار الأول والنموذج الأكثر موثوقية في الشرق الأوسط في تقديم حلول الأنظمة المتكاملة وتجهيز مراكز البيانات الذكية."
                     : "To be the region's most trusted partner for integrated technology systems that secure, connect and empower enterprises."
-                )}
-              </p>
+                )} />
 
               {/* Highlights */}
               <div className="space-y-2 pt-2 border-t border-border/50">
@@ -374,14 +372,11 @@ function AboutPage() {
                 {L(content.missionT, isAr ? "تمكين المؤسسات بحلول مستدامة" : "Empowering Enterprise Operations")}
               </h3>
 
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {L(
-                  content.missionD,
+              <AboutRichText className="text-sm text-muted-foreground leading-relaxed" value={R(content.missionD,
                   isAr
                     ? "تسخير أحدث التقنيات العالمية والكوادر الهندسية المعتمدة لتقديم مشروعات متكاملة تلبي أعلى معايير الأمان والاستمرارية."
                     : "Deliver end-to-end engineered solutions with uncompromising quality, certified expertise, and lifelong client partnership."
-                )}
-              </p>
+                )} />
 
               {/* Highlights */}
               <div className="space-y-2 pt-2 border-t border-border/50">
@@ -514,14 +509,11 @@ function AboutPage() {
 
               <div className="relative p-5 rounded-2xl bg-muted/40 border border-border/70">
                 <Quote className="h-8 w-8 text-[#E8722C]/30 absolute top-3 end-4 pointer-events-none" />
-                <p className="text-muted-foreground leading-relaxed text-sm sm:text-base relative z-10 italic">
-                  "{L(
-                    content.ownerBio,
+                <AboutRichText className="text-muted-foreground leading-relaxed text-sm sm:text-base relative z-10 italic" value={R(content.ownerBio,
                     isAr
                       ? "نفخر بمسيرتنا التي تمتد لأكثر من 20 عاماً في خدمة كبرى المشروعات القومية والتجارية، واضعين معايير الجودة ورضا العملاء في صدارة أولوياتنا."
                       : "For more than 20 years, our foundational philosophy has remained unchanged: delivering robust, future-proof engineering integration that empowers corporate growth."
-                  )}"
-                </p>
+                  )} />
               </div>
 
               {/* 3 Executive Pillars */}
@@ -614,9 +606,7 @@ function AboutPage() {
                     {L(v.title)}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    {L(v.desc)}
-                  </p>
+                  <AboutRichText className="text-xs sm:text-sm text-muted-foreground leading-relaxed" value={R(v.desc)} />
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-border/60 flex items-center gap-1.5 text-xs font-bold text-[#E8722C] relative z-10">
@@ -639,9 +629,7 @@ function AboutPage() {
           <h2 className="text-2xl sm:text-3xl font-bold font-display text-foreground">
             {L(content.certificationsT, isAr ? "الشهادات والاعتمادات الدولية" : "Certified Standards & Compliance")}
           </h2>
-          <p className="text-sm text-muted-foreground">
-            {L(content.certificationsSub, isAr ? "نلتزم بأعلى معايير السلامة والجودة العالمية" : "Engineered in accordance with rigorous global standards")}
-          </p>
+          <AboutRichText className="text-sm text-muted-foreground" value={R(content.certificationsSub, isAr ? "نلتزم بأعلى معايير السلامة والجودة العالمية" : "Engineered in accordance with rigorous global standards")} />
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
@@ -653,7 +641,7 @@ function AboutPage() {
               <div className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
-              <span className="font-semibold text-xs sm:text-sm text-foreground truncate">{c}</span>
+              <span className="font-semibold text-xs sm:text-sm text-foreground min-w-0 break-words">{aboutPlainText(c)}</span>
             </div>
           ))}
         </div>
@@ -669,14 +657,11 @@ function AboutPage() {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-display tracking-tight text-foreground">
             {L(content.teamTitle, isAr ? "فريق القيادة والهندسة المعتمد" : "Leadership & Engineering Team")}
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            {L(
-              content.teamSub,
+          <AboutRichText className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto" value={R(content.teamSub,
               isAr
                 ? "مهندسون معتمدون وقادة مشاريع ومستشارون يحولون التعقيد إلى نتائج موثوقة لأكثر من 500 مشروع قومي وخاص."
                 : "Certified systems architects, project leaders and engineering directors transforming complexity into reliable turnkey outcomes."
-            )}
-          </p>
+            )} />
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto relative z-10">
