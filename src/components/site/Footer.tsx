@@ -2,11 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram, Youtube } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useSettings } from "@/lib/settings-store";
+import { useSectionTitle } from "@/lib/titles-store";
 import logo from "@/assets/logo.png";
 
 export function Footer() {
   const { t, lang } = useI18n();
   const { settings } = useSettings();
+  const footerTitle = useSectionTitle("global.footer");
   const year = new Date().getFullYear();
   const vis = settings.visibility;
   const show = (k: keyof typeof vis) => vis[k] !== false;
@@ -23,10 +25,10 @@ export function Footer() {
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2 font-display font-bold text-lg mb-3">
             <img src={logo} alt="Integrated Technics" className="h-9 w-auto bg-white/95 rounded-md p-1" />
-            <span>Integrated<span className="text-accent">Technics</span></span>
+            <span>{footerTitle.title || (<>Integrated<span className="text-accent">Technics</span></>)}</span>
           </div>
           <p className="text-sm opacity-90 leading-relaxed max-w-sm">
-            {(settings.bio?.[lang] || settings.bio?.en) ?? t("footer.tagline")}
+            {(settings.bio?.[lang] || settings.bio?.en) ?? footerTitle.subtitle ?? t("footer.tagline")}
           </p>
           <div className="flex gap-2.5 mt-4">
             {socials.map(({ Icon, href, label }) => (

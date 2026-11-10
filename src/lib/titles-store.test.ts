@@ -17,18 +17,37 @@ describe("Titles Store & Default Configuration", () => {
       "home.news",
       "home.cta",
       "page.about",
+      "about.overview",
+      "about.triad",
+      "about.values",
+      "about.certifications",
+      "about.team",
+      "about.cta",
       "page.services",
       "page.solutions",
       "page.products",
+      "products.track_quote",
       "page.projects",
+      "projects.clientele",
       "page.industries",
+      "industries.sectors",
       "page.partners",
       "page.careers",
+      "careers.track",
       "page.news",
+      "news.updates",
+      "news.related",
       "page.events",
       "page.training",
+      "training.faq",
+      "training.portal",
       "page.contact",
+      "contact.channels",
+      "contact.form",
+      "contact.map",
       "page.faqs",
+      "page.policies",
+      "global.footer",
     ];
 
     for (const key of requiredKeys) {
@@ -53,6 +72,11 @@ describe("Titles Store & Default Configuration", () => {
     expect(DEFAULT_TITLES["home.hero"].page).toBe("home");
     expect(DEFAULT_TITLES["page.services"].page).toBe("services");
     expect(DEFAULT_TITLES["page.projects"].page).toBe("projects");
+    expect(DEFAULT_TITLES["projects.clientele"].page).toBe("projects");
+    expect(DEFAULT_TITLES["industries.sectors"].page).toBe("industries");
+    expect(DEFAULT_TITLES["contact.form"].page).toBe("contact");
+    expect(DEFAULT_TITLES["training.faq"].page).toBe("training");
+    expect(DEFAULT_TITLES["page.policies"].page).toBe("global");
     expect(DEFAULT_TITLES["global.footer"].page).toBe("global");
   });
 });

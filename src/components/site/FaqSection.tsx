@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export function FaqSection({
   className = "",
@@ -24,6 +25,7 @@ export function FaqSection({
   const { faqs, loading } = useFaqs();
   const { lang } = useI18n();
   const isAr = lang === "ar";
+  const sectionTitle = useSectionTitle("page.faqs");
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [selectedCat, setSelectedCat] = useState<string>("all");
@@ -81,15 +83,16 @@ export function FaqSection({
         <div className="text-center space-y-3 mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold uppercase tracking-widest">
             <HelpCircle className="h-3.5 w-3.5" />
-            <span>{isAr ? "الأسئلة الشائعة" : "Knowledge Base"}</span>
+            <span>{sectionTitle.badge || (isAr ? "الأسئلة الشائعة" : "Knowledge Base")}</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground">
-            {isAr ? "إجابات على أكثر الأسئلة استفساراً" : "Frequently Asked Questions"}
+            {sectionTitle.title || (isAr ? "إجابات على أكثر الأسئلة استفساراً" : "Frequently Asked Questions")}
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-            {isAr
-              ? "تعرف على حلولنا الهندسية، معايير التنفيذ، عقود الصيانة، وكيفية بدء مشروعك معنا."
-              : "Learn about our turnkey delivery, engineering certifications, SLAs, and project engagement models."}
+            {sectionTitle.subtitle ||
+              (isAr
+                ? "تعرف على حلولنا الهندسية، معايير التنفيذ، عقود الصيانة، وكيفية بدء مشروعك معنا."
+                : "Learn about our turnkey delivery, engineering certifications, SLAs, and project engagement models.")}
           </p>
         </div>
 

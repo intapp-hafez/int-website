@@ -48,6 +48,7 @@ import logoImg from "@/assets/logo.png";
 import artboard39Logo from "@/assets/artboard-39.svg";
 import { AboutRichText, aboutPlainText } from "@/components/site/AboutRichText";
 import { AboutLogoWheel } from "@/components/site/AboutLogoWheel";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -70,6 +71,13 @@ function AboutPage() {
   const { lang, t } = useI18n();
   const { content, hero, updatedAt } = useAboutContent();
   const { settings } = useSettings();
+  const heroTitles = useSectionTitle("page.about");
+  const overviewTitles = useSectionTitle("about.overview");
+  const triadTitles = useSectionTitle("about.triad");
+  const valuesTitles = useSectionTitle("about.values");
+  const certTitles = useSectionTitle("about.certifications");
+  const teamTitles = useSectionTitle("about.team");
+  const ctaTitles = useSectionTitle("about.cta");
   const isAr = lang === "ar";
   const L = (b: { en: string; ar: string } | null | undefined, fallback = "") =>
     aboutPlainText(pickBi(b, isAr ? "ar" : "en", fallback));
@@ -140,13 +148,21 @@ function AboutPage() {
         )}
 
         <div className="container mx-auto px-4 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20 lg:pt-16 lg:pb-24 relative z-10 text-center max-w-4xl">
+          {/* Eyebrow / Tagline */}
+          {(heroTitles.badge || (content.eyebrow && L(content.eyebrow))) ? (
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold mb-4 animate-fade-in-up">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>{heroTitles.badge || L(content.eyebrow, isAr ? "من نحن" : "About Us")}</span>
+            </div>
+          ) : null}
+
           {/* Main Title */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold font-display tracking-tight text-foreground leading-tight sm:leading-tight lg:leading-tight mb-5 animate-fade-in-up">
-            {L(content.title, isAr ? "ريادة هندسية متكاملة للمؤسسات الكبرى" : "Pioneering Mission-Critical System Integration")}
+            {heroTitles.title || L(content.title, isAr ? "ريادة هندسية متكاملة للمؤسسات الكبرى" : "Pioneering Mission-Critical System Integration")}
           </h1>
 
           {/* Subtitle */}
-          <AboutRichText className="text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-in-up" value={R(content.sub,
+          <AboutRichText className="text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-in-up" value={heroTitles.subtitle || R(content.sub,
               isAr
                 ? "أكثر من عقدين من الخبرة في تصميم وتنفيذ البنية التحتية لمراكز البيانات والأنظمة الأمنية والشبكات وحلول القاعات الذكية."
                 : "Over two decades architecting turnkey ICT, IP security, certified Tier-3 data centers, and unified AV environments across the MENA region."
@@ -209,16 +225,16 @@ function AboutPage() {
           <div className="lg:col-span-6 space-y-5 text-start">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-semibold">
               <Building2 className="h-3.5 w-3.5" />
-              <span>{isAr ? "من نحن وقصتنا" : "Who We Are & History"}</span>
+              <span>{overviewTitles.badge || L(content.eyebrow, isAr ? "من نحن وقصتنا" : "Who We Are & History")}</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-bold font-display text-foreground leading-snug">
-              {L(content.overviewT, isAr ? "نبذة عن إنترجريتد تكنيكس" : "Architecting the Future of Enterprise Technology")}
+              {overviewTitles.title || L(content.overviewT, isAr ? "نبذة عن إنترجريتد تكنيكس" : "Architecting the Future of Enterprise Technology")}
             </h2>
             <div className="text-muted-foreground leading-relaxed text-sm sm:text-base space-y-4">
               <AboutRichText value={R(content.overviewD,
-                  isAr
+                  overviewTitles.subtitle || (isAr
                     ? "تأسست شركة إنترجريتد تكنيكس لتكون الشريك الهندسي المعتمد للهيئات والمؤسسات الكبرى في تصميم وتنفيذ البنية التحتية التكنولوجية وحلول الأمن المتكاملة."
-                    : "Integrated Technics stands as a premier regional technology engineering and systems integration firm, delivering certified turnkey infrastructure for high-demand enterprise environments."
+                    : "Integrated Technics stands as a premier regional technology engineering and systems integration firm, delivering certified turnkey infrastructure for high-demand enterprise environments.")
                 )} />
               <p>
                 {isAr
@@ -266,10 +282,10 @@ function AboutPage() {
         <div className="text-center space-y-3 mb-14 max-w-3xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8722C]/10 border border-[#E8722C]/30 text-[#E8722C] text-xs font-bold uppercase tracking-wider shadow-xs">
             <Rocket className="h-3.5 w-3.5 text-[#E8722C]" />
-            <span>{isAr ? "بوصلتنا الاستراتيجية وقيمنا" : "Strategic Compass & Values"}</span>
+            <span>{triadTitles.badge || (isAr ? "بوصلتنا الاستراتيجية وقيمنا" : "Strategic Compass & Values")}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-display tracking-tight text-foreground">
-            {isAr ? (
+            {triadTitles.title || (isAr ? (
               <>
                 الرؤية، الرسالة{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#E8722C] to-accent">
@@ -283,12 +299,12 @@ function AboutPage() {
                   Core Values
                 </span>
               </>
-            )}
+            ))}
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            {isAr
+            {triadTitles.subtitle || (isAr
               ? "الركائز الأساسية التي تقود استراتيجيتنا الهندسية، معايير الجودة الصارمة، والتزامنا الأخلاقي المستمر تجاه عملائنا."
-              : "The foundational pillars that guide our engineering strategy, stringent quality standards, and ethical commitment to enterprise clients."}
+              : "The foundational pillars that guide our engineering strategy, stringent quality standards, and ethical commitment to enterprise clients.")}
           </p>
         </div>
 
@@ -421,14 +437,14 @@ function AboutPage() {
               </div>
 
               <h3 className="text-xl sm:text-2xl font-bold font-display text-foreground group-hover:text-[#E8722C] transition-colors">
-                {isAr ? "النزاهة، الدقة والشراكة" : "Integrity, Precision & Partnership"}
+                {L(content.valuesT, isAr ? "النزاهة، الدقة والشراكة" : "Integrity, Precision & Partnership")}
               </h3>
 
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {isAr
-                  ? "ترسيخ النزاهة الهندسية المطلقة، الدقة التقنية، الالتزام بأعلى معايير السلامة، وبناء شراكات وثيقة ومستدامة في كل مشروع."
-                  : "Upholding uncompromising integrity, technical excellence, safety compliance, and lifelong client partnership in every deployment."}
-              </p>
+              <AboutRichText className="text-sm text-muted-foreground leading-relaxed" value={R(content.values?.[0]?.desc,
+                  isAr
+                    ? "ترسيخ النزاهة الهندسية المطلقة، الدقة التقنية، الالتزام بأعلى معايير السلامة، وبناء شراكات وثيقة ومستدامة في كل مشروع."
+                    : "Upholding uncompromising integrity, technical excellence, safety compliance, and lifelong client partnership in every deployment."
+                )} />
 
               {/* Highlights */}
               <div className="space-y-2 pt-2 border-t border-border/50">
@@ -565,15 +581,15 @@ function AboutPage() {
         <div className="text-center space-y-3 mb-14 max-w-3xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8722C]/10 border border-[#E8722C]/30 text-[#E8722C] text-xs font-bold uppercase tracking-wider shadow-xs">
             <Heart className="h-3.5 w-3.5 text-[#E8722C]" />
-            <span>{isAr ? "ركائزنا ومبادئنا الراسخة" : "Uncompromising Principles"}</span>
+            <span>{valuesTitles.badge || (isAr ? "ركائزنا ومبادئنا الراسخة" : "Uncompromising Principles")}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-display tracking-tight text-foreground">
-            {L(content.valuesT, isAr ? "القيم الجوهرية التي تحكم عملنا" : "The Core Values Driving Our Engineering")}
+            {valuesTitles.title || L(content.valuesT, isAr ? "القيم الجوهرية التي تحكم عملنا" : "The Core Values Driving Our Engineering")}
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            {isAr
+            {valuesTitles.subtitle || (isAr
               ? "ستة معايير لا مساومة عليها تحكم كل تمديد كابل، تجهيز غرفة عمليات، وشراكة نبنيها مع كبرى المؤسسات."
-              : "Six immutable principles that govern every cable run, command center configuration, and client relationship."}
+              : "Six immutable principles that govern every cable run, command center configuration, and client relationship.")}
           </p>
         </div>
 
@@ -624,12 +640,12 @@ function AboutPage() {
         <div className="text-center space-y-3 mb-10 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
             <Award className="h-3.5 w-3.5" />
-            <span>{isAr ? "الاعتمادات والمعايير" : "Quality Certifications"}</span>
+            <span>{certTitles.badge || (isAr ? "الاعتمادات والمعايير" : "Quality Certifications")}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold font-display text-foreground">
-            {L(content.certificationsT, isAr ? "الشهادات والاعتمادات الدولية" : "Certified Standards & Compliance")}
+            {certTitles.title || L(content.certificationsT, isAr ? "الشهادات والاعتمادات الدولية" : "Certified Standards & Compliance")}
           </h2>
-          <AboutRichText className="text-sm text-muted-foreground" value={R(content.certificationsSub, isAr ? "نلتزم بأعلى معايير السلامة والجودة العالمية" : "Engineered in accordance with rigorous global standards")} />
+          <AboutRichText className="text-sm text-muted-foreground" value={certTitles.subtitle || R(content.certificationsSub, isAr ? "نلتزم بأعلى معايير السلامة والجودة العالمية" : "Engineered in accordance with rigorous global standards")} />
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
@@ -652,12 +668,12 @@ function AboutPage() {
         <div className="text-center space-y-3 mb-14 max-w-3xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8722C]/10 border border-[#E8722C]/30 text-[#E8722C] text-xs font-bold uppercase tracking-wider shadow-xs">
             <Users2 className="h-3.5 w-3.5 text-[#E8722C]" />
-            <span>{isAr ? "قادة الهندسة والتنفيذ" : "Engineering Leadership"}</span>
+            <span>{teamTitles.badge || (isAr ? "قادة الهندسة والتنفيذ" : "Engineering Leadership")}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-display tracking-tight text-foreground">
-            {L(content.teamTitle, isAr ? "فريق القيادة والهندسة المعتمد" : "Leadership & Engineering Team")}
+            {teamTitles.title || L(content.teamTitle, isAr ? "فريق القيادة والهندسة المعتمد" : "Leadership & Engineering Team")}
           </h2>
-          <AboutRichText className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto" value={R(content.teamSub,
+          <AboutRichText className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto" value={teamTitles.subtitle || R(content.teamSub,
               isAr
                 ? "مهندسون معتمدون وقادة مشاريع ومستشارون يحولون التعقيد إلى نتائج موثوقة لأكثر من 500 مشروع قومي وخاص."
                 : "Certified systems architects, project leaders and engineering directors transforming complexity into reliable turnkey outcomes."
@@ -666,7 +682,7 @@ function AboutPage() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto relative z-10">
           {content.team.map((m) => {
-            const dept = m.department ? m.department : (departmentByKey[m.key] ?? { en: "Leadership", ar: "القيادة" });
+            const dept = m.department?.en || m.department?.ar ? m.department : (departmentByKey[m.key] ?? { en: "Leadership", ar: "القيادة" });
             const memberImg = m.image || teamImageByKey[m.key] || teamKarim;
             return (
               <div
@@ -751,12 +767,12 @@ function AboutPage() {
             <div className="relative grid md:grid-cols-[1fr_auto] gap-8 items-center">
               <div className="space-y-2">
                 <h3 className="font-display text-2xl md:text-4xl font-bold tracking-tight">
-                  {isAr ? "جاهز لبدء مشروعك الهندسي القادم؟" : "Ready to Engineer Your Next Turnkey Facility?"}
+                  {ctaTitles.title || (isAr ? "جاهز لبدء مشروعك الهندسي القادم؟" : "Ready to Engineer Your Next Turnkey Facility?")}
                 </h3>
                 <p className="text-primary-foreground/85 text-sm md:text-base max-w-2xl leading-relaxed">
-                  {isAr
+                  {ctaTitles.subtitle || (isAr
                     ? "تواصل مع كبار مهندسينا للحصول على دراسة جدوى مجانية وعرض فني ومالي مفصل خلال 24-48 ساعة."
-                    : "Connect with our certified systems architects for an on-site technical assessment and formal proposal delivered within 24-48 hours."}
+                    : "Connect with our certified systems architects for an on-site technical assessment and formal proposal delivered within 24-48 hours.")}
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">

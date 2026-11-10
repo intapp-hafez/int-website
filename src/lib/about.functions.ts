@@ -6,7 +6,19 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Bilingual = z.object({ en: z.string().max(2000), ar: z.string().max(2000) });
 const AboutValue = z.object({ title: Bilingual, desc: Bilingual });
-const TeamMember = z.object({ key: z.string().min(1).max(64), name: Bilingual, role: Bilingual });
+const TeamMember = z.object({
+  key: z.string().min(1).max(64),
+  name: Bilingual,
+  role: Bilingual,
+  image: z.string().max(2000).optional(),
+  department: Bilingual.optional(),
+});
+const AboutStat = z.object({
+  value: z.string().max(50),
+  label: Bilingual,
+  sub: Bilingual,
+  iconName: z.string().max(50).optional(),
+});
 
 const AboutContentSchema = z.object({
   eyebrow: Bilingual,
@@ -19,7 +31,7 @@ const AboutContentSchema = z.object({
   missionT: Bilingual,
   missionD: Bilingual,
   valuesT: Bilingual,
-  values: z.array(AboutValue).length(3),
+  values: z.array(AboutValue).min(1).max(10),
   certificationsT: Bilingual,
   certificationsSub: Bilingual,
   certifications: z.array(z.string().min(1).max(120)).max(50),
@@ -28,9 +40,11 @@ const AboutContentSchema = z.object({
   ownerName: Bilingual,
   ownerRole: Bilingual,
   ownerBio: Bilingual,
+  ownerImage: z.string().max(2000).optional(),
   teamTitle: Bilingual,
   teamSub: Bilingual,
   team: z.array(TeamMember).max(24),
+  stats: z.array(AboutStat).max(10).optional(),
 });
 
 const SaveSchema = z.object({

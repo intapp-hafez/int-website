@@ -10,6 +10,7 @@ import { Loader2, Search, Mail, Phone, Building2, Package, CheckCircle2, Clock, 
 import { trackQuote, type TrackedQuote } from "@/lib/track-quote.functions";
 import { useI18n } from "@/lib/i18n";
 import { toast } from "sonner";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/track-quote")({
   head: () => ({ meta: [{ title: "Track your quote request" }, { name: "description", content: "Track the status of your quote request by 8-character reference number." }] }),
@@ -30,6 +31,7 @@ const STATUS_TONE: Record<string, string> = {
 function TrackQuotePage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
+  const sectionTitle = useSectionTitle("products.track_quote");
   const fn = useServerFn(trackQuote);
   const search = Route.useSearch();
   const [id, setId] = useState(search.id ?? "");
@@ -82,9 +84,19 @@ function TrackQuotePage() {
 
   return (
     <main className="container mx-auto px-4 py-10 max-w-3xl">
-      <h1 className="font-display text-3xl font-bold mb-2">{ar ? "تتبع طلب عرض السعر" : "Track your quote"}</h1>
+      {sectionTitle.badge && (
+        <div className="text-xs font-semibold uppercase tracking-wider text-accent mb-2">
+          {sectionTitle.badge}
+        </div>
+      )}
+      <h1 className="font-display text-3xl font-bold mb-2">
+        {sectionTitle.title || (ar ? "تتبع طلب عرض السعر" : "Track your quote")}
+      </h1>
       <p className="text-sm text-muted-foreground mb-6">
-        {ar ? "أدخل رقم العرض المكون من أول 8 خانات (مثال: E7F3B1A2). يمكنك إضافة البريد الإلكتروني للتأكد من الملكية." : "Enter your 8-character quote number (e.g. E7F3B1A2). Add your email for extra verification."}
+        {sectionTitle.subtitle ||
+          (ar
+            ? "أدخل رقم العرض المكون من أول 8 خانات (مثال: E7F3B1A2). يمكنك إضافة البريد الإلكتروني للتأكد من الملكية."
+            : "Enter your 8-character quote number (e.g. E7F3B1A2). Add your email for extra verification.")}
       </p>
 
       <Card>

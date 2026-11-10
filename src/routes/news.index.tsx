@@ -21,6 +21,7 @@ function NewsPage() {
   const locale = lang === "ar" ? "ar" : "en-US";
   const isRtl = dir === "rtl";
   const sectionTitle = useSectionTitle("page.news");
+  const updatesTitle = useSectionTitle("news.updates");
 
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("all");
@@ -73,7 +74,12 @@ function NewsPage() {
           <p className="text-lg text-muted-foreground max-w-2xl">{sectionTitle.subtitle || t("news.sub")}</p>
         </div>
       </section>
-      <Section className="!pt-8 !md:pt-12" title={lang === "ar" ? "أحدث الأخبار" : "Latest updates"}>
+      <Section
+        className="!pt-8 !md:pt-12"
+        eyebrow={updatesTitle.badge}
+        title={updatesTitle.title || (lang === "ar" ? "أحدث الأخبار" : "Latest updates")}
+        sub={updatesTitle.subtitle}
+      >
         {active.length === 0 ? (
           <p className="text-center text-muted-foreground">{lang === "ar" ? "لا توجد أخبار بعد." : "No news yet."}</p>
         ) : (

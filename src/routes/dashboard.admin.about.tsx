@@ -141,6 +141,7 @@ function AboutAdminPage() {
     name: { en: "", ar: "" },
     role: { en: "", ar: "" },
     image: "",
+    department: { en: "", ar: "" },
   });
 
   const moveTeamMember = (fromIdx: number, toIdx: number) => {
@@ -159,6 +160,7 @@ function AboutAdminPage() {
       name: { en: "", ar: "" },
       role: { en: "", ar: "" },
       image: "",
+      department: { en: "", ar: "" },
     });
     setTeamModalOpen(true);
   };
@@ -170,6 +172,7 @@ function AboutAdminPage() {
       name: { en: form.team[idx].name?.en || "", ar: form.team[idx].name?.ar || "" },
       role: { en: form.team[idx].role?.en || "", ar: form.team[idx].role?.ar || "" },
       image: form.team[idx].image || "",
+      department: { en: form.team[idx].department?.en || "", ar: form.team[idx].department?.ar || "" },
     });
     setTeamModalOpen(true);
   };
@@ -880,16 +883,26 @@ function AboutAdminPage() {
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-1.5">
-                <Label>Founder Photo URL</Label>
-                <Input
-                  value={form.ownerImage ?? ""}
-                  placeholder="https://integratedtechnics.com/.../founder.webp"
-                  onChange={(e) => {
-                    setForm({ ...form, ownerImage: e.target.value });
-                    setDirty(true);
-                  }}
-                />
-                <p className="text-xs text-muted-foreground">URL of the founder image displayed on the public About page.</p>
+                <Label>Founder Photo</Label>
+                <div className="flex gap-2 items-center">
+                  <Input
+                    value={form.ownerImage ?? ""}
+                    placeholder="https://integratedtechnics.com/.../founder.webp"
+                    className="flex-1 text-xs"
+                    onChange={(e) => {
+                      setForm({ ...form, ownerImage: e.target.value });
+                      setDirty(true);
+                    }}
+                  />
+                  <TeamPhotoUpload
+                    disabled={!isAdmin}
+                    onUploaded={(url) => {
+                      setForm((current) => ({ ...current, ownerImage: url }));
+                      setDirty(true);
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Upload a photo or enter a URL for the founder/managing director.</p>
               </div>
 
               <BiField
@@ -1144,6 +1157,7 @@ function AboutAdminPage() {
                             <TableHead className="w-[50px] text-xs">Photo</TableHead>
                             <TableHead className="text-xs">Name (EN / AR)</TableHead>
                             <TableHead className="text-xs">Role (EN / AR)</TableHead>
+                            <TableHead className="text-xs">Department (EN / AR)</TableHead>
                             <TableHead className="w-[130px] text-xs">Key</TableHead>
                             <TableHead className="w-[90px] text-xs">Status</TableHead>
                             <TableHead className="w-[100px] text-end text-xs">Actions</TableHead>
@@ -1259,6 +1273,14 @@ function AboutAdminPage() {
                                   </div>
                                   <div className="text-[11px] text-muted-foreground leading-snug mt-0.5" dir="rtl">
                                     {m.role.ar || <span className="text-muted-foreground/60 italic">—</span>}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="py-2.5">
+                                  <div className="text-xs text-foreground leading-snug">
+                                    {m.department?.en || <span className="text-muted-foreground italic">—</span>}
+                                  </div>
+                                  <div className="text-[11px] text-muted-foreground leading-snug mt-0.5" dir="rtl">
+                                    {m.department?.ar || <span className="text-muted-foreground/60 italic">—</span>}
                                   </div>
                                 </TableCell>
                                 <TableCell className="py-2.5">
@@ -1460,6 +1482,16 @@ function AboutAdminPage() {
                           errorEn={errors[`team.${idx}.role.en`]}
                           errorAr={errors[`team.${idx}.role.ar`]}
                         />
+
+                        <BiField
+                          label="Department / Practice"
+                          value={m.department || { en: "", ar: "" }}
+                          onChange={(lang, v) => {
+                            const team = form.team.map((t, i) => i === idx ? { ...t, department: { ...(t.department || { en: "", ar: "" }), [lang]: v } } : t);
+                            setForm({ ...form, team });
+                            setDirty(true);
+                          }}
+                        />
                       </div>
                     );
                   })}
@@ -1543,6 +1575,17 @@ function AboutAdminPage() {
                     setMemberForm({
                       ...memberForm,
                       role: { ...memberForm.role, [lang]: v },
+                    })
+                  }
+                />
+
+                <BiField
+                  label="Department / Practice"
+                  value={memberForm.department || { en: "", ar: "" }}
+                  onChange={(lang, v) =>
+                    setMemberForm({
+                      ...memberForm,
+                      department: { ...(memberForm.department || { en: "", ar: "" }), [lang]: v },
                     })
                   }
                 />

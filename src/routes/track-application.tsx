@@ -9,6 +9,7 @@ import { Loader2, Search, Briefcase, MapPin, CheckCircle2, Circle, XCircle } fro
 import { trackApplication, type TrackedApplication } from "@/lib/career-track.functions";
 import { STATUS_LABEL, STATUS_PIPELINE, type CareerStatus } from "@/lib/career-workflow";
 import { useI18n } from "@/lib/i18n";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/track-application")({
   head: () => ({
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/track-application")({
 function TrackApplicationPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
+  const sectionTitle = useSectionTitle("careers.track");
   const fn = useServerFn(trackApplication);
   const search = Route.useSearch();
   const [ref, setRef] = useState(search.ref ?? "");
@@ -63,9 +65,19 @@ function TrackApplicationPage() {
   return (
     <main dir={ar ? "rtl" : "ltr"} className="container mx-auto max-w-3xl px-4 py-12 space-y-6">
       <header className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-semibold">{ar ? "تتبع حالة طلب التوظيف" : "Track your application"}</h1>
+        {sectionTitle.badge && (
+          <div className="text-xs font-semibold uppercase tracking-wider text-accent">
+            {sectionTitle.badge}
+          </div>
+        )}
+        <h1 className="text-2xl md:text-3xl font-semibold">
+          {sectionTitle.title || (ar ? "تتبع حالة طلب التوظيف" : "Track your application")}
+        </h1>
         <p className="text-sm text-muted-foreground">
-          {ar ? "أدخل رقم المرجع الذي استلمته بعد التقديم لعرض حالة طلبك." : "Enter the reference number you received after applying to view your progress."}
+          {sectionTitle.subtitle ||
+            (ar
+              ? "أدخل رقم المرجع الذي استلمته بعد التقديم لعرض حالة طلبك."
+              : "Enter the reference number you received after applying to view your progress.")}
         </p>
       </header>
 

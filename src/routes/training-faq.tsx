@@ -4,6 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { TrainingChatWidget } from "@/components/site/TrainingChatWidget";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/training-faq")({
   head: () => ({
@@ -67,6 +68,7 @@ const FAQS: { q: { en: string; ar: string }; a: { en: string; ar: string } }[] =
 function TrainingFaqPage() {
   const { lang, dir } = useI18n();
   const isAr = lang === "ar";
+  const sectionTitle = useSectionTitle("training.faq");
 
   return (
     <div dir={dir}>
@@ -74,15 +76,16 @@ function TrainingFaqPage() {
         <div className="absolute inset-0 grid-bg opacity-50" />
         <div className={`container mx-auto px-4 lg:px-8 py-20 relative ${isAr ? "text-right" : "text-left"}`}>
           <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">
-            {isAr ? "التدريب" : "Training"}
+            {sectionTitle.badge || (isAr ? "التدريب" : "Training")}
           </div>
           <h1 className={`text-4xl md:text-5xl font-bold mb-4 ${isAr ? "font-arabic leading-[1.3]" : ""}`}>
-            {isAr ? "الأسئلة الشائعة عن التدريب" : "Training FAQ"}
+            {sectionTitle.title || (isAr ? "الأسئلة الشائعة عن التدريب" : "Training FAQ")}
           </h1>
           <p className={`text-lg text-muted-foreground max-w-2xl ${isAr ? "font-arabic leading-loose ms-auto" : ""}`}>
-            {isAr
-              ? "كل ما تحتاج معرفته عن التسجيل والمواعيد والمدربين والشهادات."
-              : "Everything you need to know about registration, dates, trainers and certificates."}
+            {sectionTitle.subtitle ||
+              (isAr
+                ? "كل ما تحتاج معرفته عن التسجيل والمواعيد والمدربين والشهادات."
+                : "Everything you need to know about registration, dates, trainers and certificates.")}
           </p>
         </div>
       </section>

@@ -8,6 +8,7 @@ import { useNews } from "@/lib/news-store";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { Countdown } from "@/components/ui/countdown";
 import DOMPurify from "dompurify";
+import { useSectionTitle } from "@/lib/titles-store";
 
 const humanize = (s: string) => s.split("-").filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
 
@@ -40,6 +41,7 @@ function NewsDetailsPage() {
   const post = posts.find((p) => p.slug === slug);
   const locale = lang === "ar" ? "ar" : "en-US";
   const isRtl = lang === "ar";
+  const relatedTitle = useSectionTitle("news.related");
 
   const related = useMemo(() => {
     if (!post) return [];
@@ -141,7 +143,21 @@ function NewsDetailsPage() {
       {related.length > 0 && (
         <div className="mt-20 pt-16 border-t">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">{lang === "ar" ? "أخبار ذات صلة" : "Related News"}</h2>
+            <div>
+              {relatedTitle.badge && (
+                <div className="text-xs font-semibold uppercase tracking-wider text-accent mb-1">
+                  {relatedTitle.badge}
+                </div>
+              )}
+              <h2 className="text-3xl font-bold">
+                {relatedTitle.title || (lang === "ar" ? "أخبار ذات صلة" : "Related News")}
+              </h2>
+              {relatedTitle.subtitle && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {relatedTitle.subtitle}
+                </p>
+              )}
+            </div>
             <Link to="/news" className="text-accent text-sm font-medium hover:underline inline-flex items-center gap-1">
               {lang === "ar" ? "عرض الكل" : "View all"} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
             </Link>

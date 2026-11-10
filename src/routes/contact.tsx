@@ -35,6 +35,7 @@ import { ContactMap } from "@/components/site/ContactMap";
 import { FaqSection } from "@/components/site/FaqSection";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -87,9 +88,15 @@ function ContactPage() {
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${encodeURIComponent(address)}`;
   const mapEmbed = settings.mapUrl?.trim();
 
-  const headerBadge = settings.contactHeader?.badge?.[lang] || (isAr ? "تواصل معنا" : "Get In Touch");
-  const headerTitle = settings.contactHeader?.title?.[lang] || (isAr ? "لنبني معاً بنيتك التحتية المتكاملة" : "Let's Architect Your Infrastructure");
+  const pageTitle = useSectionTitle("page.contact");
+  const channelsTitle = useSectionTitle("contact.channels");
+  const formTitle = useSectionTitle("contact.form");
+  const mapTitle = useSectionTitle("contact.map");
+
+  const headerBadge = pageTitle.badge || settings.contactHeader?.badge?.[lang] || (isAr ? "تواصل معنا" : "Get In Touch");
+  const headerTitle = pageTitle.title || settings.contactHeader?.title?.[lang] || (isAr ? "لنبني معاً بنيتك التحتية المتكاملة" : "Let's Architect Your Infrastructure");
   const headerSubtitle =
+    pageTitle.subtitle ||
     settings.contactHeader?.subtitle?.[lang] ||
     (isAr
       ? "تحدث مباشرة مع كبار مهندسينا المعتمدين. عروض أسعار ودراسات فنية متكاملة للمشاريع خلال 24–48 ساعة."
@@ -283,11 +290,19 @@ function ContactPage() {
           {/* Contact & Quotation Form */}
           <div className="lg:col-span-2 p-6 sm:p-8 rounded-2xl border bg-card shadow-xs">
             <div className="mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold">{isAr ? "أرسل تفاصيل مشروعك أو استفسارك" : "Send an Inquiry or RFP"}</h2>
+              {formTitle.badge && (
+                <div className="text-xs font-semibold uppercase tracking-wider text-accent mb-1.5">
+                  {formTitle.badge}
+                </div>
+              )}
+              <h2 className="text-xl sm:text-2xl font-bold">
+                {formTitle.title || (isAr ? "أرسل تفاصيل مشروعك أو استفسارك" : "Send an Inquiry or RFP")}
+              </h2>
               <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                {isAr
-                  ? "املأ النموذج أدناه وسيتولى مهندس حلول متخصص مراجعة متطلباتك والرد عليك."
-                  : "Fill in the details below and a certified solutions architect will review your project requirements."}
+                {formTitle.subtitle ||
+                  (isAr
+                    ? "املأ النموذج أدناه وسيتولى مهندس حلول متخصص مراجعة متطلباتك والرد عليك."
+                    : "Fill in the details below and a certified solutions architect will review your project requirements.")}
               </p>
             </div>
 
@@ -533,8 +548,13 @@ function ContactPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold">{isAr ? "موقع المقر على الخريطة" : "Headquarters Location"}</h2>
-              <p className="text-xs text-muted-foreground">{address}</p>
+              {mapTitle.badge && (
+                <div className="text-xs font-semibold uppercase tracking-wider text-accent mb-1">
+                  {mapTitle.badge}
+                </div>
+              )}
+              <h2 className="text-lg font-bold">{mapTitle.title || (isAr ? "موقع المقر على الخريطة" : "Headquarters Location")}</h2>
+              <p className="text-xs text-muted-foreground">{mapTitle.subtitle || address}</p>
             </div>
             <a
               href={directionsUrl}

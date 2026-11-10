@@ -34,4 +34,5 @@ supabase/.temp/
 scratch/
 run-migration.cjs
 seed.cjs
+*.zip
 

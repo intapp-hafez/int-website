@@ -11,6 +11,7 @@ import { useI18n } from "@/lib/i18n";
 import { downloadCertificate } from "@/lib/training-certificate";
 import { lookupLearnerTrainings, type LearnerRegistration } from "@/lib/learner-portal.functions";
 import { buildIcs, downloadIcs } from "@/lib/ics";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/my-training")({
   head: () => ({
@@ -41,6 +42,7 @@ function MyTrainingPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const L = (en: string, arabic: string) => (ar ? arabic : en);
+  const sectionTitle = useSectionTitle("training.portal");
 
   const lookup = useServerFn(lookupLearnerTrainings);
   const [email, setEmail] = useState("");
@@ -170,12 +172,20 @@ function MyTrainingPage() {
   return (
     <div className="container py-10 md:py-14 space-y-8" dir={ar ? "rtl" : "ltr"}>
       <header className="space-y-2 max-w-2xl">
-        <h1 className="font-display text-2xl md:text-3xl font-bold">{L("My training", "تدريباتي")}</h1>
+        {sectionTitle.badge && (
+          <div className="text-xs font-semibold uppercase tracking-wider text-accent">
+            {sectionTitle.badge}
+          </div>
+        )}
+        <h1 className="font-display text-2xl md:text-3xl font-bold">
+          {sectionTitle.title || L("My training", "تدريباتي")}
+        </h1>
         <p className="text-muted-foreground text-sm">
-          {L(
-            "Enter the email you registered with to see your pending requests, approved sessions and certificates.",
-            "أدخل البريد الإلكتروني الذي سجّلت به لعرض طلباتك قيد المراجعة والجلسات المعتمدة والشهادات.",
-          )}
+          {sectionTitle.subtitle ||
+            L(
+              "Enter the email you registered with to see your pending requests, approved sessions and certificates.",
+              "أدخل البريد الإلكتروني الذي سجّلت به لعرض طلباتك قيد المراجعة والجلسات المعتمدة والشهادات.",
+            )}
         </p>
       </header>
 

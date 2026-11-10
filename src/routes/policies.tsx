@@ -5,6 +5,7 @@ import { Lock, ShieldCheck, Clock, ArrowRight, CheckCircle2 } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
+import { useSectionTitle } from "@/lib/titles-store";
 
 export const Route = createFileRoute("/policies")({
   head: () => ({
@@ -20,6 +21,7 @@ function PoliciesPage() {
   const { lang } = useI18n();
   const isAr = lang === "ar";
   const { content } = useLegalContent("policies_content", DEFAULT_POLICIES);
+  const sectionTitle = useSectionTitle("page.policies");
 
   const activeText = isAr ? content.ar : content.en;
 
@@ -32,15 +34,16 @@ function PoliciesPage() {
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold uppercase tracking-widest">
               <Lock className="h-3.5 w-3.5" />
-              <span>{isAr ? "الخصوصية والأمان" : "Data Privacy & Governance"}</span>
+              <span>{sectionTitle.badge || (isAr ? "الخصوصية والأمان" : "Data Privacy & Governance")}</span>
             </div>
             <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-foreground">
-              {isAr ? "سياسة الخصوصية والأمان" : "Privacy Policy & Compliance"}
+              {sectionTitle.title || (isAr ? "سياسة الخصوصية والأمان" : "Privacy Policy & Compliance")}
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
-              {isAr
-                ? "التزامنا الراسخ بحماية بيانات العملاء وخصوصية المشروعات والامتثال لأعلى المعايير الدولية."
-                : "Our commitment to safeguarding enterprise client data, project secrecy, and regulatory compliance."}
+              {sectionTitle.subtitle ||
+                (isAr
+                  ? "التزامنا الراسخ بحماية بيانات العملاء وخصوصية المشروعات والامتثال لأعلى المعايير الدولية."
+                  : "Our commitment to safeguarding enterprise client data, project secrecy, and regulatory compliance.")}
             </p>
           </div>
         </div>

@@ -3,13 +3,15 @@ import { createElement, Fragment } from "react";
 
 const blocked = new Set(["script", "style", "iframe", "object", "embed", "svg", "math", "form", "input", "button", "template"]);
 const inlineTags = new Set(["strong", "b", "em", "i", "u", "s", "br", "sub", "sup"]);
-const blockTags = new Set(["p", "ul", "ol", "li", "blockquote"]);
+const blockTags = new Set(["p", "ul", "ol", "li", "blockquote", "h1", "h2", "h3", "h4", "h5", "h6"]);
 
 export function aboutPlainText(value: string): string {
   const text = (nodes: DOMNode[]): string => nodes.map((node) => {
     if (node.type === "text" && "data" in node) return node.data;
-    if (!(node instanceof Element) || blocked.has(node.name)) return "";
-    return `${text(node.children as DOMNode[])}${blockTags.has(node.name) || node.name === "div" || node.name === "br" ? " " : ""}`;
+    if (!("name" in node) || blocked.has((node as any).name)) return "";
+    const el = node as any;
+    const childText = Array.isArray(el.children) ? text(el.children) : "";
+    return `${childText}${blockTags.has(el.name) || el.name === "div" || el.name === "br" ? " " : ""}`;
   }).join("");
   return text(htmlToDOM(value)).replace(/\s+/g, " ").trim();
 }
@@ -17,14 +19,15 @@ export function aboutPlainText(value: string): string {
 export function AboutRichText({ value, inline = false, className = "" }: { value: string; inline?: boolean; className?: string }) {
   const options: HTMLReactParserOptions = {
     replace(node) {
-      if (!(node instanceof Element)) return;
-      if (blocked.has(node.name)) return <Fragment />;
-      const children = domToReact(node.children as DOMNode[], options);
-      if (inlineTags.has(node.name)) return createElement(node.name, {}, children);
-      if (!inline && blockTags.has(node.name)) return createElement(node.name, {}, children);
-      if (!inline && node.name === "div") return <div>{children}</div>;
+      if (!("name" in node)) return;
+      const el = node as Element;
+      if (blocked.has(el.name)) return <Fragment />;
+      const children = domToReact(el.children as DOMNode[], options);
+      if (inlineTags.has(el.name)) return createElement(el.name, {}, children);
+      if (!inline && blockTags.has(el.name)) return createElement(el.name, {}, children);
+      if (!inline && el.name === "div") return <div>{children}</div>;
       // Discard editor layout wrappers, styles and attributes, retaining their content.
-      return <Fragment>{children}{inline && (blockTags.has(node.name) || node.name === "div") ? " " : null}</Fragment>;
+      return <Fragment>{children}{inline && (blockTags.has(el.name) || el.name === "div") ? " " : null}</Fragment>;
     },
   };
   const Tag = inline ? "span" : "div";

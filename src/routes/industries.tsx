@@ -15,6 +15,7 @@ function IndustriesPage() {
   const { industries, loading, error } = useIndustries();
   const activeIndustries = industries.filter((i) => i.active !== false);
   const sectionTitle = useSectionTitle("page.industries");
+  const sectorsTitle = useSectionTitle("industries.sectors");
 
   return (
     <div>
@@ -26,7 +27,11 @@ function IndustriesPage() {
           <p className="text-lg text-muted-foreground max-w-2xl">{sectionTitle.subtitle || t("industries.sub")}</p>
         </div>
       </section>
-      <Section title={lang === "ar" ? "القطاعات التي نخدمها" : "Sectors we serve"}>
+      <Section
+        eyebrow={sectorsTitle.badge}
+        title={sectorsTitle.title || (lang === "ar" ? "القطاعات التي نخدمها" : "Sectors we serve")}
+        sub={sectorsTitle.subtitle}
+      >
         {loading && <p role="status" className="text-muted-foreground">{lang === "ar" ? "جارٍ تحميل القطاعات…" : "Loading industries…"}</p>}
         {error && <p role="alert" className="text-muted-foreground">{lang === "ar" ? "القطاعات غير متاحة حالياً." : "Industries are currently unavailable."}</p>}
         {!loading && !error && activeIndustries.length === 0 && <p className="text-muted-foreground">{lang === "ar" ? "لا توجد قطاعات منشورة حالياً." : "No industries are currently published."}</p>}

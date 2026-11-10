@@ -53,6 +53,7 @@ export default function ProjectsPage() {
   const isAr = lang === "ar";
   const { items: projects, loading } = useProjects();
   const sectionTitle = useSectionTitle("page.projects");
+  const clienteleTitle = useSectionTitle("projects.clientele");
   const [filter, setFilter] = useState<string>("All");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [clienteleModalOpen, setClienteleModalOpen] = useState(false);
@@ -133,11 +134,16 @@ export default function ProjectsPage() {
               <div>
                 <div className="inline-flex items-center gap-2 text-xs font-bold text-[#E8722C] uppercase tracking-wider mb-2">
                   <ShieldCheck className="h-4 w-4" />
-                  {isAr ? "قائمة الشركاء والعملاء الاستراتيجيين" : "Trusted By Leading Enterprise Clients"}
+                  {clienteleTitle.badge || (isAr ? "قائمة الشركاء والعملاء الاستراتيجيين" : "Trusted By Leading Enterprise Clients")}
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-                  {isAr ? "عملاؤنا وسجل الثقة والاعتماد" : "Our Clientele Wall & Reference Network"}
+                  {clienteleTitle.title || (isAr ? "عملاؤنا وسجل الثقة والاعتماد" : "Our Clientele Wall & Reference Network")}
                 </h2>
+                {clienteleTitle.subtitle && (
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
+                    {clienteleTitle.subtitle}
+                  </p>
+                )}
               </div>
 
               <Button
