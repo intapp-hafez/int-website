@@ -1,5 +1,7 @@
 # Architecture rules
 
+- Team photo editors share a Storage API upload control that updates the saved image URL only after upload success, so failed uploads cannot appear persisted.
+
 - About content renders through an allowlisted rich-text renderer that drops editor wrappers and unsafe attributes; headings and image labels use plain text so saved HTML never appears literally.
 
 - System category creation uses the authenticated browser database client and only updates the selector after the database returns the saved row, so rejected writes never appear saved.
