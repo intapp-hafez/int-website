@@ -1430,6 +1430,10 @@ function AboutAdminPage() {
                                 setDirty(true);
                               }}
                             />
+                            <TeamPhotoUpload disabled={!isAdmin} onUploaded={(url) => {
+                              setForm((current) => ({ ...current, team: current.team.map((member, i) => i === idx ? { ...member, image: url } : member) }));
+                              setDirty(true);
+                            }} />
                           </div>
                         </div>
 
@@ -1482,7 +1486,7 @@ function AboutAdminPage() {
                   {editingTeamIdx !== null ? `Edit Team Member #${editingTeamIdx + 1}` : "Add Team Member"}
                 </DialogTitle>
                 <DialogDescription className="text-xs">
-                  Configure member profile details in English and Arabic, unique key identifier, and photo URL.
+                  Configure member profile details in English and Arabic, unique key identifier, and photo.
                 </DialogDescription>
               </DialogHeader>
 
@@ -1517,6 +1521,7 @@ function AboutAdminPage() {
                         onChange={(e) => setMemberForm({ ...memberForm, image: e.target.value })}
                       />
                     </div>
+                    <TeamPhotoUpload disabled={!isAdmin} onUploaded={(url) => setMemberForm((current) => ({ ...current, image: url }))} />
                   </div>
                 </div>
 
@@ -1581,6 +1586,41 @@ function AboutAdminPage() {
       </div>
     </div>
   );
+}
+
+function TeamPhotoUpload({ disabled, onUploaded }: { disabled: boolean; onUploaded: (url: string) => void }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const upload = async (file: File) => {
+    if (disabled || busy) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please choose an image file"); return; }
+    if (file.size > 8 * 1024 * 1024) { toast.error("Image must be under 8 MB"); return; }
+    setBusy(true);
+    try {
+      const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const path = `team/${crypto.randomUUID()}.${extension}`;
+      const { error } = await supabase.storage.from("about-images").upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("about-images").getPublicUrl(path);
+      onUploaded(data.publicUrl);
+      toast.success("Photo uploaded. Save the member and page changes to publish.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Photo upload failed");
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+  return <>
+    <input ref={inputRef} type="file" accept="image/*" className="hidden" aria-label="Choose team photo" disabled={disabled || busy} onChange={(event) => {
+      const file = event.target.files?.[0];
+      if (file) void upload(file);
+    }} />
+    <Button type="button" variant="outline" size="sm" disabled={disabled || busy} onClick={() => inputRef.current?.click()}>
+      {busy ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : <Upload className="h-4 w-4 me-2" />}
+      {busy ? "Uploading…" : "Upload photo"}
+    </Button>
+  </>;
 }
 
 function BiField({
