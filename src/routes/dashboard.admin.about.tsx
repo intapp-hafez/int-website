@@ -68,7 +68,14 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/dashboard/admin/about")({
-  head: () => ({ meta: [{ title: "About Page — Admin" }] }),
+  head: () => ({ meta: [
+    { title: "About Content — Integrated Technics Admin" },
+    { name: "description", content: "Manage Integrated Technics About content and founder profile." },
+    { property: "og:title", content: "About Content — Integrated Technics Admin" },
+    { property: "og:description", content: "Manage About content and founder profile." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: AboutAdminPage,
 });
 
@@ -880,8 +887,9 @@ function AboutAdminPage() {
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-1.5">
-                <Label>Founder Photo URL</Label>
+                <Label htmlFor="founder-photo-url">Founder Photo URL</Label>
                 <Input
+                  id="founder-photo-url"
                   value={form.ownerImage ?? ""}
                   placeholder="https://integratedtechnics.com/.../founder.webp"
                   onChange={(e) => {
@@ -889,7 +897,10 @@ function AboutAdminPage() {
                     setDirty(true);
                   }}
                 />
-                <p className="text-xs text-muted-foreground">URL of the founder image displayed on the public About page.</p>
+                <TeamPhotoUpload disabled={!isAdmin} photoLabel="founder" onUploaded={(url) => {
+                  setForm((current) => ({ ...current, ownerImage: url }));
+                  setDirty(true);
+                }} />
               </div>
 
               <BiField
@@ -928,6 +939,36 @@ function AboutAdminPage() {
                 errorEn={errors["ownerBio.en"]}
                 errorAr={errors["ownerBio.ar"]}
               />
+
+              <BiField label="Experience Badge" value={form.ownerExperience}
+                onChange={(lang, value) => setBi("ownerExperience", lang, value)} />
+              {form.ownerPillars.map((pillar, index) => (
+                <BiField key={index} label={`Executive Highlight ${index + 1}`} value={pillar}
+                  onChange={(lang, value) => {
+                    setForm((current) => ({ ...current, ownerPillars: current.ownerPillars.map((item, i) =>
+                      i === index ? { ...item, [lang]: value } : item) as AboutContent["ownerPillars"] }));
+                    setDirty(true);
+                  }} />
+              ))}
+              <BiField label="Consultation Button Text" value={form.ownerConsultationLabel}
+                onChange={(lang, value) => setBi("ownerConsultationLabel", lang, value)} />
+              <div className="space-y-1.5">
+                <Label htmlFor="founder-consultation-url">Consultation Button Link</Label>
+                <Input id="founder-consultation-url" dir="ltr" value={form.ownerConsultationUrl}
+                  placeholder="/contact" onChange={(event) => {
+                    setForm({ ...form, ownerConsultationUrl: event.target.value }); setDirty(true);
+                  }} />
+              </div>
+              <BiField label="LinkedIn Button Text" value={form.ownerLinkedinLabel}
+                onChange={(lang, value) => setBi("ownerLinkedinLabel", lang, value)} />
+              <div className="space-y-1.5">
+                <Label htmlFor="founder-linkedin-url">Founder LinkedIn Link</Label>
+                <Input id="founder-linkedin-url" dir="ltr" value={form.ownerLinkedinUrl ?? ""}
+                  placeholder="Uses company LinkedIn when not set" onChange={(event) => {
+                    setForm({ ...form, ownerLinkedinUrl: event.target.value }); setDirty(true);
+                  }} />
+                <p className="text-xs text-muted-foreground">Leave blank to hide the LinkedIn button. Until edited, the company LinkedIn link is used.</p>
+              </div>
 
               {/* Side-by-side Leadership Preview */}
               <div className="border-t pt-4">
@@ -1588,7 +1629,7 @@ function AboutAdminPage() {
   );
 }
 
-function TeamPhotoUpload({ disabled, onUploaded }: { disabled: boolean; onUploaded: (url: string) => void }) {
+function TeamPhotoUpload({ disabled, onUploaded, photoLabel = "team" }: { disabled: boolean; onUploaded: (url: string) => void; photoLabel?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const upload = async (file: File) => {
@@ -1598,12 +1639,12 @@ function TeamPhotoUpload({ disabled, onUploaded }: { disabled: boolean; onUpload
     setBusy(true);
     try {
       const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-      const path = `team/${crypto.randomUUID()}.${extension}`;
+      const path = `${photoLabel}/${crypto.randomUUID()}.${extension}`;
       const { error } = await supabase.storage.from("about-images").upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });
       if (error) throw error;
       const { data } = supabase.storage.from("about-images").getPublicUrl(path);
       onUploaded(data.publicUrl);
-      toast.success("Photo uploaded. Save the member and page changes to publish.");
+      toast.success("Photo uploaded. Save page changes to publish.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Photo upload failed");
     } finally {
@@ -1612,7 +1653,7 @@ function TeamPhotoUpload({ disabled, onUploaded }: { disabled: boolean; onUpload
     }
   };
   return <>
-    <input ref={inputRef} type="file" accept="image/*" className="hidden" aria-label="Choose team photo" disabled={disabled || busy} onChange={(event) => {
+    <input ref={inputRef} type="file" accept="image/*" className="hidden" aria-label={`Choose ${photoLabel} photo`} disabled={disabled || busy} onChange={(event) => {
       const file = event.target.files?.[0];
       if (file) void upload(file);
     }} />
@@ -1657,6 +1698,7 @@ function BiField({
           <Input
             dir="ltr"
             value={value.en}
+            aria-label={`${label} (English)`}
             onChange={(e) => onChange("en", e.target.value)}
             aria-invalid={!!errorEn}
             className={errorEn ? "border-destructive" : ""}
@@ -1681,6 +1723,7 @@ function BiField({
           <Input
             dir="rtl"
             value={value.ar}
+            aria-label={`${label} (Arabic)`}
             onChange={(e) => onChange("ar", e.target.value)}
             aria-invalid={!!errorAr}
             className={errorAr ? "border-destructive" : ""}

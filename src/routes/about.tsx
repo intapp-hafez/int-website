@@ -33,6 +33,7 @@ import {
   withCacheBust,
   pickBi,
   DEFAULT_ABOUT_STATS,
+  safeAboutLink,
   type AboutStat,
 } from "@/lib/about-store";
 import { useSettings } from "@/lib/settings-store";
@@ -76,6 +77,8 @@ function AboutPage() {
   const R = (b: { en: string; ar: string } | null | undefined, fallback = "") =>
     pickBi(b, isAr ? "ar" : "en", fallback);
 
+  const consultationUrl = safeAboutLink(content.ownerConsultationUrl);
+  const linkedinUrl = safeAboutLink(content.ownerLinkedinUrl ?? settings.social?.linkedin);
   const shouldMirror = hero.mirror_rtl && isAr;
   const heroSrc = withCacheBust(hero.image_url, updatedAt);
 
@@ -480,7 +483,7 @@ function AboutPage() {
                 {/* Floating Experience Milestone Badge */}
                 <div className="absolute top-4 start-4 px-3 py-1.5 rounded-full bg-background/90 backdrop-blur-md border border-[#E8722C]/40 text-foreground text-xs font-bold shadow-md flex items-center gap-1.5">
                   <Award className="h-3.5 w-3.5 text-[#E8722C]" />
-                  <span>{isAr ? "+20 عاماً من الريادة" : "20+ Years Track Record"}</span>
+                  <span>{L(content.ownerExperience)}</span>
                 </div>
 
                 {/* Bottom Founder Title Card */}
@@ -516,41 +519,29 @@ function AboutPage() {
                   )} />
               </div>
 
-              {/* 3 Executive Pillars */}
+              {/* Executive highlights */}
               <div className="grid sm:grid-cols-3 gap-3 pt-1">
-                <div className="p-3 rounded-xl bg-card border border-border/80 flex items-center gap-2.5 shadow-xs">
-                  <CheckCircle2 className="h-4 w-4 text-[#E8722C] shrink-0" />
-                  <span className="text-xs font-semibold text-foreground leading-tight">
-                    {isAr ? "معايير أمان معتمدة" : "Zero-Defect QA"}
-                  </span>
-                </div>
-                <div className="p-3 rounded-xl bg-card border border-border/80 flex items-center gap-2.5 shadow-xs">
-                  <CheckCircle2 className="h-4 w-4 text-[#E8722C] shrink-0" />
-                  <span className="text-xs font-semibold text-foreground leading-tight">
-                    {isAr ? "إشراف تنفيذي مباشر" : "Direct Oversight"}
-                  </span>
-                </div>
-                <div className="p-3 rounded-xl bg-card border border-border/80 flex items-center gap-2.5 shadow-xs">
-                  <CheckCircle2 className="h-4 w-4 text-[#E8722C] shrink-0" />
-                  <span className="text-xs font-semibold text-foreground leading-tight">
-                    {isAr ? "شراكات OEM كبرى" : "Tier-1 OEM Alliances"}
-                  </span>
-                </div>
+                {content.ownerPillars.map((pillar, index) => (
+                  <div key={index} className="p-3 rounded-xl bg-card border border-border/80 flex items-center gap-2.5 shadow-xs">
+                    <CheckCircle2 className="h-4 w-4 text-accent shrink-0" />
+                    <span className="text-xs font-semibold text-foreground leading-tight">{L(pillar)}</span>
+                  </div>
+                ))}
               </div>
 
               {/* Actions */}
               <div className="pt-2 flex flex-wrap items-center gap-4">
-                <Button asChild size="default" className="bg-[#E8722C] hover:bg-[#d0621f] text-white font-bold shadow-lg shadow-[#E8722C]/25 px-6">
-                  <Link to="/contact">
+                {consultationUrl && <Button asChild size="default" className="font-bold px-6">
+                  <a href={consultationUrl}>
                     <CalendarCheck className="h-4 w-4 me-2" />
-                    {isAr ? "حجز استشارة تنفيذية" : "Schedule Executive Consultation"}
-                  </Link>
-                </Button>
-                {settings.social?.linkedin && (
+                    {L(content.ownerConsultationLabel)}
+                  </a>
+                </Button>}
+                {linkedinUrl && (
                   <Button asChild size="default" variant="outline" className="border-[#E8722C]/40 hover:border-[#E8722C] hover:bg-[#E8722C]/10 text-foreground font-semibold">
-                    <a href={settings.social.linkedin} target="_blank" rel="noopener noreferrer">
+                    <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">
                       <Linkedin className="h-4 w-4 me-2 text-[#E8722C]" />
-                      <span>{isAr ? "حساب LinkedIn الرسمي" : "Connect on LinkedIn"}</span>
+                      <span>{L(content.ownerLinkedinLabel)}</span>
                     </a>
                   </Button>
                 )}
@@ -702,7 +693,7 @@ function AboutPage() {
                   {settings.social?.linkedin && (
                     <div className="absolute bottom-3 end-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-10">
                       <a
-                        href={settings.social.linkedin}
+                        href={linkedinUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`LinkedIn - ${L(m.name)}`}

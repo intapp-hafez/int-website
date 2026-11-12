@@ -61,6 +61,12 @@ export type AboutContent = {
   ownerRole: Bilingual;
   ownerBio: Bilingual;
   ownerImage?: string;
+  ownerExperience: Bilingual;
+  ownerPillars: [Bilingual, Bilingual, Bilingual];
+  ownerConsultationLabel: Bilingual;
+  ownerConsultationUrl: string;
+  ownerLinkedinLabel: Bilingual;
+  ownerLinkedinUrl?: string;
   teamTitle: Bilingual;
   teamSub: Bilingual;
   team: TeamMember[];
@@ -134,6 +140,15 @@ export const defaultAboutContent: AboutContent = {
   certificationsT: { en: "Certifications & Compliance", ar: "الشهادات والامتثال" },
   certificationsSub: { en: "Vetted by global standards bodies and OEM partners.", ar: "معتمدون من هيئات المعايير العالمية وشركاء التصنيع." },
   certifications: ["ISO 9001", "ISO 27001", "ISO 14001", "OHSAS 45001", "Cisco Gold", "Fortinet Expert", "Dell Titanium", "PMP-led"],
+  ownerExperience: { en: "20+ Years Track Record", ar: "+20 عاماً من الريادة" },
+  ownerPillars: [
+    { en: "Zero-Defect QA", ar: "معايير أمان معتمدة" },
+    { en: "Direct Oversight", ar: "إشراف تنفيذي مباشر" },
+    { en: "Tier-1 OEM Alliances", ar: "شراكات OEM كبرى" },
+  ],
+  ownerConsultationLabel: { en: "Schedule Executive Consultation", ar: "حجز استشارة تنفيذية" },
+  ownerConsultationUrl: "/contact",
+  ownerLinkedinLabel: { en: "Connect on LinkedIn", ar: "حساب LinkedIn الرسمي" },
   ownerEyebrow: { en: "Leadership", ar: "القيادة" },
   ownerTitle: { en: "Message from Our Founder", ar: "رسالة من مؤسسنا" },
   ownerName: { en: "Eng: Waleed Al Agamy", ar: "م. وليد العجمي" },
@@ -274,4 +289,15 @@ export function withCacheBust(url: string | null, version: string | null): strin
   const v = version ? Date.parse(version) || version : "";
   if (!v) return url;
   return url.includes("?") ? `${url}&v=${encodeURIComponent(String(v))}` : `${url}?v=${encodeURIComponent(String(v))}`;
+}
+
+/** Only web links and same-site paths are allowed in editable founder actions. */
+export function safeAboutLink(value: string | undefined): string | undefined {
+  const url = value?.trim();
+  if (!url) return undefined;
+  if (url.startsWith("/") && !url.startsWith("//") && !url.includes("\\")) return url;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.href : undefined;
+  } catch { return undefined; }
 }
