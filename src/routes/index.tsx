@@ -25,6 +25,7 @@ import { LatestNews } from "@/components/site/LatestNews";
 import { InteractiveHeroWheel } from "@/components/site/InteractiveHeroWheel";
 import { supabase } from "@/integrations/supabase/client";
 import { useSectionTitle } from "@/lib/titles-store";
+import { TestimonialSubmission } from "@/components/site/TestimonialSubmission";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -48,7 +49,6 @@ const whyIcons = [Shield, Award, Clock, Users];
 
 function TestimonialsSection() {
   const { lang } = useI18n();
-  const { settings } = useSettings();
 
   const [dbReviews, setDbReviews] = useState<any[]>([]);
 
@@ -61,27 +61,27 @@ function TestimonialsSection() {
           .eq("approved", true)
           .order("created_at", { ascending: false });
 
-        if (data && data.length > 0) {
-          setDbReviews(data);
-        }
+        setDbReviews(data ?? []);
       } catch (err) {
         console.warn("[homepage-reviews] fetch error:", err);
       }
     };
     void loadApprovedReviews();
+    const channel = supabase
+      .channel("homepage-reviews")
+      .on("postgres_changes", { event: "*", schema: "public", table: "reviews" }, () => void loadApprovedReviews())
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
   }, []);
 
-  const items = dbReviews.length > 0
-    ? dbReviews.map((r) => ({
+  const items = dbReviews.map((r) => ({
         quote: { en: r.text, ar: r.text },
         author: { en: r.author, ar: r.author },
         role: { en: r.company, ar: r.company },
         rating: r.rating || 5,
-      }))
-    : settings.testimonials || [];
+      }));
 
   const testimonialsTitle = useSectionTitle("home.testimonials");
-  if (!items || items.length === 0) return null;
 
   return (
     <Section eyebrow={testimonialsTitle.badge} title={testimonialsTitle.title} sub={testimonialsTitle.subtitle} center className="bg-muted/30">
@@ -111,6 +111,7 @@ function TestimonialsSection() {
           );
         })}
       </div>
+      <TestimonialSubmission />
     </Section>
   );
 }

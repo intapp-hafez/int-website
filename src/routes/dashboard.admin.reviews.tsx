@@ -34,7 +34,14 @@ export type Review = {
 };
 
 export const Route = createFileRoute("/dashboard/admin/reviews")({
-  head: () => ({ meta: [{ title: "Reviews & Testimonials — Admin" }] }),
+  head: () => ({ meta: [
+    { title: "Review Approvals — Integrated Technics Admin" },
+    { name: "description", content: "Review visitor testimonials and approve them for the Integrated Technics homepage." },
+    { property: "og:title", content: "Review Approvals — Integrated Technics Admin" },
+    { property: "og:description", content: "Manage pending and published customer reviews." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   validateSearch: validateListSearch,
   component: ReviewsPage,
 });
@@ -101,15 +108,18 @@ function ReviewsPage() {
   const toggle = async (id: string, currentStatus: boolean) => {
     if (!can.edit) return;
     const nextStatus = !currentStatus;
-    setItems((prev) => prev.map((x) => (x.id === id ? { ...x, approved: nextStatus } : x)));
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("reviews")
         .update({ approved: nextStatus, updated_at: new Date().toISOString() })
-        .eq("id", id);
+        .eq("id", id)
+        .select("id, approved")
+        .single();
 
       if (error) throw error;
+      if (!data || data.approved !== nextStatus) throw new Error("Review approval was not saved");
+      setItems((prev) => prev.map((x) => (x.id === id ? { ...x, approved: data.approved } : x)));
       toast.success(nextStatus ? (isAr ? "تم اعتماد التقييم" : "Review approved") : (isAr ? "تم إخفاء التقييم" : "Review hidden"));
     } catch (err: any) {
       toast.error(err?.message || "Failed to update review status");

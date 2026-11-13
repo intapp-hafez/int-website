@@ -1,5 +1,7 @@
 # Architecture rules
 
+- Visitor review submissions use a validated pending-only payload and database moderation policies; success is shown only after a successful database response.
+
 - Team photo editors share a Storage API upload control that updates the saved image URL only after upload success, so failed uploads cannot appear persisted.
 
 - About content renders through an allowlisted rich-text renderer that drops editor wrappers and unsafe attributes; headings and image labels use plain text so saved HTML never appears literally.
@@ -12,3 +14,4 @@
 
 - The current Vite configuration aliases Start to a browser shim; never treat its server functions or middleware as trusted server boundaries. Privileged actions need a separately verified server deployment.
 - Security scans probe the configured Supabase Auth and Data APIs without admin credentials; session lifetime, refresh rotation, and other hosted Auth settings must remain unverified unless read from the provider.
+- Founder section content and action destinations are stored in the About content JSON and edited in the leadership tab; missing fields retain existing display defaults for older saved records.

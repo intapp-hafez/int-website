@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Add homepage testimonial form; real pending submissions save successfully and remain hidden from public reads.
+- [ ] Apply review validation safeguards and verify Admin approval — database policy migration disabled; authenticated Admin testing unavailable. Two clearly labeled workflow test reviews await cleanup in Admin.
+
 - [ ] Enhance Permissions Management: staff search and confirmed save/error states.
 - [ ] Enforce permission-table access and atomic grant approval in Supabase.
 - [ ] Connect approval emails and verify delivery — trusted email deployment and authenticated testing required.
@@ -14,3 +17,5 @@
 - [~] SEO findings: careers/industries og tags + news og:type=article already in code (scanner stale); og:image + sitemap need a published URL first
 - [ ] Submit sitemap to Google — BLOCKED: site not published, no public URL
 - [ ] Apply supabase/schema/29_access_quotes.sql — BLOCKED: migration tool disabled; user must run it in the Supabase SQL editor
+
+- [x] Make founder section badge, highlights, button labels/links, and photo editable alongside existing bilingual profile fields.
