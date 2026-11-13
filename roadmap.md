@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Add homepage testimonial form; real pending submissions save successfully and remain hidden from public reads.
+- [ ] Apply review validation safeguards and verify Admin approval — database policy migration disabled; authenticated Admin testing unavailable. Two clearly labeled workflow test reviews await cleanup in Admin.
+
 - [ ] Enhance Permissions Management: staff search and confirmed save/error states.
 - [ ] Enforce permission-table access and atomic grant approval in Supabase.
 - [ ] Connect approval emails and verify delivery — trusted email deployment and authenticated testing required.

@@ -1,5 +1,7 @@
 # Architecture rules
 
+- Visitor review submissions use a validated pending-only payload and database moderation policies; success is shown only after a successful database response.
+
 - Team photo editors share a Storage API upload control that updates the saved image URL only after upload success, so failed uploads cannot appear persisted.
 
 - About content renders through an allowlisted rich-text renderer that drops editor wrappers and unsafe attributes; headings and image labels use plain text so saved HTML never appears literally.

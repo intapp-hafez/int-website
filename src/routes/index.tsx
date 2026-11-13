@@ -25,6 +25,7 @@ import { LatestNews } from "@/components/site/LatestNews";
 import { InteractiveHeroWheel } from "@/components/site/InteractiveHeroWheel";
 import { supabase } from "@/integrations/supabase/client";
 import { useSectionTitle } from "@/lib/titles-store";
+import { TestimonialSubmission } from "@/components/site/TestimonialSubmission";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -81,7 +82,6 @@ function TestimonialsSection() {
       }));
 
   const testimonialsTitle = useSectionTitle("home.testimonials");
-  if (!items || items.length === 0) return null;
 
   return (
     <Section eyebrow={testimonialsTitle.badge} title={testimonialsTitle.title} sub={testimonialsTitle.subtitle} center className="bg-muted/30">
@@ -111,6 +111,7 @@ function TestimonialsSection() {
           );
         })}
       </div>
+      <TestimonialSubmission />
     </Section>
   );
 }
