@@ -37,6 +37,7 @@ import {
   type Bilingual,
   type TeamMember,
   type AboutStat,
+  type AboutValue,
 } from "@/lib/about-store";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -252,6 +253,37 @@ function AboutAdminPage() {
     const values = form.values.map((val, i) =>
       i === idx ? { ...val, [field]: { ...val[field], [lang]: v } } : val,
     ) as AboutContent["values"];
+    setForm({ ...form, values });
+    setDirty(true);
+  };
+  const addValue = () => {
+    if (form.values.length >= 16) {
+      toast.warning("Maximum of 16 values allowed.");
+      return;
+    }
+    const newValue: AboutValue = {
+      title: { en: "", ar: "" },
+      desc: { en: "", ar: "" },
+    };
+    setForm({ ...form, values: [...form.values, newValue] });
+    setDirty(true);
+  };
+  const removeValue = (idx: number) => {
+    if (form.values.length <= 1) {
+      toast.warning("At least one value is required.");
+      return;
+    }
+    const values = form.values.filter((_, i) => i !== idx);
+    setForm({ ...form, values });
+    setDirty(true);
+  };
+  const moveValue = (idx: number, direction: "up" | "down") => {
+    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= form.values.length) return;
+    const values = [...form.values];
+    const temp = values[idx];
+    values[idx] = values[targetIdx];
+    values[targetIdx] = temp;
     setForm({ ...form, values });
     setDirty(true);
   };
@@ -998,14 +1030,25 @@ function AboutAdminPage() {
         {/* ============================================================== */}
         <TabsContent value="values" className="space-y-6 pt-4">
           <Card className="rounded-2xl border shadow-xs">
-            <CardHeader>
-              <CardTitle className="font-display text-lg flex items-center gap-2">
-                <Award className="h-4 w-4 text-cyan-500" />
-                Core Values
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Key organizational values highlighting integrity, engineering excellence, and customer trust.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <div>
+                <CardTitle className="font-display text-lg flex items-center gap-2">
+                  <Award className="h-4 w-4 text-cyan-500" />
+                  Core Values
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Key organizational values highlighting integrity, engineering excellence, and customer trust.
+                </CardDescription>
+              </div>
+              <Button
+                type="button"
+                onClick={addValue}
+                size="sm"
+                className="gap-1.5 bg-accent hover:bg-accent/90 text-white shadow-xs"
+              >
+                <Plus className="h-4 w-4" />
+                Add Value
+              </Button>
             </CardHeader>
             <CardContent className="space-y-6">
               <BiField
@@ -1016,8 +1059,53 @@ function AboutAdminPage() {
 
               <div className="space-y-4 pt-2">
                 {form.values.map((v, idx) => (
-                  <div key={idx} className="space-y-3 border rounded-xl p-4 bg-muted/10">
-                    <div className="text-sm font-semibold text-accent">Value #{idx + 1}</div>
+                  <div key={idx} className="space-y-3 border rounded-xl p-4 bg-muted/10 hover:border-accent/40 transition-colors">
+                    <div className="flex items-center justify-between pb-2 border-b border-border/40">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
+                          #{String(idx + 1).padStart(2, "0")}
+                        </span>
+                        <span className="text-sm font-semibold text-foreground">
+                          {v.title.en || v.title.ar || `Value #${idx + 1}`}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          disabled={idx === 0}
+                          onClick={() => moveValue(idx, "up")}
+                          title="Move up"
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          disabled={idx === form.values.length - 1}
+                          onClick={() => moveValue(idx, "down")}
+                          title="Move down"
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                          disabled={form.values.length <= 1}
+                          onClick={() => removeValue(idx)}
+                          title="Delete value"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
                     <BiField
                       label="Title"
                       value={v.title}
@@ -1035,6 +1123,16 @@ function AboutAdminPage() {
                     />
                   </div>
                 ))}
+
+                <Button
+                  type="button"
+                  onClick={addValue}
+                  variant="outline"
+                  className="w-full border-dashed border-2 py-5 gap-2 hover:border-accent hover:bg-accent/5 text-muted-foreground hover:text-accent font-semibold"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Value Card
+                </Button>
               </div>
             </CardContent>
           </Card>

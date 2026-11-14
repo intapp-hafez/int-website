@@ -25,6 +25,11 @@ export function pickBi(
   return fallback;
 }
 
+export type AboutValue = {
+  title: Bilingual;
+  desc: Bilingual;
+};
+
 export type TeamMember = {
   key: string;
   name: Bilingual;
@@ -51,7 +56,7 @@ export type AboutContent = {
   missionT: Bilingual;
   missionD: Bilingual;
   valuesT: Bilingual;
-  values: [AboutValue, AboutValue, AboutValue];
+  values: AboutValue[];
   certificationsT: Bilingual;
   certificationsSub: Bilingual;
   certifications: string[];

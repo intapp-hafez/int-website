@@ -31,7 +31,7 @@ const AboutContentSchema = z.object({
   missionT: Bilingual,
   missionD: Bilingual,
   valuesT: Bilingual,
-  values: z.array(AboutValue).min(1).max(10),
+  values: z.array(AboutValue).min(1).max(16),
   certificationsT: Bilingual,
   certificationsSub: Bilingual,
   certifications: z.array(z.string().min(1).max(120)).max(50),
