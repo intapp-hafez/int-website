@@ -497,71 +497,102 @@ function AboutPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent opacity-80" />
 
                 {/* Floating Experience Milestone Badge */}
-                <div className="absolute top-4 start-4 px-3 py-1.5 rounded-full bg-background/90 backdrop-blur-md border border-[#E8722C]/40 text-foreground text-xs font-bold shadow-md flex items-center gap-1.5">
-                  <Award className="h-3.5 w-3.5 text-[#E8722C]" />
-                  <span>{L(content.ownerExperience)}</span>
-                </div>
+                {Boolean(L(content.ownerExperience)?.trim()) && (
+                  <div className="absolute top-4 start-4 px-3 py-1.5 rounded-full bg-background/90 backdrop-blur-md border border-[#E8722C]/40 text-foreground text-xs font-bold shadow-md flex items-center gap-1.5">
+                    <Award className="h-3.5 w-3.5 text-[#E8722C]" />
+                    <span>{L(content.ownerExperience)}</span>
+                  </div>
+                )}
 
                 {/* Bottom Founder Title Card */}
-                <div className="absolute bottom-4 inset-x-4 p-4 rounded-2xl bg-background/95 backdrop-blur-md border border-[#E8722C]/40 shadow-xl text-center">
-                  <div className="font-bold text-base sm:text-lg text-foreground flex items-center justify-center gap-1.5">
-                    <span>{L(content.ownerName, "Founder & CEO")}</span>
-                    <BadgeCheck className="h-4 w-4 text-[#E8722C] shrink-0" />
+                {(Boolean(L(content.ownerName)?.trim()) || Boolean(L(content.ownerRole)?.trim())) && (
+                  <div className="absolute bottom-4 inset-x-4 p-4 rounded-2xl bg-background/95 backdrop-blur-md border border-[#E8722C]/40 shadow-xl text-center">
+                    {Boolean(L(content.ownerName)?.trim()) && (
+                      <div className="font-bold text-base sm:text-lg text-foreground flex items-center justify-center gap-1.5">
+                        <span>{L(content.ownerName, "Founder & CEO")}</span>
+                        <BadgeCheck className="h-4 w-4 text-[#E8722C] shrink-0" />
+                      </div>
+                    )}
+                    {Boolean(L(content.ownerRole)?.trim()) && (
+                      <div className="text-xs text-[#E8722C] font-semibold mt-0.5 tracking-wide">
+                        {L(content.ownerRole, "Founder & Managing Director")}
+                      </div>
+                    )}
                   </div>
-                  <div className="text-xs text-[#E8722C] font-semibold mt-0.5 tracking-wide">
-                    {L(content.ownerRole, "Founder & Managing Director")}
-                  </div>
-                </div>
+                )}
               </div>
             </div>
 
             {/* Executive Message Column */}
             <div className="lg:col-span-7 space-y-6 text-start">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8722C]/10 border border-[#E8722C]/30 text-[#E8722C] text-xs font-bold uppercase tracking-wider shadow-xs">
-                <Award className="h-3.5 w-3.5 text-[#E8722C]" />
-                <span>{L(content.ownerEyebrow, isAr ? "كلمة الإدارة التنفيذية" : "Executive Leadership")}</span>
-              </div>
+              {Boolean(L(content.ownerEyebrow)?.trim()) && (
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8722C]/10 border border-[#E8722C]/30 text-[#E8722C] text-xs font-bold uppercase tracking-wider shadow-xs">
+                  <Award className="h-3.5 w-3.5 text-[#E8722C]" />
+                  <span>{L(content.ownerEyebrow, isAr ? "كلمة الإدارة التنفيذية" : "Executive Leadership")}</span>
+                </div>
+              )}
 
-              <h2 className="text-2xl sm:text-4xl font-extrabold font-display tracking-tight text-foreground leading-tight">
-                {L(content.ownerTitle, isAr ? "الالتزام بالتميز الهندسي والنزاهة المؤسسية" : "Engineering Integrity & Lasting Value")}
-              </h2>
+              {Boolean(L(content.ownerTitle)?.trim()) && (
+                <h2 className="text-2xl sm:text-4xl font-extrabold font-display tracking-tight text-foreground leading-tight">
+                  {L(content.ownerTitle, isAr ? "الالتزام بالتميز الهندسي والنزاهة المؤسسية" : "Engineering Integrity & Lasting Value")}
+                </h2>
+              )}
 
-              <div className="relative p-5 rounded-2xl bg-muted/40 border border-border/70">
-                <Quote className="h-8 w-8 text-[#E8722C]/30 absolute top-3 end-4 pointer-events-none" />
-                <AboutRichText className="text-muted-foreground leading-7 text-sm sm:text-base relative z-10 pe-5" value={R(content.ownerBio,
-                    isAr
-                      ? "نفخر بمسيرتنا التي تمتد لأكثر من 20 عاماً في خدمة كبرى المشروعات القومية والتجارية، واضعين معايير الجودة ورضا العملاء في صدارة أولوياتنا."
-                      : "For more than 20 years, our foundational philosophy has remained unchanged: delivering robust, future-proof engineering integration that empowers corporate growth."
-                  )} />
-              </div>
+              {Boolean(R(content.ownerBio)?.trim()) && (
+                <div className="relative p-5 rounded-2xl bg-muted/40 border border-border/70">
+                  <Quote className="h-8 w-8 text-[#E8722C]/30 absolute top-3 end-4 pointer-events-none" />
+                  <AboutRichText className="text-muted-foreground leading-7 text-sm sm:text-base relative z-10 pe-5" value={R(content.ownerBio,
+                      isAr
+                        ? "نفخر بمسيرتنا التي تمتد لأكثر من 20 عاماً في خدمة كبرى المشروعات القومية والتجارية، واضعين معايير الجودة ورضا العملاء في صدارة أولوياتنا."
+                        : "For more than 20 years, our foundational philosophy has remained unchanged: delivering robust, future-proof engineering integration that empowers corporate growth."
+                    )} />
+                </div>
+              )}
 
               {/* Executive highlights */}
-              <div className="grid sm:grid-cols-3 gap-3 pt-1">
-                {content.ownerPillars.map((pillar, index) => (
-                  <div key={index} className="p-3 rounded-xl bg-card border border-border/80 flex items-center gap-2.5 shadow-xs">
-                    <CheckCircle2 className="h-4 w-4 text-accent shrink-0" />
-                    <span className="text-xs font-semibold text-foreground leading-tight">{L(pillar)}</span>
+              {(() => {
+                const validPillars = (content.ownerPillars || []).filter((p) => Boolean(L(p)?.trim()));
+                if (validPillars.length === 0) return null;
+                const gridCols =
+                  validPillars.length === 1
+                    ? "grid-cols-1"
+                    : validPillars.length === 2
+                      ? "grid-cols-1 sm:grid-cols-2"
+                      : "grid-cols-1 sm:grid-cols-3";
+                return (
+                  <div className={`grid ${gridCols} gap-3 pt-1`}>
+                    {validPillars.map((pillar, index) => (
+                      <div key={index} className="p-3 rounded-xl bg-card border border-border/80 flex items-center gap-2.5 shadow-xs">
+                        <CheckCircle2 className="h-4 w-4 text-accent shrink-0" />
+                        <span className="text-xs font-semibold text-foreground leading-tight">{L(pillar)}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                );
+              })()}
 
               {/* Actions */}
-              <div className="pt-2 flex flex-wrap items-center gap-4">
-                {consultationUrl && <Button asChild size="default" className="font-bold px-6">
-                  <a href={consultationUrl}>
-                    <CalendarCheck className="h-4 w-4 me-2" />
-                    {L(content.ownerConsultationLabel)}
-                  </a>
-                </Button>}
-                {linkedinUrl && (
-                  <Button asChild size="default" variant="outline" className="border-[#E8722C]/40 hover:border-[#E8722C] hover:bg-[#E8722C]/10 text-foreground font-semibold">
-                    <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">
-                      <Linkedin className="h-4 w-4 me-2 text-[#E8722C]" />
-                      <span>{L(content.ownerLinkedinLabel)}</span>
-                    </a>
-                  </Button>
-                )}
-              </div>
+              {(Boolean(consultationUrl && L(content.ownerConsultationLabel)?.trim()) ||
+                Boolean(linkedinUrl && L(content.ownerLinkedinLabel)?.trim())) && (
+                <div className="pt-2 flex flex-wrap items-center gap-4">
+                  {consultationUrl && Boolean(L(content.ownerConsultationLabel)?.trim()) && (
+                    <Button asChild size="default" className="font-bold px-6">
+                      <a href={consultationUrl}>
+                        <CalendarCheck className="h-4 w-4 me-2" />
+                        {L(content.ownerConsultationLabel)}
+                      </a>
+                    </Button>
+                  )}
+                  {linkedinUrl && Boolean(L(content.ownerLinkedinLabel)?.trim()) && (
+                    <Button asChild size="default" variant="outline" className="border-[#E8722C]/40 hover:border-[#E8722C] hover:bg-[#E8722C]/10 text-foreground font-semibold">
+                      <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">
+                        <Linkedin className="h-4 w-4 me-2 text-[#E8722C]" />
+                        <span>{L(content.ownerLinkedinLabel)}</span>
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -584,46 +615,56 @@ function AboutPage() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto relative z-10">
-          {content.values.map((v, idx) => {
-            const Icon = valueIcons[idx % valueIcons.length] ?? Heart;
-            return (
-              <div
-                key={idx}
-                className="group p-7 sm:p-8 rounded-3xl border-2 border-[#E8722C] bg-card shadow-[0_4px_24px_rgba(232,114,44,0.12)] hover:shadow-[0_12px_40px_rgba(232,114,44,0.22)] transition-all duration-300 hover:-translate-y-1.5 text-start flex flex-col justify-between relative overflow-hidden"
-              >
-                {/* Live animated border beam on hover */}
-                <div className="absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden z-20">
-                  <span className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#E8722C_85%,transparent_100%)] opacity-80" />
-                </div>
-
-                <div className="absolute top-0 end-0 h-32 w-32 bg-[#E8722C]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
-
-                <div className="space-y-4 relative z-10">
-                  <div className="flex items-center justify-between">
-                    <div className="h-13 w-13 rounded-2xl bg-[#E8722C]/10 text-[#E8722C] border border-[#E8722C]/30 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#E8722C] group-hover:text-white transition-all duration-300 shadow-sm">
-                      <Icon className="h-6 w-6" />
+        {(() => {
+          const validValues = (content.values || []).filter((v) => Boolean(L(v.title)?.trim() || R(v.desc)?.trim()));
+          if (validValues.length === 0) return null;
+          return (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto relative z-10">
+              {validValues.map((v, idx) => {
+                const Icon = valueIcons[idx % valueIcons.length] ?? Heart;
+                return (
+                  <div
+                    key={idx}
+                    className="group p-7 sm:p-8 rounded-3xl border-2 border-[#E8722C] bg-card shadow-[0_4px_24px_rgba(232,114,44,0.12)] hover:shadow-[0_12px_40px_rgba(232,114,44,0.22)] transition-all duration-300 hover:-translate-y-1.5 text-start flex flex-col justify-between relative overflow-hidden"
+                  >
+                    {/* Live animated border beam on hover */}
+                    <div className="absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden z-20">
+                      <span className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#E8722C_85%,transparent_100%)] opacity-80" />
                     </div>
-                    <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-muted text-[#E8722C] border border-[#E8722C]/30">
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
+
+                    <div className="absolute top-0 end-0 h-32 w-32 bg-[#E8722C]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+
+                    <div className="space-y-4 relative z-10">
+                      <div className="flex items-center justify-between">
+                        <div className="h-13 w-13 rounded-2xl bg-[#E8722C]/10 text-[#E8722C] border border-[#E8722C]/30 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#E8722C] group-hover:text-white transition-all duration-300 shadow-sm">
+                          <Icon className="h-6 w-6" />
+                        </div>
+                        <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-muted text-[#E8722C] border border-[#E8722C]/30">
+                          {String(idx + 1).padStart(2, "0")}
+                        </span>
+                      </div>
+
+                      {Boolean(L(v.title)?.trim()) && (
+                        <h3 className="font-display text-xl font-bold text-foreground group-hover:text-[#E8722C] transition-colors">
+                          {L(v.title)}
+                        </h3>
+                      )}
+
+                      {Boolean(R(v.desc)?.trim()) && (
+                        <AboutRichText className="text-xs sm:text-sm text-muted-foreground leading-relaxed" value={R(v.desc)} />
+                      )}
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-border/60 flex items-center gap-1.5 text-xs font-bold text-[#E8722C] relative z-10">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      <span>{isAr ? "معيار تشغيلي صارم" : "Strict Operational Standard"}</span>
+                    </div>
                   </div>
-
-                  <h3 className="font-display text-xl font-bold text-foreground group-hover:text-[#E8722C] transition-colors">
-                    {L(v.title)}
-                  </h3>
-
-                  <AboutRichText className="text-xs sm:text-sm text-muted-foreground leading-relaxed" value={R(v.desc)} />
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-border/60 flex items-center gap-1.5 text-xs font-bold text-[#E8722C] relative z-10">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  <span>{isAr ? "معيار تشغيلي صارم" : "Strict Operational Standard"}</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          );
+        })()}
       </Section>
 
       {/* 7. CERTIFICATIONS & ACCREDITATIONS */}
@@ -639,19 +680,25 @@ function AboutPage() {
           <AboutRichText className="text-sm text-muted-foreground" value={certTitles.subtitle || R(content.certificationsSub, isAr ? "نلتزم بأعلى معايير السلامة والجودة العالمية" : "Engineered in accordance with rigorous global standards")} />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
-          {content.certifications.map((c, idx) => (
-            <div
-              key={idx}
-              className="p-4 rounded-2xl border bg-card hover:border-emerald-500/50 transition-all flex items-center gap-3 shadow-xs"
-            >
-              <div className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-              <span className="font-semibold text-xs sm:text-sm text-foreground min-w-0 break-words">{aboutPlainText(c)}</span>
+        {(() => {
+          const validCerts = (content.certifications || []).filter((c) => Boolean(aboutPlainText(c).trim()));
+          if (validCerts.length === 0) return null;
+          return (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+              {validCerts.map((c, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-2xl border bg-card hover:border-emerald-500/50 transition-all flex items-center gap-3 shadow-xs"
+                >
+                  <div className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="h-4 w-4" />
+                  </div>
+                  <span className="font-semibold text-xs sm:text-sm text-foreground min-w-0 break-words">{aboutPlainText(c)}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()}
       </Section>
 
       {/* 8. EXECUTIVE TEAM SECTION */}
@@ -671,39 +718,45 @@ function AboutPage() {
             )} />
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto relative z-10">
-          {content.team.map((m) => {
-            const dept = m.department?.en || m.department?.ar ? m.department : (departmentByKey[m.key] ?? { en: "Leadership", ar: "القيادة" });
-            const memberImg = m.image || teamImageByKey[m.key] || teamKarim;
-            return (
-              <div
-                key={m.key}
-                className="group relative rounded-3xl border-2 border-[#E8722C] bg-card overflow-hidden shadow-[0_4px_24px_rgba(232,114,44,0.12)] hover:shadow-[0_12px_44px_rgba(232,114,44,0.24)] transition-all duration-500 hover:-translate-y-2 flex flex-col text-start"
-              >
-                {/* Live animated border beam on hover */}
-                <div className="absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden z-20">
-                  <span className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#E8722C_85%,transparent_100%)] opacity-80" />
-                </div>
+        {(() => {
+          const validTeam = (content.team || []).filter((m) => Boolean(L(m.name)?.trim()));
+          if (validTeam.length === 0) return null;
+          return (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto relative z-10">
+              {validTeam.map((m) => {
+                const dept = m.department?.en || m.department?.ar ? m.department : (departmentByKey[m.key] ?? { en: "Leadership", ar: "القيادة" });
+                const memberImg = m.image || teamImageByKey[m.key] || teamKarim;
+                return (
+                  <div
+                    key={m.key}
+                    className="group relative rounded-3xl border-2 border-[#E8722C] bg-card overflow-hidden shadow-[0_4px_24px_rgba(232,114,44,0.12)] hover:shadow-[0_12px_44px_rgba(232,114,44,0.24)] transition-all duration-500 hover:-translate-y-2 flex flex-col text-start"
+                  >
+                    {/* Live animated border beam on hover */}
+                    <div className="absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden z-20">
+                      <span className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#E8722C_85%,transparent_100%)] opacity-80" />
+                    </div>
 
-                {/* Image Container */}
-                <div className="relative aspect-[4/4.5] w-[calc(100%-1.25rem)] mx-auto mt-2.5 overflow-hidden rounded-2xl bg-muted/40">
-                  <img
-                    src={memberImg}
-                    alt={L(m.name)}
-                    loading="lazy"
-                    width={512}
-                    height={512}
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-50 group-hover:opacity-30 transition-opacity duration-500" />
+                    {/* Image Container */}
+                    <div className="relative aspect-[4/4.5] w-[calc(100%-1.25rem)] mx-auto mt-2.5 overflow-hidden rounded-2xl bg-muted/40">
+                      <img
+                        src={memberImg}
+                        alt={L(m.name)}
+                        loading="lazy"
+                        width={512}
+                        height={512}
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-50 group-hover:opacity-30 transition-opacity duration-500" />
 
-                  {/* Floating Department Badge */}
-                  <div className="absolute top-3 start-3">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-background/90 backdrop-blur-md border border-[#E8722C]/40 text-foreground shadow-sm">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#E8722C] animate-pulse" />
-                      {L(dept)}
-                    </span>
-                  </div>
+                      {/* Floating Department Badge */}
+                      {Boolean(L(dept)?.trim()) && (
+                        <div className="absolute top-3 start-3">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-background/90 backdrop-blur-md border border-[#E8722C]/40 text-foreground shadow-sm">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#E8722C] animate-pulse" />
+                            {L(dept)}
+                          </span>
+                        </div>
+                      )}
 
                   {/* Floating LinkedIn */}
                   {settings.social?.linkedin && (
@@ -749,7 +802,9 @@ function AboutPage() {
             );
           })}
         </div>
-      </Section>
+      );
+    })()}
+  </Section>
       {/* 9. BOTTOM MASTER CALL-TO-ACTION */}
       <section aria-label={isAr ? "دعوة للتواصل" : "Call to action"} className="py-16 md:py-20">
         <div className="container mx-auto px-4 lg:px-8">

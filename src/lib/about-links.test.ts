@@ -14,4 +14,19 @@ describe("editable founder links", () => {
   it("hides actions when their destination is explicitly cleared", () => {
     expect(safeAboutLink("")).toBeUndefined();
   });
+
+  it("filters out empty pillars so blank pills do not render on the frontend", () => {
+    const pillars = [
+      { en: "", ar: "" },
+      { en: "Direct Oversight", ar: "إشراف تنفيذي مباشر" },
+      { en: "Tier-1 OEM Alliances", ar: "شراكات OEM كبرى" },
+    ];
+    const validEn = pillars.filter((p) => Boolean(p.en.trim()));
+    expect(validEn).toHaveLength(2);
+    expect(validEn.map((p) => p.en)).toEqual(["Direct Oversight", "Tier-1 OEM Alliances"]);
+
+    const validAr = pillars.filter((p) => Boolean(p.ar.trim()));
+    expect(validAr).toHaveLength(2);
+    expect(validAr.map((p) => p.ar)).toEqual(["إشراف تنفيذي مباشر", "شراكات OEM كبرى"]);
+  });
 });
