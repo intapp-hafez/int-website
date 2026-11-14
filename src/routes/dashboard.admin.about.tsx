@@ -120,6 +120,12 @@ function validate(form: AboutContent, hero: AboutHero): Record<string, string> {
   return errs;
 }
 
+function stripHtml(html?: string, max = 120): string {
+  const text = (html || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (!text) return "—";
+  return text.length > max ? text.slice(0, max) + "…" : text;
+}
+
 function AboutAdminPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -151,6 +157,50 @@ function AboutAdminPage() {
     image: "",
     department: { en: "", ar: "" },
   });
+
+  // Core Values view mode (Table view by default) & modal state
+  const [valuesViewMode, setValuesViewMode] = useState<"table" | "cards">("table");
+  const [valueModalOpen, setValueModalOpen] = useState(false);
+  const [editingValueIdx, setEditingValueIdx] = useState<number | null>(null);
+  const [valueForm, setValueForm] = useState<AboutValue>({
+    title: { en: "", ar: "" },
+    desc: { en: "", ar: "" },
+  });
+
+  const handleOpenAddValue = () => {
+    if (form.values.length >= 16) {
+      toast.warning("Maximum of 16 values allowed.");
+      return;
+    }
+    setEditingValueIdx(null);
+    setValueForm({
+      title: { en: "", ar: "" },
+      desc: { en: "", ar: "" },
+    });
+    setValueModalOpen(true);
+  };
+
+  const handleOpenEditValue = (idx: number) => {
+    setEditingValueIdx(idx);
+    setValueForm({
+      title: { en: form.values[idx]?.title?.en || "", ar: form.values[idx]?.title?.ar || "" },
+      desc: { en: form.values[idx]?.desc?.en || "", ar: form.values[idx]?.desc?.ar || "" },
+    });
+    setValueModalOpen(true);
+  };
+
+  const handleSaveValueModal = () => {
+    if (editingValueIdx !== null) {
+      const nextValues = form.values.map((v, i) => (i === editingValueIdx ? valueForm : v));
+      setForm({ ...form, values: nextValues });
+      toast.success(`Value #${editingValueIdx + 1} updated`);
+    } else {
+      setForm({ ...form, values: [...form.values, valueForm] });
+      toast.success(`Value #${form.values.length + 1} added`);
+    }
+    setDirty(true);
+    setValueModalOpen(false);
+  };
 
   const moveTeamMember = (fromIdx: number, toIdx: number) => {
     if (toIdx < 0 || toIdx >= form.team.length || toIdx === fromIdx) return;
@@ -1037,18 +1087,42 @@ function AboutAdminPage() {
                   Core Values
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Key organizational values highlighting integrity, engineering excellence, and customer trust.
+                  Key organizational values highlighting integrity, engineering excellence, and customer trust. Table view is active by default.
                 </CardDescription>
               </div>
-              <Button
-                type="button"
-                onClick={addValue}
-                size="sm"
-                className="gap-1.5 bg-accent hover:bg-accent/90 text-white shadow-xs"
-              >
-                <Plus className="h-4 w-4" />
-                Add Value
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center rounded-lg border bg-muted/40 p-0.5">
+                  <Button
+                    type="button"
+                    variant={valuesViewMode === "table" ? "secondary" : "ghost"}
+                    size="sm"
+                    className="h-8 px-2.5 text-xs gap-1.5 shadow-none"
+                    onClick={() => setValuesViewMode("table")}
+                  >
+                    <TableIcon className="h-3.5 w-3.5" />
+                    <span>Table</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={valuesViewMode === "cards" ? "secondary" : "ghost"}
+                    size="sm"
+                    className="h-8 px-2.5 text-xs gap-1.5 shadow-none"
+                    onClick={() => setValuesViewMode("cards")}
+                  >
+                    <LayoutGrid className="h-3.5 w-3.5" />
+                    <span>Cards</span>
+                  </Button>
+                </div>
+                <Button
+                  type="button"
+                  onClick={handleOpenAddValue}
+                  size="sm"
+                  className="gap-1.5 bg-accent hover:bg-accent/90 text-white shadow-xs text-xs h-8"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add Value
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <BiField
@@ -1057,85 +1131,290 @@ function AboutAdminPage() {
                 onChange={(lang, v) => setBi("valuesT", lang, v)}
               />
 
-              <div className="space-y-4 pt-2">
-                {form.values.map((v, idx) => (
-                  <div key={idx} className="space-y-3 border rounded-xl p-4 bg-muted/10 hover:border-accent/40 transition-colors">
-                    <div className="flex items-center justify-between pb-2 border-b border-border/40">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
-                          #{String(idx + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-sm font-semibold text-foreground">
-                          {v.title.en || v.title.ar || `Value #${idx + 1}`}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                          disabled={idx === 0}
-                          onClick={() => moveValue(idx, "up")}
-                          title="Move up"
-                        >
-                          <ArrowUp className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                          disabled={idx === form.values.length - 1}
-                          onClick={() => moveValue(idx, "down")}
-                          title="Move down"
-                        >
-                          <ArrowDown className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                          disabled={form.values.length <= 1}
-                          onClick={() => removeValue(idx)}
-                          title="Delete value"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+              {valuesViewMode === "table" ? (
+                form.values.length === 0 ? (
+                  <div className="text-center py-12 border border-dashed rounded-xl">
+                    <Award className="h-10 w-10 text-muted-foreground/40 mx-auto mb-2" />
+                    <p className="text-sm font-medium text-muted-foreground">No core values added yet.</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleOpenAddValue}
+                      className="mt-3 text-xs"
+                    >
+                      <Plus className="h-3.5 w-3.5 me-1.5" /> Add First Value
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <div className="rounded-xl border overflow-hidden bg-card">
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-muted/40 hover:bg-muted/40">
+                              <TableHead className="w-[110px] text-xs"># / Order</TableHead>
+                              <TableHead className="w-[220px] text-xs">Title (EN / AR)</TableHead>
+                              <TableHead className="text-xs">Description (EN / AR)</TableHead>
+                              <TableHead className="w-[90px] text-center text-xs">Status</TableHead>
+                              <TableHead className="w-[100px] text-end text-xs">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {form.values.map((v, idx) => {
+                              const isComplete = Boolean(
+                                v.title?.en?.trim() &&
+                                v.title?.ar?.trim() &&
+                                v.desc?.en?.trim() &&
+                                v.desc?.ar?.trim()
+                              );
+                              const hasErrors =
+                                errors[`values.${idx}.title.en`] ||
+                                errors[`values.${idx}.title.ar`] ||
+                                errors[`values.${idx}.desc.en`] ||
+                                errors[`values.${idx}.desc.ar`];
+
+                              return (
+                                <TableRow key={idx} className="hover:bg-muted/30 transition-colors">
+                                  <TableCell className="font-mono text-xs py-3">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="font-bold text-accent px-1.5 py-0.5 rounded bg-accent/10 border border-accent/20">
+                                        #{String(idx + 1).padStart(2, "0")}
+                                      </span>
+                                      <div className="flex flex-col">
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => moveValue(idx, "up")}
+                                          disabled={idx === 0}
+                                          aria-label="Move up"
+                                          title="Move up"
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <ArrowUp className="h-2.5 w-2.5" />
+                                        </Button>
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => moveValue(idx, "down")}
+                                          disabled={idx === form.values.length - 1}
+                                          aria-label="Move down"
+                                          title="Move down"
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <ArrowDown className="h-2.5 w-2.5" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="py-3">
+                                    <div className="font-semibold text-xs text-foreground leading-snug">
+                                      {v.title?.en || <span className="text-muted-foreground italic">Untitled</span>}
+                                    </div>
+                                    <div className="text-[11px] text-muted-foreground leading-snug mt-0.5" dir="rtl">
+                                      {v.title?.ar || <span className="text-muted-foreground/60 italic">—</span>}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="py-3 max-w-md">
+                                    <div className="text-xs text-foreground/90 leading-snug line-clamp-2">
+                                      {stripHtml(v.desc?.en)}
+                                    </div>
+                                    <div className="text-[11px] text-muted-foreground leading-snug line-clamp-2 mt-0.5" dir="rtl">
+                                      {stripHtml(v.desc?.ar)}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="py-3 text-center">
+                                    {hasErrors || !isComplete ? (
+                                      <Badge variant="destructive" className="text-[10px] gap-1 px-1.5 py-0 font-normal">
+                                        <AlertCircle className="h-3 w-3" /> Issues
+                                      </Badge>
+                                    ) : (
+                                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800">
+                                        Valid
+                                      </Badge>
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="py-3 text-end">
+                                    <div className="flex items-center justify-end gap-1">
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleOpenEditValue(idx)}
+                                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                        title="Edit Value"
+                                      >
+                                        <Pencil className="h-3.5 w-3.5" />
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        disabled={form.values.length <= 1}
+                                        onClick={() => removeValue(idx)}
+                                        className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                        title="Delete Value"
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
                       </div>
                     </div>
-
-                    <BiField
-                      label="Title"
-                      value={v.title}
-                      onChange={(lang, val) => setValue(idx, "title", lang, val)}
-                      errorEn={errors[`values.${idx}.title.en`]}
-                      errorAr={errors[`values.${idx}.title.ar`]}
-                    />
-                    <BiField
-                      label="Description"
-                      rows={3}
-                      value={v.desc}
-                      onChange={(lang, val) => setValue(idx, "desc", lang, val)}
-                      errorEn={errors[`values.${idx}.desc.en`]}
-                      errorAr={errors[`values.${idx}.desc.ar`]}
-                    />
+                    <Button
+                      type="button"
+                      onClick={handleOpenAddValue}
+                      variant="outline"
+                      className="w-full border-dashed border-2 py-4 gap-2 hover:border-accent hover:bg-accent/5 text-muted-foreground hover:text-accent font-semibold text-xs"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Value
+                    </Button>
                   </div>
-                ))}
+                )
+              ) : (
+                <div className="space-y-4 pt-2">
+                  {form.values.map((v, idx) => (
+                    <div key={idx} className="space-y-3 border rounded-xl p-4 bg-muted/10 hover:border-accent/40 transition-colors">
+                      <div className="flex items-center justify-between pb-2 border-b border-border/40">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
+                            #{String(idx + 1).padStart(2, "0")}
+                          </span>
+                          <span className="text-sm font-semibold text-foreground">
+                            {v.title.en || v.title.ar || `Value #${idx + 1}`}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            disabled={idx === 0}
+                            onClick={() => moveValue(idx, "up")}
+                            title="Move up"
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            disabled={idx === form.values.length - 1}
+                            onClick={() => moveValue(idx, "down")}
+                            title="Move down"
+                          >
+                            <ArrowDown className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                            disabled={form.values.length <= 1}
+                            onClick={() => removeValue(idx)}
+                            title="Delete value"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
 
-                <Button
-                  type="button"
-                  onClick={addValue}
-                  variant="outline"
-                  className="w-full border-dashed border-2 py-5 gap-2 hover:border-accent hover:bg-accent/5 text-muted-foreground hover:text-accent font-semibold"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Value Card
-                </Button>
-              </div>
+                      <BiField
+                        label="Title"
+                        value={v.title}
+                        onChange={(lang, val) => setValue(idx, "title", lang, val)}
+                        errorEn={errors[`values.${idx}.title.en`]}
+                        errorAr={errors[`values.${idx}.title.ar`]}
+                      />
+                      <BiField
+                        label="Description"
+                        rows={3}
+                        value={v.desc}
+                        onChange={(lang, val) => setValue(idx, "desc", lang, val)}
+                        errorEn={errors[`values.${idx}.desc.en`]}
+                        errorAr={errors[`values.${idx}.desc.ar`]}
+                      />
+                    </div>
+                  ))}
+
+                  <Button
+                    type="button"
+                    onClick={addValue}
+                    variant="outline"
+                    className="w-full border-dashed border-2 py-5 gap-2 hover:border-accent hover:bg-accent/5 text-muted-foreground hover:text-accent font-semibold"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Value Card
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
+
+          {/* Add / Edit Value Modal Dialog */}
+          <Dialog open={valueModalOpen} onOpenChange={setValueModalOpen}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="font-display">
+                  {editingValueIdx !== null ? `Edit Core Value #${editingValueIdx + 1}` : "Add Core Value"}
+                </DialogTitle>
+                <DialogDescription className="text-xs">
+                  Configure the core value title and rich description in English and Arabic.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 py-2">
+                <BiField
+                  label="Title"
+                  value={valueForm.title}
+                  onChange={(lang, val) =>
+                    setValueForm((current) => ({
+                      ...current,
+                      title: { ...current.title, [lang]: val },
+                    }))
+                  }
+                />
+                <BiField
+                  label="Description"
+                  rows={3}
+                  value={valueForm.desc}
+                  onChange={(lang, val) =>
+                    setValueForm((current) => ({
+                      ...current,
+                      desc: { ...current.desc, [lang]: val },
+                    }))
+                  }
+                />
+              </div>
+
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setValueModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  className="bg-accent hover:bg-accent/90 text-white"
+                  onClick={handleSaveValueModal}
+                >
+                  {editingValueIdx !== null ? "Save Changes" : "Add Value"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           <Card className="rounded-2xl border shadow-xs">
             <CardHeader>
