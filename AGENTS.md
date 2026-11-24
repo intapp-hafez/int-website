@@ -1,5 +1,8 @@
 # Architecture rules
 
+- The reference-style homepage hero is a separate component with CDN background and wheel assets; the previous hero remains hidden intact for restoration.
+- Preview bootstrap entry points use real Start runtime exports while app server helpers retain the legacy shim; the root renders HeadContent so route styles and metadata load.
+
 - Visitor review submissions use a validated pending-only payload and database moderation policies; success is shown only after a successful database response.
 
 - Team photo editors share a Storage API upload control that updates the saved image URL only after upload success, so failed uploads cannot appear persisted.

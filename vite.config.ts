@@ -34,9 +34,8 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   resolve: {
-    alias: {
-      "@tanstack/react-start/server": startShim,
-      "@tanstack/react-start": startShim,
-    },
+    // Keep the legacy app helpers without intercepting the preview runner's
+    // real /client and /server entry points.
+    alias: [{ find: /^@tanstack\/react-start$/, replacement: startShim }],
   },
 });

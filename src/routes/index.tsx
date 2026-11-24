@@ -26,6 +26,7 @@ import { InteractiveHeroWheel } from "@/components/site/InteractiveHeroWheel";
 import { supabase } from "@/integrations/supabase/client";
 import { useSectionTitle } from "@/lib/titles-store";
 import { TestimonialSubmission } from "@/components/site/TestimonialSubmission";
+import { EnterpriseHero } from "@/components/site/EnterpriseHero";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -490,6 +491,8 @@ function Home() {
   const ctaTitle = useSectionTitle("home.cta");
   return (
     <div>
+      <EnterpriseHero />
+      <div hidden aria-hidden="true" data-legacy-hero>
       {/* Hero — slider when admin slides exist, else default */}
       {activeSlides.length > 0 ? (
         <section className="relative overflow-hidden gradient-surface">
@@ -581,6 +584,8 @@ function Home() {
         </div>
       </section>
       )}
+
+      </div>
 
       {/* Stats */}
       <section className="border-y bg-muted/30">
