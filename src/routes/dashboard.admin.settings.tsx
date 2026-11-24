@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useRef, memo, type FormEvent } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle2, RotateCcw, Download, Upload, History, Trash2, Loader2, Building2, Plus, Sparkles, ShieldCheck, Headphones, Award as AwardIcon, Clock as ClockIcon, Star as StarIcon, Zap, Image as ImageIcon, ExternalLink, Play } from "lucide-react";
 import { useAdminT } from "@/lib/admin-i18n";
 import { toast } from "sonner";
-import { useRef } from "react";
 import { ChevronDown, Menu as MenuIcon, Home, Info, Briefcase, Layers as LayersIcon, Phone, ShoppingCart, Search } from "lucide-react";
 import { services as servicesData } from "@/data/site";
 import { useI18n } from "@/lib/i18n";
@@ -68,7 +67,14 @@ function HeroImageUpload({ onUploaded, label = "image" }: { onUploaded: (url: st
 
 function SettingsPage() {
   const { settings, loading, update, reset } = useSettings();
-  const [form, setForm] = useState<SiteSettings>(settings);
+  const [form, _setForm] = useState<SiteSettings>(settings);
+  const isDirty = useRef(false);
+
+  const setForm = (next: SiteSettings | ((prev: SiteSettings) => SiteSettings)) => {
+    isDirty.current = true;
+    _setForm(next);
+  };
+
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const { t: at } = useAdminT();
@@ -79,9 +85,11 @@ function SettingsPage() {
   const [history, setHistory] = useState<BackupSnapshot[]>([]);
   const [pending, setPending] = useState<{ source: "history" | "file"; payload: Record<string, unknown>; label: string } | null>(null);
 
-  // Sync form state when database settings load or change in real-time
+  // Sync form state when database settings load or change in real-time, unless user has local unsaved edits
   useEffect(() => {
-    setForm(settings);
+    if (!isDirty.current) {
+      _setForm(settings);
+    }
   }, [settings]);
 
   useEffect(() => {
@@ -174,6 +182,7 @@ function SettingsPage() {
     setSaving(true);
     try {
       await update(form);
+      isDirty.current = false;
       setSaved(true);
       toast.success("Settings saved — synced across the database and site in real time.");
       setTimeout(() => setSaved(false), 2500);
@@ -222,6 +231,7 @@ function SettingsPage() {
       setSaving(true);
       try {
         await reset();
+        isDirty.current = false;
         toast.success("Settings reset to defaults.");
       } catch (err: any) {
         toast.error(err?.message || "Failed to reset settings.");
@@ -230,6 +240,22 @@ function SettingsPage() {
       }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-display text-2xl md:text-3xl font-bold">Site Settings</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Update the contact information and social links shown across the website header and footer.
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="h-8 w-8 animate-spin text-accent" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -246,27 +272,29 @@ function SettingsPage() {
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6">
-<div className={tab==="security"?"space-y-6":"hidden"}>
-        <TurnstileSettingsCard />
-</div>
-<div className={tab==="contact"?"space-y-6":"hidden"}>
-        <Card>
-          <CardHeader><CardTitle className="font-display text-lg">Contact</CardTitle></CardHeader>
-          <CardContent className="grid md:grid-cols-2 gap-4">
-            <Field label="Email" id="email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
-            <Field label="Phone" id="phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-            <Field label="Sales email" id="sales_email" type="email" value={form.salesEmail} onChange={(v) => setForm({ ...form, salesEmail: v })} hint="Shown on the Contact page as the sales department address." />
-            <Field label="Support email" id="support_email" type="email" value={form.supportEmail} onChange={(v) => setForm({ ...form, supportEmail: v })} hint="Shown on the Contact page as the technical support address." />
-            <Field label="WhatsApp number" id="wa" value={form.whatsapp} onChange={(v) => setForm({ ...form, whatsapp: v })} hint="Digits with country code, e.g. +201007419344" />
-            <Field label="Address (English)" id="address_en" value={form.address.en} onChange={(v) => setForm({ ...form, address: { ...form.address, en: v } })} />
-            <Field label="العنوان (عربي)" id="address_ar" value={form.address.ar} onChange={(v) => setForm({ ...form, address: { ...form.address, ar: v } })} dir="rtl" />
-          </CardContent>
-        </Card>
-</div>
+        {tab === "security" && (
+          <div className="space-y-6">
+            <TurnstileSettingsCard />
+          </div>
+        )}
 
-        {/* Contact Page Hero Header & Working Hours */}
-<div className={tab==="contact"?"space-y-6":"hidden"}>
-        <Card>
+        {tab === "contact" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader><CardTitle className="font-display text-lg">Contact</CardTitle></CardHeader>
+              <CardContent className="grid md:grid-cols-2 gap-4">
+                <Field label="Email" id="email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
+                <Field label="Phone" id="phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
+                <Field label="Sales email" id="sales_email" type="email" value={form.salesEmail} onChange={(v) => setForm({ ...form, salesEmail: v })} hint="Shown on the Contact page as the sales department address." />
+                <Field label="Support email" id="support_email" type="email" value={form.supportEmail} onChange={(v) => setForm({ ...form, supportEmail: v })} hint="Shown on the Contact page as the technical support address." />
+                <Field label="WhatsApp number" id="wa" value={form.whatsapp} onChange={(v) => setForm({ ...form, whatsapp: v })} hint="Digits with country code, e.g. +201007419344" />
+                <Field label="Address (English)" id="address_en" value={form.address.en} onChange={(v) => setForm({ ...form, address: { ...form.address, en: v } })} />
+                <Field label="العنوان (عربي)" id="address_ar" value={form.address.ar} onChange={(v) => setForm({ ...form, address: { ...form.address, ar: v } })} dir="rtl" />
+              </CardContent>
+            </Card>
+
+            {/* Contact Page Hero Header & Working Hours */}
+            <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Contact Page Content & Working Hours</CardTitle>
           </CardHeader>
@@ -501,9 +529,31 @@ function SettingsPage() {
             )}
           </CardContent>
         </Card>
-</div>
 
-<div className={tab==="company"?"space-y-6":"hidden"}>
+        {/* Contact Page SEO */}
+        <Card>
+          <CardHeader><CardTitle className="font-display text-lg">Contact Page SEO</CardTitle></CardHeader>
+          <CardContent className="grid md:grid-cols-2 gap-4">
+            <Field label="Title (English)" id="cseo_title_en" value={form.contactSeo.title.en} onChange={(v) => setForm({ ...form, contactSeo: { ...form.contactSeo, title: { ...form.contactSeo.title, en: v } } })} hint="Recommended ≤ 60 characters." />
+            <Field label="العنوان (عربي)" id="cseo_title_ar" dir="rtl" value={form.contactSeo.title.ar} onChange={(v) => setForm({ ...form, contactSeo: { ...form.contactSeo, title: { ...form.contactSeo.title, ar: v } } })} />
+            <div className="space-y-1.5 md:col-span-2">
+              <Label htmlFor="cseo_desc_en">Description (English)</Label>
+              <textarea id="cseo_desc_en" value={form.contactSeo.description.en} onChange={(e) => setForm({ ...form, contactSeo: { ...form.contactSeo, description: { ...form.contactSeo.description, en: e.target.value } } })} className="flex min-h-[72px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm" />
+              <p className="text-xs text-muted-foreground">Recommended ≤ 160 characters.</p>
+            </div>
+            <div className="space-y-1.5 md:col-span-2">
+              <Label htmlFor="cseo_desc_ar">الوصف (عربي)</Label>
+              <textarea id="cseo_desc_ar" dir="rtl" value={form.contactSeo.description.ar} onChange={(e) => setForm({ ...form, contactSeo: { ...form.contactSeo, description: { ...form.contactSeo.description, ar: e.target.value } } })} className="flex min-h-[72px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm" />
+            </div>
+            <Field label="Open Graph image (English)" id="cseo_og_en" type="url" value={form.contactSeo.ogImage.en} onChange={(v) => setForm({ ...form, contactSeo: { ...form.contactSeo, ogImage: { ...form.contactSeo.ogImage, en: v } } })} hint="Absolute URL, 1200×630 recommended." />
+            <Field label="صورة Open Graph (عربي)" id="cseo_og_ar" type="url" value={form.contactSeo.ogImage.ar} onChange={(v) => setForm({ ...form, contactSeo: { ...form.contactSeo, ogImage: { ...form.contactSeo.ogImage, ar: v } } })} dir="rtl" />
+          </CardContent>
+        </Card>
+      </div>
+    )}
+
+    {tab === "company" && (
+      <div className="space-y-6">
         <Card>
           <CardHeader><CardTitle className="font-display text-lg">About & Location</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-4">
@@ -583,9 +633,8 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-</div>
 
-<div className={tab==="company"?"space-y-6":"hidden"}>
+        {/* Social Links */}
         <Card>
           <CardHeader><CardTitle className="font-display text-lg">Social Links</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-4">
@@ -596,30 +645,8 @@ function SettingsPage() {
             <Field label="YouTube URL" id="yt" type="url" value={form.social.youtube} onChange={(v) => setForm({ ...form, social: { ...form.social, youtube: v } })} />
           </CardContent>
         </Card>
-</div>
 
-<div className={tab==="contact"?"space-y-6":"hidden"}>
-        <Card>
-          <CardHeader><CardTitle className="font-display text-lg">Contact Page SEO</CardTitle></CardHeader>
-          <CardContent className="grid md:grid-cols-2 gap-4">
-            <Field label="Title (English)" id="cseo_title_en" value={form.contactSeo.title.en} onChange={(v) => setForm({ ...form, contactSeo: { ...form.contactSeo, title: { ...form.contactSeo.title, en: v } } })} hint="Recommended ≤ 60 characters." />
-            <Field label="العنوان (عربي)" id="cseo_title_ar" dir="rtl" value={form.contactSeo.title.ar} onChange={(v) => setForm({ ...form, contactSeo: { ...form.contactSeo, title: { ...form.contactSeo.title, ar: v } } })} />
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="cseo_desc_en">Description (English)</Label>
-              <textarea id="cseo_desc_en" value={form.contactSeo.description.en} onChange={(e) => setForm({ ...form, contactSeo: { ...form.contactSeo, description: { ...form.contactSeo.description, en: e.target.value } } })} className="flex min-h-[72px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm" />
-              <p className="text-xs text-muted-foreground">Recommended ≤ 160 characters.</p>
-            </div>
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="cseo_desc_ar">الوصف (عربي)</Label>
-              <textarea id="cseo_desc_ar" dir="rtl" value={form.contactSeo.description.ar} onChange={(e) => setForm({ ...form, contactSeo: { ...form.contactSeo, description: { ...form.contactSeo.description, ar: e.target.value } } })} className="flex min-h-[72px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm" />
-            </div>
-            <Field label="Open Graph image (English)" id="cseo_og_en" type="url" value={form.contactSeo.ogImage.en} onChange={(v) => setForm({ ...form, contactSeo: { ...form.contactSeo, ogImage: { ...form.contactSeo.ogImage, en: v } } })} hint="Absolute URL, 1200×630 recommended." />
-            <Field label="صورة Open Graph (عربي)" id="cseo_og_ar" type="url" value={form.contactSeo.ogImage.ar} onChange={(v) => setForm({ ...form, contactSeo: { ...form.contactSeo, ogImage: { ...form.contactSeo.ogImage, ar: v } } })} dir="rtl" />
-          </CardContent>
-        </Card>
-</div>
-
-<div className={tab==="company"?"space-y-6":"hidden"}>
+        {/* Invoice */}
         <Card>
           <CardHeader><CardTitle className="font-display text-lg">Invoice</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-4">
@@ -640,9 +667,11 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-</div>
+      </div>
+    )}
 
-<div className={tab==="home"?"space-y-6":"hidden"}>
+    {tab === "home" && (
+      <div className="space-y-6">
         {/* HOMEPAGE HERO CONFIGURATION */}
         <Card>
           <CardHeader>
@@ -1202,9 +1231,11 @@ function SettingsPage() {
             </Button>
           </CardContent>
         </Card>
-</div>
+      </div>
+    )}
 
-<div className={tab==="site"?"space-y-6":"hidden"}>
+    {tab === "site" && (
+      <div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Page Visibility</CardTitle>
@@ -1239,10 +1270,8 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-</div>
 
         {/* Header & Navigation Icons Toggle Card */}
-<div className={tab==="site"?"space-y-6":"hidden"}>
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Header & Navigation Icons</CardTitle>
@@ -1282,16 +1311,13 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-</div>
 
-<div className={tab==="site"?"space-y-6":"hidden"}>
         <VisibilityPreview
           visibility={form.visibility}
           headerIcons={form.headerIcons}
           lang={lang}
         />
-</div>
-<div className={tab==="site"?"space-y-6":"hidden"}>
+
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Sticky Contact Buttons</CardTitle>
@@ -1380,85 +1406,88 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-</div>
+      </div>
+    )}
 
-        <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" disabled={saving}>
-            {saving && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
-            Save changes
-          </Button>
-          <Button type="button" variant="outline" onClick={() => void onReset()} disabled={saving}>
-            <RotateCcw className="h-4 w-4 me-2" /> Reset to defaults
-          </Button>
-          {saved && (
-            <span className="text-sm text-emerald-600 inline-flex items-center gap-1">
-              <CheckCircle2 className="h-4 w-4" /> Saved — visible site-wide.
-            </span>
-          )}
-        </div>
+        {tab !== "backup" && tab !== "security" && (
+          <div className="flex flex-wrap items-center gap-3">
+            <Button type="submit" disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
+              Save changes
+            </Button>
+            <Button type="button" variant="outline" onClick={() => void onReset()} disabled={saving}>
+              <RotateCcw className="h-4 w-4 me-2" /> Reset to defaults
+            </Button>
+            {saved && (
+              <span className="text-sm text-emerald-600 inline-flex items-center gap-1">
+                <CheckCircle2 className="h-4 w-4" /> Saved — visible site-wide.
+              </span>
+            )}
+          </div>
+        )}
       </form>
 
-<div className={tab==="backup"?"space-y-6":"hidden"}>
-      <Card>
-        <CardHeader><CardTitle className="font-display text-lg">{at("backupRestore")}</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">{at("backupHint")}</p>
-          <div className="flex flex-wrap gap-3">
-            <Button type="button" onClick={onTakeBackup}>
-              <Download className="h-4 w-4 me-2" /> {at("takeBackup")}
-            </Button>
-            <Button type="button" variant="outline" onClick={() => fileRef.current?.click()}>
-              <Upload className="h-4 w-4 me-2" /> {at("restoreBackup")}
-            </Button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="application/json,.json"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) requestRestoreFromFile(f);
-                e.target.value = "";
-              }}
-            />
-          </div>
-        </CardContent>
-      </Card>
-</div>
+      {tab === "backup" && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader><CardTitle className="font-display text-lg">{at("backupRestore")}</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">{at("backupHint")}</p>
+              <div className="flex flex-wrap gap-3">
+                <Button type="button" onClick={onTakeBackup}>
+                  <Download className="h-4 w-4 me-2" /> {at("takeBackup")}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => fileRef.current?.click()}>
+                  <Upload className="h-4 w-4 me-2" /> {at("restoreBackup")}
+                </Button>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="application/json,.json"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) requestRestoreFromFile(f);
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-<div className={tab==="backup"?"space-y-6":"hidden"}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-display text-lg inline-flex items-center gap-2">
-            <History className="h-4 w-4" /> {at("backupHistory")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {history.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{at("noBackups")}</p>
-          ) : (
-            <ul className="divide-y">
-              {history.map((h) => (
-                <li key={h.id} className="py-2 flex items-center justify-between gap-3">
-                  <div className="text-sm">
-                    <div className="font-medium">{new Date(h.at).toLocaleString()}</div>
-                    <div className="text-xs text-muted-foreground font-mono">{h.id.slice(0, 8)}</div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setPending({ source: "history", payload: h.payload, label: new Date(h.at).toLocaleString() })}>
-                      <RotateCcw className="h-4 w-4 me-2" /> {at("restore")}
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => deleteSnapshot(h.id)} aria-label="delete">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
-</div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-display text-lg inline-flex items-center gap-2">
+                <History className="h-4 w-4" /> {at("backupHistory")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {history.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{at("noBackups")}</p>
+              ) : (
+                <ul className="divide-y">
+                  {history.map((h) => (
+                    <li key={h.id} className="py-2 flex items-center justify-between gap-3">
+                      <div className="text-sm">
+                        <div className="font-medium">{new Date(h.at).toLocaleString()}</div>
+                        <div className="text-xs text-muted-foreground font-mono">{h.id.slice(0, 8)}</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => setPending({ source: "history", payload: h.payload, label: new Date(h.at).toLocaleString() })}>
+                          <RotateCcw className="h-4 w-4 me-2" /> {at("restore")}
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => deleteSnapshot(h.id)} aria-label="delete">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <AlertDialog open={!!pending} onOpenChange={(o) => !o && setPending(null)}>
         <AlertDialogContent>
@@ -1486,7 +1515,23 @@ function SettingsPage() {
   );
 }
 
-function Field({ label, id, value, onChange, type = "text", hint, dir }: { label: string; id: string; value: string; onChange: (v: string) => void; type?: string; hint?: string; dir?: "ltr" | "rtl" }) {
+const Field = memo(function Field({
+  label,
+  id,
+  value,
+  onChange,
+  type = "text",
+  hint,
+  dir,
+}: {
+  label: string;
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  hint?: string;
+  dir?: "ltr" | "rtl";
+}) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
@@ -1494,9 +1539,9 @@ function Field({ label, id, value, onChange, type = "text", hint, dir }: { label
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
-}
+});
 
-function VisibilityPreview({
+const VisibilityPreview = memo(function VisibilityPreview({
   visibility,
   headerIcons,
   lang,
@@ -1696,4 +1741,4 @@ function VisibilityPreview({
       </CardContent>
     </Card>
   );
-}
+});
