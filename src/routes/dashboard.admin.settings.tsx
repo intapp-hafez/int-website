@@ -4,10 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useSettings, type SiteSettings, type InvoiceWatermark, type OfficeBranch } from "@/lib/settings-store";
+import { useSettings, type SiteSettings, type InvoiceWatermark, type OfficeBranch, defaultHeroConfig } from "@/lib/settings-store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle2, RotateCcw, Download, Upload, History, Trash2, Loader2, Building2, Plus } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { supabase } from "@/integrations/supabase/client";
+import { CheckCircle2, RotateCcw, Download, Upload, History, Trash2, Loader2, Building2, Plus, Sparkles, ShieldCheck, Headphones, Award as AwardIcon, Clock as ClockIcon, Star as StarIcon, Zap, Image as ImageIcon, ExternalLink, Play } from "lucide-react";
 import { useAdminT } from "@/lib/admin-i18n";
 import { toast } from "sonner";
 import { useRef } from "react";
@@ -25,6 +28,43 @@ export const Route = createFileRoute("/dashboard/admin/settings")({
   head: () => ({ meta: [{ title: "Site Settings — Admin" }] }),
   component: SettingsPage,
 });
+
+function HeroImageUpload({ onUploaded, label = "image" }: { onUploaded: (url: string) => void; label?: string }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const upload = async (file: File) => {
+    if (busy) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please choose an image file"); return; }
+    if (file.size > 10 * 1024 * 1024) { toast.error("Image must be under 10 MB"); return; }
+    setBusy(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
+      const path = `hero/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("about-images").upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("about-images").getPublicUrl(path);
+      onUploaded(data.publicUrl);
+      toast.success(`${label} uploaded successfully.`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+  return (
+    <>
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" aria-label={`Upload ${label}`} onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) void upload(file);
+      }} />
+      <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => inputRef.current?.click()} className="text-xs gap-1.5 h-8">
+        {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+        {busy ? "Uploading…" : "Upload"}
+      </Button>
+    </>
+  );
+}
 
 function SettingsPage() {
   const { settings, loading, update, reset } = useSettings();
@@ -603,6 +643,460 @@ function SettingsPage() {
 </div>
 
 <div className={tab==="home"?"space-y-6":"hidden"}>
+        {/* HOMEPAGE HERO CONFIGURATION */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="font-display text-lg flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-accent" />
+                  Homepage Hero Section
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Configure hero visual assets, layout mode, call-to-action buttons, and value badges.
+                </p>
+              </div>
+              <Badge variant="outline" className="text-xs capitalize">
+                Mode: {form.hero?.mode || "showcase"}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* 1. Hero Mode */}
+            <div className="space-y-3 pb-4 border-b">
+              <Label className="text-sm font-semibold">Hero Layout Mode</Label>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div
+                  onClick={() => setForm({ ...form, hero: { ...(form.hero || defaultHeroConfig), mode: "showcase" } })}
+                  className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                    (form.hero?.mode || "showcase") === "showcase"
+                      ? "border-accent bg-accent/5 ring-1 ring-accent"
+                      : "border-border hover:border-muted-foreground/40 bg-card"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-semibold text-sm">Enterprise Showcase</span>
+                    {(form.hero?.mode || "showcase") === "showcase" && (
+                      <CheckCircle2 className="h-4 w-4 text-accent" />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Modern high-impact hero with interactive wheel, background asset, and value badges.
+                  </p>
+                </div>
+
+                <div
+                  onClick={() => setForm({ ...form, hero: { ...(form.hero || defaultHeroConfig), mode: "slider" } })}
+                  className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                    form.hero?.mode === "slider"
+                      ? "border-accent bg-accent/5 ring-1 ring-accent"
+                      : "border-border hover:border-muted-foreground/40 bg-card"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-semibold text-sm">Carousel Sliders</span>
+                    {form.hero?.mode === "slider" && (
+                      <CheckCircle2 className="h-4 w-4 text-accent" />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Multi-slide rotating carousel configured under Sliders Management.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Visual Assets (Background & Wheel) */}
+            <div className="space-y-4 pb-4 border-b">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <ImageIcon className="h-4 w-4 text-accent" />
+                Hero Visual Assets
+              </h4>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Background Image */}
+                <div className="space-y-2 rounded-xl border p-3.5 bg-muted/10">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold">Background Visual</Label>
+                    <HeroImageUpload
+                      label="Background image"
+                      onUploaded={(url) =>
+                        setForm({
+                          ...form,
+                          hero: { ...(form.hero || defaultHeroConfig), backgroundImage: url },
+                        })
+                      }
+                    />
+                  </div>
+                  <Input
+                    value={form.hero?.backgroundImage || ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        hero: { ...(form.hero || defaultHeroConfig), backgroundImage: e.target.value },
+                      })
+                    }
+                    placeholder="Custom background image URL (or leave blank for default)"
+                    className="text-xs"
+                  />
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <div className="space-y-1">
+                      <Label className="text-[11px] text-muted-foreground">Image Fit</Label>
+                      <Select
+                        value={form.hero?.backgroundFit || "contain"}
+                        onValueChange={(val: "contain" | "cover") =>
+                          setForm({
+                            ...form,
+                            hero: { ...(form.hero || defaultHeroConfig), backgroundFit: val },
+                          })
+                        }
+                      >
+                        <SelectTrigger className="text-xs h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="contain">Contain (Full View)</SelectItem>
+                          <SelectItem value="cover">Cover (Fill Area)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px] text-muted-foreground">
+                        <Label className="text-[11px]">Opacity</Label>
+                        <span>{form.hero?.backgroundOpacity ?? 100}%</span>
+                      </div>
+                      <Slider
+                        value={[form.hero?.backgroundOpacity ?? 100]}
+                        min={10}
+                        max={100}
+                        step={5}
+                        onValueChange={([val]) =>
+                          setForm({
+                            ...form,
+                            hero: { ...(form.hero || defaultHeroConfig), backgroundOpacity: val },
+                          })
+                        }
+                        className="py-1"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Showcase Wheel Image */}
+                <div className="space-y-2 rounded-xl border p-3.5 bg-muted/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs font-semibold">Showcase Wheel</Label>
+                      <Switch
+                        checked={form.hero?.showWheel !== false}
+                        onCheckedChange={(checked) =>
+                          setForm({
+                            ...form,
+                            hero: { ...(form.hero || defaultHeroConfig), showWheel: checked },
+                          })
+                        }
+                        aria-label="Toggle showcase wheel"
+                      />
+                    </div>
+                    <HeroImageUpload
+                      label="Wheel image"
+                      onUploaded={(url) =>
+                        setForm({
+                          ...form,
+                          hero: { ...(form.hero || defaultHeroConfig), wheelImage: url },
+                        })
+                      }
+                    />
+                  </div>
+                  <Input
+                    value={form.hero?.wheelImage || ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        hero: { ...(form.hero || defaultHeroConfig), wheelImage: e.target.value },
+                      })
+                    }
+                    placeholder="Custom wheel graphic URL (or leave blank for default)"
+                    className="text-xs"
+                    disabled={form.hero?.showWheel === false}
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Displays the circular solutions graphic on the right side of the hero.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Call-to-Action Buttons */}
+            <div className="space-y-4 pb-4 border-b">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <Play className="h-4 w-4 text-accent" />
+                Hero Call-to-Action Buttons
+              </h4>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Primary Button */}
+                <div className="space-y-3 rounded-xl border p-3.5 bg-muted/10">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-accent">Primary Action Button</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-muted-foreground">Enabled</span>
+                      <Switch
+                        checked={form.hero?.primaryCta?.enabled !== false}
+                        onCheckedChange={(checked) =>
+                          setForm({
+                            ...form,
+                            hero: {
+                              ...(form.hero || defaultHeroConfig),
+                              primaryCta: {
+                                ...(form.hero?.primaryCta || defaultHeroConfig.primaryCta),
+                                enabled: checked,
+                              },
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-[11px]">Text (English)</Label>
+                      <Input
+                        value={form.hero?.primaryCta?.text?.en ?? defaultHeroConfig.primaryCta.text.en}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            hero: {
+                              ...(form.hero || defaultHeroConfig),
+                              primaryCta: {
+                                ...(form.hero?.primaryCta || defaultHeroConfig.primaryCta),
+                                text: {
+                                  ...(form.hero?.primaryCta?.text || defaultHeroConfig.primaryCta.text),
+                                  en: e.target.value,
+                                },
+                              },
+                            },
+                          })
+                        }
+                        className="text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[11px]">النص (عربي)</Label>
+                      <Input
+                        dir="rtl"
+                        value={form.hero?.primaryCta?.text?.ar ?? defaultHeroConfig.primaryCta.text.ar}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            hero: {
+                              ...(form.hero || defaultHeroConfig),
+                              primaryCta: {
+                                ...(form.hero?.primaryCta || defaultHeroConfig.primaryCta),
+                                text: {
+                                  ...(form.hero?.primaryCta?.text || defaultHeroConfig.primaryCta.text),
+                                  ar: e.target.value,
+                                },
+                              },
+                            },
+                          })
+                        }
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Destination URL</Label>
+                    <Input
+                      value={form.hero?.primaryCta?.url ?? defaultHeroConfig.primaryCta.url}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          hero: {
+                            ...(form.hero || defaultHeroConfig),
+                            primaryCta: {
+                              ...(form.hero?.primaryCta || defaultHeroConfig.primaryCta),
+                              url: e.target.value,
+                            },
+                          },
+                        })
+                      }
+                      placeholder="/contact"
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Secondary Button */}
+                <div className="space-y-3 rounded-xl border p-3.5 bg-muted/10">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-foreground">Secondary Action Button</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-muted-foreground">Enabled</span>
+                      <Switch
+                        checked={form.hero?.secondaryCta?.enabled !== false}
+                        onCheckedChange={(checked) =>
+                          setForm({
+                            ...form,
+                            hero: {
+                              ...(form.hero || defaultHeroConfig),
+                              secondaryCta: {
+                                ...(form.hero?.secondaryCta || defaultHeroConfig.secondaryCta),
+                                enabled: checked,
+                              },
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-[11px]">Text (English)</Label>
+                      <Input
+                        value={form.hero?.secondaryCta?.text?.en ?? defaultHeroConfig.secondaryCta.text.en}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            hero: {
+                              ...(form.hero || defaultHeroConfig),
+                              secondaryCta: {
+                                ...(form.hero?.secondaryCta || defaultHeroConfig.secondaryCta),
+                                text: {
+                                  ...(form.hero?.secondaryCta?.text || defaultHeroConfig.secondaryCta.text),
+                                  en: e.target.value,
+                                },
+                              },
+                            },
+                          })
+                        }
+                        className="text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[11px]">النص (عربي)</Label>
+                      <Input
+                        dir="rtl"
+                        value={form.hero?.secondaryCta?.text?.ar ?? defaultHeroConfig.secondaryCta.text.ar}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            hero: {
+                              ...(form.hero || defaultHeroConfig),
+                              secondaryCta: {
+                                ...(form.hero?.secondaryCta || defaultHeroConfig.secondaryCta),
+                                text: {
+                                  ...(form.hero?.secondaryCta?.text || defaultHeroConfig.secondaryCta.text),
+                                  ar: e.target.value,
+                                },
+                              },
+                            },
+                          })
+                        }
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Destination URL</Label>
+                    <Input
+                      value={form.hero?.secondaryCta?.url ?? defaultHeroConfig.secondaryCta.url}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          hero: {
+                            ...(form.hero || defaultHeroConfig),
+                            secondaryCta: {
+                              ...(form.hero?.secondaryCta || defaultHeroConfig.secondaryCta),
+                              url: e.target.value,
+                            },
+                          },
+                        })
+                      }
+                      placeholder="/solutions"
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Strengths & Highlights Badges */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-accent" />
+                    Hero Strengths Badges
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    The 4 credibility badges highlighted across the bottom of the hero section.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                {(form.hero?.strengths || defaultHeroConfig.strengths).map((s, idx) => (
+                  <div key={idx} className="p-3 rounded-xl border bg-card space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-accent">Strength #{idx + 1}</span>
+                      <Select
+                        value={s.iconName || "ShieldCheck"}
+                        onValueChange={(val) => {
+                          const updated = [...(form.hero?.strengths || defaultHeroConfig.strengths)];
+                          updated[idx] = { ...updated[idx], iconName: val };
+                          setForm({ ...form, hero: { ...(form.hero || defaultHeroConfig), strengths: updated } });
+                        }}
+                      >
+                        <SelectTrigger className="h-7 text-xs w-[140px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ShieldCheck">ShieldCheck</SelectItem>
+                          <SelectItem value="Layers">Layers</SelectItem>
+                          <SelectItem value="Users">Users</SelectItem>
+                          <SelectItem value="Headphones">Headphones</SelectItem>
+                          <SelectItem value="Award">Award</SelectItem>
+                          <SelectItem value="Clock">Clock</SelectItem>
+                          <SelectItem value="Star">Star</SelectItem>
+                          <SelectItem value="Sparkles">Sparkles</SelectItem>
+                          <SelectItem value="Zap">Zap</SelectItem>
+                          <SelectItem value="CheckCircle2">CheckCircle2</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        value={s.label.en}
+                        onChange={(e) => {
+                          const updated = [...(form.hero?.strengths || defaultHeroConfig.strengths)];
+                          updated[idx] = { ...updated[idx], label: { ...updated[idx].label, en: e.target.value } };
+                          setForm({ ...form, hero: { ...(form.hero || defaultHeroConfig), strengths: updated } });
+                        }}
+                        placeholder="Label (EN)"
+                        className="text-xs h-8"
+                      />
+                      <Input
+                        dir="rtl"
+                        value={s.label.ar}
+                        onChange={(e) => {
+                          const updated = [...(form.hero?.strengths || defaultHeroConfig.strengths)];
+                          updated[idx] = { ...updated[idx], label: { ...updated[idx].label, ar: e.target.value } };
+                          setForm({ ...form, hero: { ...(form.hero || defaultHeroConfig), strengths: updated } });
+                        }}
+                        placeholder="التسمية (AR)"
+                        className="text-xs h-8"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Homepage Stats</CardTitle>

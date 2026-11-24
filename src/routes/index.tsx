@@ -489,10 +489,12 @@ function Home() {
   const whyTitle = useSectionTitle("home.why");
   const partnersTitle = useSectionTitle("home.partners");
   const ctaTitle = useSectionTitle("home.cta");
+  const isSliderMode = settings?.hero?.mode === "slider";
+
   return (
     <div>
-      <EnterpriseHero />
-      <div hidden aria-hidden="true" data-legacy-hero>
+      {!isSliderMode && <EnterpriseHero />}
+      <div hidden={!isSliderMode} aria-hidden={!isSliderMode} data-legacy-hero>
       {/* Hero — slider when admin slides exist, else default */}
       {activeSlides.length > 0 ? (
         <section className="relative overflow-hidden gradient-surface">

@@ -49,6 +49,29 @@ export type HeaderIconsConfig = {
   tracking: boolean;
 };
 
+export type HeroCta = {
+  enabled: boolean;
+  text: Bilingual;
+  url: string;
+};
+
+export type HeroStrength = {
+  iconName?: string;
+  label: Bilingual;
+};
+
+export type HomepageHeroConfig = {
+  mode: "showcase" | "slider";
+  backgroundImage?: string;
+  backgroundFit: "contain" | "cover";
+  backgroundOpacity: number;
+  wheelImage?: string;
+  showWheel: boolean;
+  primaryCta: HeroCta;
+  secondaryCta: HeroCta;
+  strengths: HeroStrength[];
+};
+
 export type SiteSettings = {
   email: string;
   salesEmail: string;
@@ -74,9 +97,35 @@ export type SiteSettings = {
   sticky: StickyConfig;
   stats: HomepageStat[];
   testimonials: Testimonial[];
+  hero: HomepageHeroConfig;
 };
 
 const env = (import.meta as any).env ?? {};
+
+export const defaultHeroConfig: HomepageHeroConfig = {
+  mode: "showcase",
+  backgroundImage: "",
+  backgroundFit: "contain",
+  backgroundOpacity: 100,
+  wheelImage: "",
+  showWheel: true,
+  primaryCta: {
+    enabled: true,
+    text: { en: "Request a Consultation", ar: "طلب استشارة" },
+    url: "/contact",
+  },
+  secondaryCta: {
+    enabled: true,
+    text: { en: "Our Solutions", ar: "حلولنا" },
+    url: "/solutions",
+  },
+  strengths: [
+    { iconName: "ShieldCheck", label: { en: "Proven Expertise", ar: "خبرات مثبتة" } },
+    { iconName: "Layers", label: { en: "Integrated Solutions", ar: "حلول متكاملة" } },
+    { iconName: "Users", label: { en: "Certified Engineers", ar: "مهندسون معتمدون" } },
+    { iconName: "Headphones", label: { en: "End-to-End Support", ar: "دعم شامل" } },
+  ],
+};
 
 export const defaultSettings: SiteSettings = {
   email: env.VITE_CONTACT_EMAIL || "info@integratedtechnics.com",
@@ -152,6 +201,7 @@ export const defaultSettings: SiteSettings = {
     { value: 20, suffix: "+", label: { en: "Years of Experience", ar: "سنوات خبرة" } },
     { value: 80, suffix: "+", label: { en: "Certified Engineers", ar: "مهندس معتمد" } },
   ],
+  hero: defaultHeroConfig,
   testimonials: [
     {
       quote: {
@@ -289,6 +339,23 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
               }))
             : defaultSettings.testimonials,
           visibility: { ...defaultSettings.visibility, ...(parsed.visibility ?? {}) },
+          hero: {
+            ...defaultSettings.hero,
+            ...(parsed.hero ?? {}),
+            primaryCta: {
+              ...defaultSettings.hero.primaryCta,
+              ...(parsed.hero?.primaryCta ?? {}),
+              text: { ...defaultSettings.hero.primaryCta.text, ...(parsed.hero?.primaryCta?.text ?? {}) },
+            },
+            secondaryCta: {
+              ...defaultSettings.hero.secondaryCta,
+              ...(parsed.hero?.secondaryCta ?? {}),
+              text: { ...defaultSettings.hero.secondaryCta.text, ...(parsed.hero?.secondaryCta?.text ?? {}) },
+            },
+            strengths: Array.isArray(parsed.hero?.strengths) && parsed.hero.strengths.length > 0
+              ? parsed.hero.strengths
+              : defaultSettings.hero.strengths,
+          },
           headerIcons: {
             tracking: parsed.headerIcons?.tracking !== undefined ? Boolean(parsed.headerIcons.tracking) : defaultSettings.headerIcons.tracking,
           },
@@ -359,6 +426,29 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       branches: Array.isArray((patch as any).branches) ? (patch as any).branches : settings.branches,
       stats: (patch as any).stats ?? settings.stats,
       testimonials: (patch as any).testimonials ?? settings.testimonials,
+      hero: {
+        ...(settings.hero ?? defaultSettings.hero),
+        ...((patch as any).hero ?? {}),
+        primaryCta: {
+          ...(settings.hero?.primaryCta ?? defaultSettings.hero.primaryCta),
+          ...((patch as any).hero?.primaryCta ?? {}),
+          text: {
+            ...(settings.hero?.primaryCta?.text ?? defaultSettings.hero.primaryCta.text),
+            ...((patch as any).hero?.primaryCta?.text ?? {}),
+          },
+        },
+        secondaryCta: {
+          ...(settings.hero?.secondaryCta ?? defaultSettings.hero.secondaryCta),
+          ...((patch as any).hero?.secondaryCta ?? {}),
+          text: {
+            ...(settings.hero?.secondaryCta?.text ?? defaultSettings.hero.secondaryCta.text),
+            ...((patch as any).hero?.secondaryCta?.text ?? {}),
+          },
+        },
+        strengths: Array.isArray((patch as any).hero?.strengths)
+          ? (patch as any).hero.strengths
+          : (settings.hero?.strengths ?? defaultSettings.hero.strengths),
+      },
       visibility: { ...settings.visibility, ...((patch as any).visibility ?? {}) },
       headerIcons: { ...settings.headerIcons, ...((patch as any).headerIcons ?? {}) },
       sticky: {
