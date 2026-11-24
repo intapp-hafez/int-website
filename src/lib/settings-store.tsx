@@ -105,7 +105,7 @@ const env = (import.meta as any).env ?? {};
 export const defaultHeroConfig: HomepageHeroConfig = {
   mode: "showcase",
   backgroundImage: "",
-  backgroundFit: "contain",
+  backgroundFit: "cover",
   backgroundOpacity: 100,
   wheelImage: "",
   showWheel: true,

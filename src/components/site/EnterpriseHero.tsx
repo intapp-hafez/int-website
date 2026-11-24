@@ -58,7 +58,7 @@ export function EnterpriseHero() {
   const bgUrl = (hero.backgroundImage || "").trim() || defaultBackgroundUrl;
   const wheelUrl = (hero.wheelImage || "").trim() || defaultWheelUrl;
   const showWheel = hero.showWheel !== false;
-  const fit = hero.backgroundFit || "contain";
+  const fit = hero.backgroundFit || "cover";
   const opacity = (hero.backgroundOpacity ?? 100) / 100;
 
   const primaryCta = hero.primaryCta || defaultHeroConfig.primaryCta;

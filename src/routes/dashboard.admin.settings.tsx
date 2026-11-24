@@ -792,7 +792,7 @@ function SettingsPage() {
                     <div className="space-y-1">
                       <Label className="text-[11px] text-muted-foreground">Image Fit</Label>
                       <Select
-                        value={form.hero?.backgroundFit || "contain"}
+                        value={form.hero?.backgroundFit || "cover"}
                         onValueChange={(val: "contain" | "cover") =>
                           setForm({
                             ...form,
@@ -804,8 +804,8 @@ function SettingsPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="contain">Contain (Full View)</SelectItem>
-                          <SelectItem value="cover">Cover (Fill Area)</SelectItem>
+                          <SelectItem value="cover">Cover (Fill Screen / Edge-to-Edge)</SelectItem>
+                          <SelectItem value="contain">Contain (Letterbox / Scaled)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
