@@ -3,8 +3,13 @@ import { ArrowRight, CalendarDays, CirclePlay, Headphones, Layers, ShieldCheck, 
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useSectionTitle } from "@/lib/titles-store";
-import background from "@/assets/enterprise-background.png.asset.json";
-import wheel from "@/assets/enterprise-wheel.png.asset.json";
+import backgroundImage from "@/assets/enterprise-background.png";
+import wheelImage from "@/assets/enterprise-wheel.png";
+import backgroundAsset from "@/assets/enterprise-background.png.asset.json";
+import wheelAsset from "@/assets/enterprise-wheel.png.asset.json";
+
+const backgroundUrl = backgroundImage || backgroundAsset.url;
+const wheelUrl = wheelImage || wheelAsset.url;
 
 const disciplines = [
   { en: "Network Infrastructure", ar: "البنية التحتية للشبكات" },
@@ -26,7 +31,7 @@ export function EnterpriseHero() {
   const split = lang === "en" ? title.indexOf(" for ") : -1;
   return (
     <section className="enterprise-hero" aria-labelledby="enterprise-hero-title">
-      <img className="enterprise-hero-background" src={background.url} alt="" fetchPriority="high" />
+      <img className="enterprise-hero-background" src={backgroundUrl} alt="" fetchPriority="high" />
       <div className="enterprise-hero-inner">
         <div className="enterprise-hero-copy">
           <p className="enterprise-hero-eyebrow"><span aria-hidden="true">/</span>{content.badge || (lang === "ar" ? "تكامل الأنظمة المؤسسية" : "Enterprise System Integration")}</p>
@@ -43,7 +48,7 @@ export function EnterpriseHero() {
           </ul>
         </div>
         <div className="enterprise-hero-wheel" role="group" aria-label={lang === "ar" ? "مجالات الحلول" : "Our solution disciplines"}>
-          <img src={wheel.url} alt={lang === "ar" ? "عجلة حلول Integrated Technics" : "Integrated Technics: network infrastructure, security solutions, smart automation and audio / video"} fetchPriority="high" />
+          <img src={wheelUrl} alt={lang === "ar" ? "عجلة حلول Integrated Technics" : "Integrated Technics: network infrastructure, security solutions, smart automation and audio / video"} fetchPriority="high" />
           <div className="enterprise-hero-wheel-links">
             {disciplines.map(({ en, ar }) => <Link key={en} to="/solutions" aria-label={lang === "ar" ? ar : en} title={lang === "ar" ? ar : en} />)}
           </div>

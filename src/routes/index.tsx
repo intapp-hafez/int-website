@@ -534,7 +534,7 @@ function Home() {
                           alt={title}
                           loading="eager"
                           decoding="async"
-                          className="relative w-full h-auto aspect-square object-cover rounded-2xl"
+                          className="relative w-full h-auto aspect-square object-contain rounded-2xl"
                         />
                       </div>
                     </div>
