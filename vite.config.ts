@@ -36,6 +36,9 @@ export default defineConfig({
   resolve: {
     // Keep the legacy app helpers without intercepting the preview runner's
     // real /client and /server entry points.
-    alias: [{ find: /^@tanstack\/react-start$/, replacement: startShim }],
+    alias: [
+      { find: /^@tanstack\/react-start\/server$/, replacement: startShim },
+      { find: /^@tanstack\/react-start$/, replacement: startShim },
+    ],
   },
 });
