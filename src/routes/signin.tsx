@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { getTurnstileConfig, verifyTurnstile } from "@/lib/turnstile.functions";
 import { useAuth, isClientRole } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -38,12 +38,22 @@ function SignInPage() {
   const [siteKey, setSiteKey] = useState<string | null>(null);
   useEffect(() => { getTurnstileConfig().then((c) => setSiteKey(c.siteKey)).catch(() => {}); }, []);
 
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken((prev) => (prev === token ? prev : token));
+  }, []);
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken(null);
+  }, []);
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(""); setLoading(true);
     try {
-      const check = await verifyTurnstile({ data: { token: turnstileToken } });
-      if (!check.ok) throw new Error("Please complete the security check and try again.");
+      if (siteKey) {
+        const check = await verifyTurnstile({ data: { token: turnstileToken } });
+        if (!check.ok) throw new Error("Please complete the security check and try again.");
+      }
       const u = await signIn(email, password);
       const isClient = isClientRole(u.role);
       const dest = redirect || (isClient ? "/dashboard/workspace" : "/dashboard/admin");
@@ -99,17 +109,19 @@ function SignInPage() {
             <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">{t("signin.remember")}</Label>
           </div>
 
-          {/* Cloudflare Turnstile Bot Defense */}
-          <div className="pt-1 flex justify-center">
-            <TurnstileWidget
-              key={siteKey ?? "test"}
-              siteKey={siteKey}
-              onSuccess={(token) => setTurnstileToken(token)}
-              onExpire={() => setTurnstileToken(null)}
-              theme="auto"
-              size="flexible"
-            />
-          </div>
+          {/* Cloudflare Turnstile Bot Defense (rendered only when configured) */}
+          {siteKey && (
+            <div className="pt-1 flex justify-center">
+              <TurnstileWidget
+                key={siteKey}
+                siteKey={siteKey}
+                onSuccess={handleTurnstileSuccess}
+                onExpire={handleTurnstileExpire}
+                theme="auto"
+                size="flexible"
+              />
+            </div>
+          )}
 
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>

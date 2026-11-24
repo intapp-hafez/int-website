@@ -48,9 +48,19 @@ export function TurnstileWidget({
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
   const siteKey =
-    siteKeyProp || import.meta.env.VITE_TURNSTILE_SITE_KEY || DEFAULT_TEST_SITE_KEY;
+    siteKeyProp || import.meta.env.VITE_TURNSTILE_SITE_KEY || null;
+
+  // Keep latest callbacks in refs so inline callback changes never trigger widget unmount/render cycles
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+  const onExpireRef = useRef(onExpire);
+  onSuccessRef.current = onSuccess;
+  onErrorRef.current = onError;
+  onExpireRef.current = onExpire;
 
   useEffect(() => {
+    if (!siteKey) return;
+
     // 1. Check if turnstile script is already present
     if (window.turnstile) {
       setScriptLoaded(true);
@@ -88,14 +98,14 @@ export function TurnstileWidget({
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: siteKey,
         callback: (token: string) => {
-          onSuccess(token);
+          onSuccessRef.current?.(token);
         },
         "error-callback": (err) => {
           console.warn("[turnstile] challenge error:", err);
-          onError?.(err);
+          onErrorRef.current?.(err);
         },
         "expired-callback": () => {
-          onExpire?.();
+          onExpireRef.current?.();
         },
         theme,
         size,
@@ -112,7 +122,9 @@ export function TurnstileWidget({
         } catch {}
       }
     };
-  }, [scriptLoaded, siteKey, theme, size, onSuccess, onError, onExpire]);
+  }, [scriptLoaded, siteKey, theme, size]);
+
+  if (!siteKey) return null;
 
   return (
     <div

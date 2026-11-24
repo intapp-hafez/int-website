@@ -148,12 +148,11 @@ function RootComponent() {
   const inDashboard = pathname.startsWith("/dashboard");
 
   return (
-    <html lang="en" suppressHydrationWarning>
-    <head><HeadContent /></head>
-    <body>
-    <QueryClientProvider client={queryClient}>
-      <I18nProvider>
-        <SettingsProvider>
+    <>
+      <HeadContent />
+      <QueryClientProvider client={queryClient}>
+        <I18nProvider>
+          <SettingsProvider>
           <AboutProvider>
           <ProjectsProvider>
           <IndustriesProvider>
@@ -207,8 +206,7 @@ function RootComponent() {
       </I18nProvider>
     </QueryClientProvider>
     <Scripts />
-    </body>
-    </html>
+    </>
   );
 }
 
