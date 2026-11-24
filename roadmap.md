@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Match the homepage hero to the supplied reference while keeping the previous hero hidden and intact.
+
 - [x] Add homepage testimonial form; real pending submissions save successfully and remain hidden from public reads.
 - [ ] Apply review validation safeguards and verify Admin approval — database policy migration disabled; authenticated Admin testing unavailable. Two clearly labeled workflow test reviews await cleanup in Admin.
 

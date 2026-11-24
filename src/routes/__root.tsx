@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
+  HeadContent,
+  Scripts,
   Link,
   useRouter,
   useRouterState,
@@ -146,6 +148,9 @@ function RootComponent() {
   const inDashboard = pathname.startsWith("/dashboard");
 
   return (
+    <html lang="en" suppressHydrationWarning>
+    <head><HeadContent /></head>
+    <body>
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <SettingsProvider>
@@ -201,6 +206,9 @@ function RootComponent() {
         </SettingsProvider>
       </I18nProvider>
     </QueryClientProvider>
+    <Scripts />
+    </body>
+    </html>
   );
 }
 
