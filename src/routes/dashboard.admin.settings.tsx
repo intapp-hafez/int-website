@@ -597,13 +597,33 @@ function SettingsPage() {
               <div className="md:col-span-2">
                 <Label>Preview</Label>
                 <div className="mt-1.5 rounded-md overflow-hidden border">
-                  <iframe
-                    src={form.mapUrl}
-                    title="Map preview"
-                    className="w-full h-64"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
+                  {form.mapUrl.includes("/embed") || form.mapUrl.includes("output=embed") ? (
+                    <iframe
+                      src={form.mapUrl}
+                      title="Map preview"
+                      className="w-full h-64 border-0"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  ) : (
+                    <div className="p-4 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                      <div className="space-y-1">
+                        <div className="font-medium text-foreground">External Map Link Detected</div>
+                        <div className="text-muted-foreground">
+                          Direct links (e.g. <code className="text-[11px] bg-muted px-1 py-0.5 rounded">maps.app.goo.gl</code>) cannot be embedded in an iframe. For an interactive in-page map, use an embed URL (from Google Maps &rarr; Share &rarr; Embed a map).
+                        </div>
+                      </div>
+                      <a
+                        href={form.mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-accent hover:underline font-medium shrink-0"
+                      >
+                        <span>Open in Google Maps</span>
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
