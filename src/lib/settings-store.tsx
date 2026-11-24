@@ -385,8 +385,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void refresh();
 
+    const channelName = `site_settings_realtime_${crypto.randomUUID()}`;
     const channel = supabase
-      .channel("site_settings_realtime")
+      .channel(channelName)
       .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, () => {
         void refresh();
       })
