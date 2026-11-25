@@ -3,4 +3,4 @@ Allow: /
 Disallow: /dashboard/
 Disallow: /signin
 
-Sitemap: https://nexus-solution-craft.lovable.app/sitemap.xml
+Sitemap: https://integratedtechnics.net/sitemap.xml

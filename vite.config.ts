@@ -41,4 +41,19 @@ export default defineConfig({
       { find: /^@tanstack\/react-start$/, replacement: startShim },
     ],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("@supabase")) return "vendor-supabase";
+          if (id.includes("@tanstack")) return "vendor-tanstack";
+          if (id.includes("@radix-ui")) return "vendor-radix";
+          if (id.includes("lucide-react")) return "vendor-icons";
+          if (id.includes("recharts") || id.includes("d3-")) return "vendor-charts";
+          if (id.includes("react-dom") || id.includes("react/")) return "vendor-react";
+        },
+      },
+    },
+  },
 });

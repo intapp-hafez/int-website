@@ -34,7 +34,7 @@ export function CarouselDots({ api, className, label = "Slide navigation", itemL
     <div
       role="tablist"
       aria-label={label}
-      className={cn("mt-5 flex items-center justify-center gap-2", className)}
+      className={cn("mt-5 flex items-center justify-center gap-1", className)}
     >
       {snaps.map((_, i) => {
         const active = i === selected;
@@ -46,11 +46,16 @@ export function CarouselDots({ api, className, label = "Slide navigation", itemL
             aria-selected={active}
             aria-label={itemLabel ? itemLabel(i) : `Go to slide ${i + 1}`}
             onClick={() => api.scrollTo(i)}
-            className={cn(
-              "h-2 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              active ? "w-6 bg-accent" : "w-2 bg-muted-foreground/40 hover:bg-muted-foreground/60",
-            )}
-          />
+            className="inline-flex h-6 min-w-6 items-center justify-center px-1 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <span
+              aria-hidden="true"
+              className={cn(
+                "h-2 rounded-full transition-all",
+                active ? "w-6 bg-accent" : "w-2 bg-muted-foreground/50 hover:bg-muted-foreground/75",
+              )}
+            />
+          </button>
         );
       })}
     </div>

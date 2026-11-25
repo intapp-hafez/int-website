@@ -17,14 +17,11 @@ import { AuthProvider } from "@/lib/auth";
 import { SettingsProvider } from "@/lib/settings-store";
 import { AboutProvider } from "@/lib/about-store";
 import { ProjectsProvider } from "@/lib/projects-store";
-import { PermissionsProvider } from "@/lib/permissions-store";
-import { AccessRequestsProvider } from "@/lib/access-requests";
 import { SlidesProvider } from "@/lib/slides-store";
 import { NewsProvider } from "@/lib/news-store";
 import { SolutionsProvider } from "@/lib/solutions-store";
 import { PartnersProvider } from "@/lib/partners-store";
 import { RecommendationsProvider } from "@/lib/recommendations-store";
-import { NotificationsProvider } from "@/lib/notifications-store";
 import { TitlesProvider } from "@/lib/titles-store";
 import { useSettings, type PageKey } from "@/lib/settings-store";
 import { useI18n } from "@/lib/i18n";
@@ -125,9 +122,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
       { rel: "icon", type: "image/png", sizes: "192x192", href: "/icons/icon-192.png" },
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/icons/icon-512.png" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" },
     ],
   }),
   component: RootComponent,
@@ -138,8 +132,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 import { IndustriesProvider } from "@/lib/industries-store";
 import { ServicesProvider } from "@/lib/services-store";
 import { FaqsProvider } from "@/lib/faqs-store";
-import { SmtpProvider } from "@/lib/smtp-store";
-import { SecurityProvider } from "@/lib/security-store";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
@@ -158,15 +150,10 @@ function RootComponent() {
           <IndustriesProvider>
           <ServicesProvider>
           <FaqsProvider>
-          <SmtpProvider>
-          <SecurityProvider>
-          <PermissionsProvider>
-          <AccessRequestsProvider>
           <SlidesProvider>
           <PartnersProvider>
           <RecommendationsProvider>
           <AuthProvider>
-          <NotificationsProvider>
           <SolutionsProvider>
           <NewsProvider>
           <TitlesProvider>
@@ -188,15 +175,10 @@ function RootComponent() {
           </TitlesProvider>
           </NewsProvider>
           </SolutionsProvider>
-          </NotificationsProvider>
           </AuthProvider>
           </RecommendationsProvider>
           </PartnersProvider>
           </SlidesProvider>
-          </AccessRequestsProvider>
-          </PermissionsProvider>
-          </SecurityProvider>
-          </SmtpProvider>
           </FaqsProvider>
           </ServicesProvider>
           </IndustriesProvider>

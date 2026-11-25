@@ -5,7 +5,11 @@ import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LayoutDashboard, ShieldCheck, LogOut, User, Inbox, Settings, ShieldAlert, Images, BarChart3, Users, UserSquare2, FileText, LifeBuoy, HelpCircle, ScrollText, Lock, Briefcase, Info, Bell, MessageCircle, Search, Mail, ChevronDown, Megaphone, Wrench, FileCog, Globe, GraduationCap, ShoppingBag, Newspaper, ShieldHalf, MapPin, Building2, Tag, ArrowRight, ArrowLeft, MessageSquare, Layers, CalendarDays, Heading } from "lucide-react";
-import { useCanAccess, usePermissions, resolveAdminPage } from "@/lib/permissions-store";
+import { useCanAccess, usePermissions, resolveAdminPage, PermissionsProvider } from "@/lib/permissions-store";
+import { AccessRequestsProvider } from "@/lib/access-requests";
+import { NotificationsProvider } from "@/lib/notifications-store";
+import { SmtpProvider } from "@/lib/smtp-store";
+import { SecurityProvider } from "@/lib/security-store";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import logo from "@/assets/logo.png";
 
@@ -118,6 +122,22 @@ const adminGroups: NavGroup[] = [
 ];
 
 function DashboardLayout() {
+  return (
+    <SmtpProvider>
+      <SecurityProvider>
+        <PermissionsProvider>
+          <AccessRequestsProvider>
+            <NotificationsProvider>
+              <DashboardLayoutInner />
+            </NotificationsProvider>
+          </AccessRequestsProvider>
+        </PermissionsProvider>
+      </SecurityProvider>
+    </SmtpProvider>
+  );
+}
+
+function DashboardLayoutInner() {
   const { user, ready, signOut } = useAuth();
   const { getUserPerms } = usePermissions();
   const { lang, setLang } = useI18n();

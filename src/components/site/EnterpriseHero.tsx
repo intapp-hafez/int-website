@@ -18,8 +18,8 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useSectionTitle } from "@/lib/titles-store";
 import { useSettings, defaultHeroConfig } from "@/lib/settings-store";
-import backgroundImage from "@/assets/enterprise-background.png";
-import wheelImage from "@/assets/enterprise-wheel.png";
+import backgroundImage from "@/assets/enterprise-background.webp";
+import wheelImage from "@/assets/enterprise-wheel.webp";
 import backgroundAsset from "@/assets/enterprise-background.png.asset.json";
 import wheelAsset from "@/assets/enterprise-wheel.png.asset.json";
 
@@ -71,6 +71,9 @@ export function EnterpriseHero() {
         className="enterprise-hero-background"
         src={bgUrl}
         alt=""
+        width={1752}
+        height={897}
+        loading="eager"
         fetchPriority="high"
         style={{ objectFit: fit, opacity }}
       />
@@ -133,6 +136,10 @@ export function EnterpriseHero() {
             <img
               src={wheelUrl}
               alt={lang === "ar" ? "عجلة حلول Integrated Technics" : "Integrated Technics: network infrastructure, security solutions, smart automation and audio / video"}
+              width={564}
+              height={572}
+              loading="eager"
+              decoding="async"
               fetchPriority="high"
             />
             <div className="enterprise-hero-wheel-links">

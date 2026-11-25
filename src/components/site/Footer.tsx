@@ -32,15 +32,15 @@ export function Footer() {
           </p>
           <div className="flex gap-2.5 mt-4">
             {socials.map(({ Icon, href, label }) => (
-              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="h-8 w-8 rounded-md border border-primary-foreground/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-colors">
-                <Icon className="h-3.5 w-3.5" />
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="h-9 w-9 rounded-md border border-primary-foreground/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-colors">
+                <Icon className="h-4 w-4" />
               </a>
             ))}
           </div>
         </div>
         {show("about") || show("services") || show("solutions") || show("projects") || show("products") ? (
           <div>
-            <h4 className="font-display text-sm uppercase tracking-wider mb-2.5 opacity-90">{t("footer.quick")}</h4>
+            <h2 className="font-display text-sm uppercase tracking-wider mb-2.5 opacity-95">{t("footer.quick")}</h2>
             <ul className="space-y-1 text-sm opacity-95">
               {show("about") && <li><Link to="/about" className="footer-link">{t("nav.about")}</Link></li>}
               {show("services") && <li><Link to="/services" className="footer-link">{t("nav.services")}</Link></li>}
@@ -52,7 +52,7 @@ export function Footer() {
         ) : null}
         {show("careers") || show("news") || show("events") || show("training") || show("partners") ? (
           <div>
-            <h4 className="font-display text-sm uppercase tracking-wider mb-2.5 opacity-90">{lang === "ar" ? "الشركة" : "Company"}</h4>
+            <h2 className="font-display text-sm uppercase tracking-wider mb-2.5 opacity-95">{lang === "ar" ? "الشركة" : "Company"}</h2>
             <ul className="space-y-1 text-sm opacity-95">
               {show("careers") && <li><Link to="/careers" className="footer-link">{t("nav.careers")}</Link></li>}
               {show("news") && <li><Link to="/news" className="footer-link">{t("nav.news")}</Link></li>}
@@ -63,7 +63,7 @@ export function Footer() {
           </div>
         ) : null}
         <div>
-          <h4 className="font-display text-sm uppercase tracking-wider mb-2.5 opacity-90">{t("footer.contact")}</h4>
+          <h2 className="font-display text-sm uppercase tracking-wider mb-2.5 opacity-95">{t("footer.contact")}</h2>
           <ul className="space-y-2.5 text-sm opacity-95">
             <li className="group flex items-start gap-2 hover:text-accent transition-colors duration-300"><MapPin className="h-4 w-4 mt-0.5 shrink-0 group-hover:text-accent transition-colors duration-300" /><span>{settings.address[lang] || settings.address.en}</span></li>
             <li className="group flex items-center gap-2 hover:text-accent transition-colors duration-300"><Phone className="h-4 w-4 shrink-0 group-hover:text-accent transition-colors duration-300" /><a href={`tel:${settings.phone.replace(/\s+/g,"")}`} dir="ltr" className="hover:text-accent transition-colors duration-300">{settings.phone}</a></li>
